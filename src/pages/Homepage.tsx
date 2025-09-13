@@ -179,9 +179,9 @@ const Homepage: React.FC = () => {
         </div>
         
         <Carousel className="w-full">
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="-ml-2 md:-ml-4 pt-4">
             {newLaunches.map((product) => (
-              <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+              <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/5">
                 <ProductCard
                   product={product}
                   onSave={handleSaveProduct}
@@ -214,6 +214,14 @@ const Homepage: React.FC = () => {
                 isAuthenticated={false}
               />
             ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <Button variant="premium" size="lg" asChild>
+              <a href="/featured-products">
+                View All Featured Products <ArrowRight className="ml-2 h-5 w-5" />
+              </a>
+            </Button>
           </div>
         </div>
       </section>
@@ -281,6 +289,14 @@ const Homepage: React.FC = () => {
             </div>
           </TabsContent>
         </Tabs>
+        
+        <div className="text-center mt-12">
+          <Button variant="premium" size="lg" asChild>
+            <a href="/free-tools">
+              View All Free Tools <ArrowRight className="ml-2 h-5 w-5" />
+            </a>
+          </Button>
+        </div>
       </section>
 
       {/* Categories Section */}

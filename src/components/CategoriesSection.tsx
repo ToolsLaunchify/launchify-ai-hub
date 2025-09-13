@@ -88,7 +88,7 @@ const CategoriesSection: React.FC = () => {
         </div>
         
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
+          <Button variant="premium" size="lg" className="hover:scale-105 transition-smooth">
             View All Categories
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>

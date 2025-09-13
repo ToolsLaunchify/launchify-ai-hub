@@ -94,7 +94,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           </div>
           
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up delay-300">
+          <div className="flex justify-center mb-12 animate-slide-up delay-300">
             <Button 
               size="lg" 
               className="text-lg px-8 py-3 bg-gradient-primary hover:opacity-90"
@@ -102,14 +102,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
             >
               <Rocket className="mr-2 h-5 w-5" />
               Explore Tools
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="text-lg px-8 py-3 border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-              onClick={() => window.location.href = '/submit'}
-            >
-              Submit Your Tool
             </Button>
           </div>
           

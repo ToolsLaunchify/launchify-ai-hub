@@ -217,7 +217,11 @@ const Homepage: React.FC = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Button variant="premium" size="lg" asChild>
+            <Button 
+              size="lg" 
+              className="text-lg px-8 py-3 bg-gradient-primary hover:opacity-90" 
+              asChild
+            >
               <a href="/featured-products">
                 View All Featured Products <ArrowRight className="ml-2 h-5 w-5" />
               </a>
@@ -291,7 +295,11 @@ const Homepage: React.FC = () => {
         </Tabs>
         
         <div className="text-center mt-12">
-          <Button variant="premium" size="lg" asChild>
+          <Button 
+            size="lg" 
+            className="text-lg px-8 py-3 bg-gradient-primary hover:opacity-90" 
+            asChild
+          >
             <a href="/free-tools">
               View All Free Tools <ArrowRight className="ml-2 h-5 w-5" />
             </a>

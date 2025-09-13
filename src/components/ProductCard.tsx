@@ -94,7 +94,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   if (variant === 'list') {
     return (
-      <Card className="bg-gradient-card hover-lift transition-smooth border border-muted">
+      <Card className="card-hover border-glow">
         <div className="flex items-start p-4 space-x-4">
           <div className="flex-shrink-0">
             <img
@@ -195,7 +195,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   }
 
   return (
-    <Card className="bg-gradient-card hover-lift transition-smooth border border-muted group">
+    <Card className="card-hover border-glow group">
       <CardHeader className="p-0">
         <div className="relative overflow-hidden rounded-t-lg">
           <img

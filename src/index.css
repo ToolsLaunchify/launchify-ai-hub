@@ -6,8 +6,8 @@
 
 @layer base {
   :root {
-    /* Core Background & Text - Light Professional Theme */
-    --background: 0 0% 100%;
+    /* Core Background & Text - Blue Professional Theme */
+    --background: 220 40% 98%;
     --foreground: 240 10% 15%;
 
     /* Cards & Surfaces */
@@ -50,18 +50,21 @@
     /* Design Tokens */
     --radius: 0.75rem;
 
-    /* Custom Gradients - Light Professional Theme */
+    /* Custom Gradients - Blue Professional Theme */
     --gradient-primary: linear-gradient(135deg, hsl(259 100% 65%), hsl(264 100% 80%));
     --gradient-accent: linear-gradient(135deg, hsl(316 70% 68%), hsl(320 85% 80%));
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(240 5% 96%) 50%, hsl(259 100% 65% / 0.05) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(240 5% 98%));
+    --gradient-hero: linear-gradient(135deg, hsl(220 40% 98%) 0%, hsl(220 30% 95%) 50%, hsl(259 100% 65% / 0.08) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 20% 99%));
+    --gradient-background: linear-gradient(135deg, hsl(220 40% 98%) 0%, hsl(215 35% 96%) 100%);
 
     /* Shadows */
-    --shadow-sm: 0 2px 4px hsl(240 10% 15% / 0.06);
-    --shadow-md: 0 4px 12px hsl(240 10% 15% / 0.08);
-    --shadow-lg: 0 8px 24px hsl(240 10% 15% / 0.12);
+    --shadow-sm: 0 2px 4px hsl(220 20% 20% / 0.08);
+    --shadow-md: 0 4px 12px hsl(220 20% 20% / 0.12);
+    --shadow-lg: 0 8px 24px hsl(220 20% 20% / 0.15);
+    --shadow-xl: 0 12px 32px hsl(220 20% 20% / 0.18);
     --shadow-glow: 0 0 32px hsl(259 100% 65% / 0.25);
     --shadow-accent-glow: 0 0 32px hsl(316 70% 68% / 0.25);
+    --shadow-card-hover: 0 16px 40px hsl(220 20% 20% / 0.2);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -103,7 +106,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    background: var(--gradient-background);
+    @apply text-foreground font-sans;
   }
 }
 
@@ -134,6 +138,32 @@
     box-shadow: var(--shadow-accent-glow);
   }
 
+  /* Card Hover Effects */
+  .card-hover {
+    @apply bg-gradient-card border border-border shadow-md transition-smooth relative overflow-hidden;
+  }
+  
+  .card-hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(259 100% 65% / 0.1), transparent);
+    transition: var(--transition-smooth);
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: hsl(259 100% 65% / 0.3);
+  }
+  
+  .card-hover:hover::before {
+    left: 100%;
+  }
+
   /* Interactive Elements */
   .hover-lift {
     transition: var(--transition-smooth);
@@ -144,19 +174,26 @@
     box-shadow: var(--shadow-lg);
   }
 
-  /* Text Effects */
-  .text-gradient-primary {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+  /* Border Glow Animation */
+  .border-glow {
+    position: relative;
+    @apply border border-border transition-smooth;
   }
   
-  .text-gradient-accent {
-    background: var(--gradient-accent);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .border-glow::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, hsl(259 100% 65%), hsl(316 70% 68%), hsl(259 100% 65%));
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: var(--transition-smooth);
+  }
+  
+  .border-glow:hover::after {
+    opacity: 0.6;
+    animation: borderPulse 2s infinite;
   }
 }
 
@@ -216,4 +253,29 @@
   60% {
     transform: translateY(-4px);
   }
+}
+
+@keyframes borderPulse {
+  0%, 100% {
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Text Effects */
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

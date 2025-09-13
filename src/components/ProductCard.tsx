@@ -108,7 +108,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <Link to={`/${permalink}`} className="block group">
-                  <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                  <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors card-title">
                     {name}
                   </h3>
                 </Link>
@@ -130,11 +130,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   )}
                 </div>
                 
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-2 card-text">
                   {description}
                 </p>
                 
-                <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
+                <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground card-muted">
                   <span className="flex items-center">
                     <Clock className="w-3 h-3 mr-1" />
                     {timeAgo(launchDate)}
@@ -248,16 +248,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         
         <Link to={`/${permalink}`} className="block group">
-          <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2">
+          <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2 card-title">
             {name}
           </h3>
         </Link>
         
-        <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
+        <p className="text-sm text-muted-foreground line-clamp-3 mb-3 card-text">
           {description}
         </p>
         
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-between text-xs text-muted-foreground card-muted">
           <span className="flex items-center">
             <Clock className="w-3 h-3 mr-1" />
             {timeAgo(launchDate)}

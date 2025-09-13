@@ -6,17 +6,17 @@
 
 @layer base {
   :root {
-    /* Core Background & Text - Purple Theme like Toolify */
-    --background: 253 29% 8%;
-    --foreground: 240 20% 95%;
+    /* Core Background & Text - Light Professional Theme */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 15%;
 
     /* Cards & Surfaces */
-    --card: 251 29% 12%;
-    --card-foreground: 240 20% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 15%;
 
     /* Popovers & Modals */
-    --popover: 251 29% 12%;
-    --popover-foreground: 240 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 15%;
 
     /* Primary Purple */
     --primary: 259 100% 65%;
@@ -24,12 +24,12 @@
     --primary-glow: 264 100% 80%;
 
     /* Secondary */
-    --secondary: 251 20% 18%;
-    --secondary-foreground: 240 20% 95%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 15%;
 
     /* Muted Elements */
-    --muted: 251 20% 18%;
-    --muted-foreground: 240 10% 60%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 10% 50%;
 
     /* Pink Accent */
     --accent: 316 70% 68%;
@@ -38,30 +38,30 @@
 
     /* Status Colors */
     --destructive: 0 84% 60%;
-    --destructive-foreground: 240 20% 95%;
+    --destructive-foreground: 0 0% 100%;
     --success: 142 76% 36%;
-    --success-foreground: 240 20% 95%;
+    --success-foreground: 0 0% 100%;
 
     /* Form Elements */
-    --border: 251 20% 20%;
-    --input: 251 20% 18%;
+    --border: 240 10% 88%;
+    --input: 240 5% 96%;
     --ring: 259 100% 65%;
 
     /* Design Tokens */
     --radius: 0.75rem;
 
-    /* Custom Gradients - Purple/Pink Theme */
+    /* Custom Gradients - Light Professional Theme */
     --gradient-primary: linear-gradient(135deg, hsl(259 100% 65%), hsl(264 100% 80%));
     --gradient-accent: linear-gradient(135deg, hsl(316 70% 68%), hsl(320 85% 80%));
-    --gradient-hero: linear-gradient(135deg, hsl(253 29% 8%) 0%, hsl(251 29% 12%) 50%, hsl(259 100% 65% / 0.1) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(251 29% 12%), hsl(251 20% 18%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(240 5% 96%) 50%, hsl(259 100% 65% / 0.05) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(240 5% 98%));
 
     /* Shadows */
-    --shadow-sm: 0 2px 4px hsl(253 29% 8% / 0.2);
-    --shadow-md: 0 4px 12px hsl(253 29% 8% / 0.25);
-    --shadow-lg: 0 8px 24px hsl(253 29% 8% / 0.3);
-    --shadow-glow: 0 0 32px hsl(259 100% 65% / 0.4);
-    --shadow-accent-glow: 0 0 32px hsl(316 70% 68% / 0.4);
+    --shadow-sm: 0 2px 4px hsl(240 10% 15% / 0.06);
+    --shadow-md: 0 4px 12px hsl(240 10% 15% / 0.08);
+    --shadow-lg: 0 8px 24px hsl(240 10% 15% / 0.12);
+    --shadow-glow: 0 0 32px hsl(259 100% 65% / 0.25);
+    --shadow-accent-glow: 0 0 32px hsl(316 70% 68% / 0.25);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

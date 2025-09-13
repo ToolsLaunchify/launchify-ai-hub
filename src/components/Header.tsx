@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, User, Rocket } from 'lucide-react';
+import { Search, Menu, X, User, Rocket, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/useAuth';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -22,6 +23,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut, isAdmin } = useAuth();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,18 +118,45 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex md:items-center md:space-x-2">
-            <Button variant="ghost" size="sm" asChild>
-              <Link to="/login">
-                <User className="h-4 w-4 mr-1" />
-                Login
-              </Link>
-            </Button>
-            <Button variant="hero" size="sm" asChild>
-              <Link to="/signup">
-                <Rocket className="h-4 w-4 mr-1" />
-                Get Started
-              </Link>
-            </Button>
+            {user ? (
+              <div className="flex items-center space-x-2">
+                {isAdmin && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.location.href = '/admin'}
+                  >
+                    Admin
+                  </Button>
+                )}
+                <Button variant="ghost" size="sm">
+                  <User className="h-4 w-4 mr-1" />
+                  {user.email?.split('@')[0]}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/auth">
+                    <User className="h-4 w-4 mr-1" />
+                    Login
+                  </Link>
+                </Button>
+                <Button 
+                  size="sm"
+                  className="bg-gradient-primary hover:opacity-90"
+                  asChild
+                >
+                  <Link to="/auth">
+                    <Rocket className="h-4 w-4 mr-1" />
+                    Get Started
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}

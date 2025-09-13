@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, Grid, List, Filter, Clock, Star, Bookmark } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import ProductCard from '@/components/ProductCard';
+import CategoriesSection from '@/components/CategoriesSection';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -282,41 +283,8 @@ const Homepage: React.FC = () => {
         </Tabs>
       </section>
 
-      {/* Popular Categories */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Popular Categories</h2>
-            <p className="text-muted-foreground">
-              Browse tools by category to find exactly what you need
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category, index) => (
-              <div
-                key={category.name}
-                className="group cursor-pointer hover-lift transition-smooth"
-              >
-                <div className="bg-gradient-card rounded-lg p-6 border border-muted hover:border-primary/40">
-                  <div className={`w-12 h-12 ${category.color} rounded-lg flex items-center justify-center mb-4`}>
-                    <div className="w-6 h-6 bg-white/20 rounded"></div>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {category.name}
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    {category.count} tools available
-                  </p>
-                  <div className="flex items-center text-sm text-primary group-hover:text-primary-foreground transition-colors">
-                    Explore category <ArrowRight className="ml-1 h-4 w-4" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Categories Section */}
+      <CategoriesSection />
 
       {/* Related Suggestions */}
       <section className="py-16 container mx-auto px-4">

@@ -65,9 +65,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
                 />
                 <Button
                   type="submit"
-                  variant="hero"
                   size="lg"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 bg-gradient-primary hover:opacity-90"
                 >
                   Search
                 </Button>
@@ -96,11 +95,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-slide-up delay-300">
-            <Button variant="hero" size="lg" className="text-lg px-8 py-3">
+            <Button 
+              size="lg" 
+              className="text-lg px-8 py-3 bg-gradient-primary hover:opacity-90"
+              onClick={() => window.location.href = '/categories'}
+            >
               <Rocket className="mr-2 h-5 w-5" />
               Explore Tools
             </Button>
-            <Button variant="premium" size="lg" className="text-lg px-8 py-3">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="text-lg px-8 py-3 border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+              onClick={() => window.location.href = '/submit'}
+            >
               Submit Your Tool
             </Button>
           </div>

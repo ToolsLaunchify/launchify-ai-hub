@@ -8,6 +8,7 @@ import ProductGallery from '@/components/ProductGallery';
 import RelatedProducts from '@/components/RelatedProducts';
 import RichTextDisplay from '@/components/ui/rich-text-display';
 import { toast } from '@/hooks/use-toast';
+import { useSavedProducts } from '@/hooks/useSavedProducts';
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -226,7 +227,7 @@ const EnhancedProductDetailPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const { isProductSaved, toggleSaveProduct, loading: saveLoading } = useSavedProducts();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', slug],
@@ -246,13 +247,7 @@ const EnhancedProductDetailPage: React.FC = () => {
     enabled: !!slug,
   });
 
-  // Check if product is saved on component mount
-  useEffect(() => {
-    if (user && product) {
-      const savedProducts = JSON.parse(localStorage.getItem(`saved_products_${user.id}`) || '[]');
-      setIsSaved(savedProducts.includes(product.id));
-    }
-  }, [user, product]);
+  // Product save state is handled by useSavedProducts hook
 
   const handleCTAClick = () => {
     if (product?.affiliate_link) {
@@ -269,36 +264,8 @@ const EnhancedProductDetailPage: React.FC = () => {
   };
 
   const handleSave = () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to save products for later.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const savedProducts = JSON.parse(localStorage.getItem(`saved_products_${user.id}`) || '[]');
-    
-    if (isSaved) {
-      // Remove from saved
-      const updatedSaved = savedProducts.filter((id: string) => id !== product?.id);
-      localStorage.setItem(`saved_products_${user.id}`, JSON.stringify(updatedSaved));
-      setIsSaved(false);
-      toast({
-        title: "Removed from saved",
-        description: "Product removed from your saved list."
-      });
-    } else {
-      // Add to saved
-      const updatedSaved = [...savedProducts, product?.id];
-      localStorage.setItem(`saved_products_${user.id}`, JSON.stringify(updatedSaved));
-      setIsSaved(true);
-      toast({
-        title: "Saved for later",
-        description: "Product added to your saved list."
-      });
-    }
+    if (!product) return;
+    toggleSaveProduct(product.id);
   };
 
   const handleShare = async () => {
@@ -546,12 +513,12 @@ const EnhancedProductDetailPage: React.FC = () => {
                   size="lg" 
                   className="text-lg py-6"
                 >
-                  {isSaved ? (
+                  {product && isProductSaved(product.id) ? (
                     <BookmarkCheck className="mr-2 h-5 w-5" />
                   ) : (
                     <BookmarkPlus className="mr-2 h-5 w-5" />
                   )}
-                  {isSaved ? 'Saved' : 'Save Tool'}
+                  {product && isProductSaved(product.id) ? 'Saved' : 'Save Tool'}
                 </Button>
                 <Button 
                   onClick={handleShare}
@@ -784,12 +751,12 @@ const EnhancedProductDetailPage: React.FC = () => {
               size="lg" 
               className="text-lg py-6 px-8"
             >
-              {isSaved ? (
+              {product && isProductSaved(product.id) ? (
                 <BookmarkCheck className="mr-2 h-5 w-5" />
               ) : (
                 <BookmarkPlus className="mr-2 h-5 w-5" />
               )}
-              {isSaved ? 'Saved for Later' : 'Save for Later'}
+              {product && isProductSaved(product.id) ? 'Saved for Later' : 'Save for Later'}
             </Button>
           </div>
         </div>

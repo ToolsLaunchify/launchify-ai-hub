@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, User, Rocket, LogOut } from 'lucide-react';
+import { Search, Menu, X, User, Rocket, LogOut, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
@@ -103,6 +103,12 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
           <div className="hidden md:flex md:items-center md:space-x-2">
             {user ? (
               <div className="flex items-center space-x-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/saved">
+                    <Bookmark className="h-4 w-4 mr-1" />
+                    Saved
+                  </Link>
+                </Button>
                 {isAdmin && (
                   <Button 
                     variant="outline" 
@@ -188,18 +194,43 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                 ))}
 
                 <div className="pt-4 border-t space-y-2">
-                  <Button variant="ghost" className="w-full justify-start" asChild>
-                    <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                      <User className="h-4 w-4 mr-2" />
-                      Login
-                    </Link>
-                  </Button>
-                  <Button variant="hero" className="w-full" asChild>
-                    <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Rocket className="h-4 w-4 mr-2" />
-                      Get Started
-                    </Link>
-                  </Button>
+                  {user ? (
+                    <>
+                      <Button variant="ghost" className="w-full justify-start" asChild>
+                        <Link to="/saved" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Bookmark className="h-4 w-4 mr-2" />
+                          Saved Products
+                        </Link>
+                      </Button>
+                      {isAdmin && (
+                        <Button variant="ghost" className="w-full justify-start" asChild>
+                          <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                            <User className="h-4 w-4 mr-2" />
+                            Admin Dashboard
+                          </Link>
+                        </Button>
+                      )}
+                      <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="ghost" className="w-full justify-start" asChild>
+                        <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                          <User className="h-4 w-4 mr-2" />
+                          Login
+                        </Link>
+                      </Button>
+                      <Button variant="hero" className="w-full" asChild>
+                        <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Rocket className="h-4 w-4 mr-2" />
+                          Get Started
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </nav>
             </SheetContent>

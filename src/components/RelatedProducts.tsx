@@ -91,7 +91,7 @@ export const RelatedProducts: React.FC<RelatedProductsProps> = ({
                   </Badge>
                   
                   <Button asChild variant="ghost" size="sm" className="group/btn">
-                    <Link to={`/product/${product.slug}`}>
+                    <Link to={`/${product.slug}`}>
                       View Details
                       <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                     </Link>

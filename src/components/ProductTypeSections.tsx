@@ -18,7 +18,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Cutting-edge AI-powered solutions',
       icon: Zap,
       gradient: 'from-blue-500 to-purple-600',
-      href: '/category/ai-tools',
+      href: '/type/ai-tools',
       count: productStats?.ai_tools || 0,
       order: 1
     },
@@ -28,7 +28,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Professional software solutions',
       icon: Monitor,
       gradient: 'from-green-500 to-teal-600',
-      href: '/category/software',
+      href: '/type/software',
       count: productStats?.software || 0,
       order: 2
     },
@@ -38,7 +38,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Useful tools at no cost',
       icon: Gift,
       gradient: 'from-orange-500 to-red-600',
-      href: '/free-tools',
+      href: '/type/free-tools',
       count: productStats?.free_tools || 0,
       order: 3
     },
@@ -48,7 +48,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Templates, assets, and downloads',
       icon: Package,
       gradient: 'from-pink-500 to-purple-600',
-      href: '/category/digital-products',
+      href: '/type/digital-products',
       count: productStats?.digital_products || 0,
       order: 4
     }

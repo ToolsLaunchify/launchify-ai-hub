@@ -11,7 +11,7 @@ import { LoginPage, SignupPage } from "./pages/AuthPages";
 import AdminDashboard from "./pages/AdminDashboard";
 import CategoryPage from "./pages/CategoryPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
-import ProductTypePage from "./pages/ProductTypePage";
+import ToolTypePage from "./pages/ToolTypePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,7 +34,7 @@ const App = () => (
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/category/:slug" element={<CategoryPage />} />
                 <Route path="/product/:slug" element={<ProductDetailPage />} />
-                <Route path="/type/:type" element={<ProductTypePage />} />
+                <Route path="/type/:type" element={<ToolTypePage />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

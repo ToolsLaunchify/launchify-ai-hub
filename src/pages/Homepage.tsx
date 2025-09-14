@@ -28,11 +28,11 @@ const Homepage: React.FC = () => {
       {/* Products by Category - Main Categories */}
       <ProductsByCategorySection />
 
+      {/* Browse by Tool Type - Moved before Categories */}
+      <ProductTypeSections />
+
       {/* Categories Section */}
       <CategoriesSection />
-
-      {/* Product Type Sections */}
-      <ProductTypeSections />
     </div>
   );
 };

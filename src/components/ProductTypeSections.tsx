@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Monitor, Gift, Package } from 'lucide-react';
+import { Zap, Monitor, Gift, Package, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useProductStats } from '@/hooks/useProductStats';
 
 interface ProductTypeSectionProps {
@@ -78,9 +79,15 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
                   <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors text-center">
                     {type.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm text-center">
+                  <p className="text-muted-foreground text-sm text-center mb-4">
                     {type.description}
                   </p>
+                  <Badge className="bg-gradient-primary text-white border-none mb-4">
+                    {type.count} Tools
+                  </Badge>
+                  <Button className="w-full bg-gradient-primary hover:opacity-90 text-white border-none group-hover:bg-primary">
+                    Explore <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
                 </CardContent>
               </Card>
             </Link>

@@ -124,9 +124,11 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => window.location.href = '/admin'}
+                    asChild
                   >
-                    Admin
+                    <Link to="/admin">
+                      Admin
+                    </Link>
                   </Button>
                 )}
                 <Button variant="ghost" size="sm">

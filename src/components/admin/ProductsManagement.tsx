@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { uploadFileToStorage, generateYouTubeThumbnail, validateFileType, validateFileSize } from '@/lib/fileStorage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -253,6 +254,52 @@ const ProductsManagement: React.FC = () => {
       }
     }
 
+    // Process file attachments - upload files to storage
+    const processedFileAttachments = [];
+    for (const attachment of fileAttachments) {
+      if (attachment.fileObject) {
+        // Validate file
+        if (!validateFileSize(attachment.fileObject, 20)) {
+          toast({
+            title: "File too large",
+            description: `${attachment.name} is larger than 20MB`,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Upload file to storage
+        const fileUrl = await uploadFileToStorage(attachment.fileObject);
+        if (fileUrl) {
+          processedFileAttachments.push({
+            id: attachment.id || Math.random().toString(36).substring(2),
+            name: attachment.name || attachment.fileObject.name,
+            url: fileUrl,
+            size: attachment.fileObject.size,
+            type: attachment.fileObject.type
+          });
+        }
+      } else if (attachment.url && attachment.name) {
+        // Keep URL-based attachments
+        processedFileAttachments.push({
+          id: attachment.id || Math.random().toString(36).substring(2),
+          name: attachment.name,
+          url: attachment.url,
+          size: 0,
+          type: 'url'
+        });
+      }
+    }
+
+    // Process video courses - add thumbnails for YouTube videos
+    const processedVideoCourses = videoCourses.map(video => ({
+      id: video.id || Math.random().toString(36).substring(2),
+      title: video.title,
+      url: video.url,
+      platform: video.platform || 'youtube',
+      thumbnail: video.url ? generateYouTubeThumbnail(video.url) : undefined
+    }));
+
     const customPermalink = formData.get('custom_permalink') as string;
     const slug = customPermalink || (formData.get('name') as string).toLowerCase().replace(/\s+/g, '-');
     
@@ -277,8 +324,8 @@ const ProductsManagement: React.FC = () => {
       payment_link: formData.get('payment_link') as string,
       cta_button_text: formData.get('cta_button_text') as string || 'Learn More',
       custom_permalink: customPermalink,
-      file_attachments: fileAttachments,
-      video_courses: videoCourses,
+      file_attachments: processedFileAttachments,
+      video_courses: processedVideoCourses,
       custom_code: formData.get('custom_code') as string,
     };
 
@@ -290,7 +337,13 @@ const ProductsManagement: React.FC = () => {
   };
 
   const addFileAttachment = () => {
-    setFileAttachments([...fileAttachments, { type: 'url', name: '', url: '' }]);
+    setFileAttachments([...fileAttachments, { 
+      id: Math.random().toString(36).substring(2),
+      type: 'url', 
+      name: '', 
+      url: '',
+      fileObject: null 
+    }]);
   };
 
   const removeFileAttachment = (index: number) => {
@@ -304,7 +357,12 @@ const ProductsManagement: React.FC = () => {
   };
 
   const addVideoCourse = () => {
-    setVideoCourses([...videoCourses, { title: '', url: '', platform: 'youtube' }]);
+    setVideoCourses([...videoCourses, { 
+      id: Math.random().toString(36).substring(2),
+      title: '', 
+      url: '', 
+      platform: 'youtube' 
+    }]);
   };
 
   const removeVideoCourse = (index: number) => {
@@ -570,17 +628,32 @@ const ProductsManagement: React.FC = () => {
                         <Label className="text-sm">Upload File</Label>
                         <Input
                           type="file"
-                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
-                          onChange={async (e) => {
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.mp4,.mov,.avi"
+                          onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              // Handle file upload to Supabase storage
-                              const fileName = `${Date.now()}-${file.name}`;
-                              updateFileAttachment(index, 'fileName', fileName);
+                              // Validate file size (20MB limit)
+                              if (!validateFileSize(file, 20)) {
+                                toast({
+                                  title: "File too large",
+                                  description: "File must be smaller than 20MB",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+                              
+                              // Store file object for later upload
                               updateFileAttachment(index, 'fileObject', file);
+                              updateFileAttachment(index, 'name', file.name);
+                              updateFileAttachment(index, 'url', ''); // Clear URL when file is selected
                             }
                           }}
                         />
+                        {attachment.fileObject && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Selected: {attachment.fileObject.name} ({(attachment.fileObject.size / 1024 / 1024).toFixed(1)} MB)
+                          </div>
+                        )}
                       </div>
                       <div>
                         <Label className="text-sm">Or Enter URL</Label>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Grid, List, Filter, Clock, Star, Bookmark } from 'lucide-react';
+import { ArrowRight, Grid, List, Filter } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
 import ProductCard from '@/components/ProductCard';
 import CategoriesSection from '@/components/CategoriesSection';
@@ -14,6 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { useProducts, useFreeToolsByCategory } from '@/hooks/useProducts';
 
 // Mock data - Replace with actual data from Supabase
 const mockProducts = [
@@ -146,6 +147,11 @@ const Homepage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeCategory, setActiveCategory] = useState('all');
 
+  // Fetch real data from Supabase
+  const { data: newlyLaunchedProducts = [] } = useProducts({ isNewlyLaunched: true, limit: 4 });
+  const { data: featuredProducts = [] } = useProducts({ isFeatured: true });
+  const { data: freeToolsData, isLoading: freeToolsLoading } = useFreeToolsByCategory();
+
   const handleSearch = (query: string) => {
     console.log('Searching for:', query);
     // Implement search functionality
@@ -156,9 +162,14 @@ const Homepage: React.FC = () => {
     // Implement save functionality
   };
 
-  const newLaunches = mockProducts.slice(0, 4);
-  const featuredProducts = mockProducts.filter(p => p.isFeatured);
-  const freeTools = mockProducts.filter(p => p.isFree);
+  // Process free tools data
+  const freeToolCategories = freeToolsData?.categories || [];
+  const allFreeTools = freeToolsData?.products || [];
+  
+  // Filter free tools by active category
+  const filteredFreeTools = activeCategory === 'all' 
+    ? allFreeTools 
+    : allFreeTools.filter(product => product.category?.slug === activeCategory);
 
   return (
     <div className="min-h-screen bg-background">
@@ -184,15 +195,46 @@ const Homepage: React.FC = () => {
         
         <Carousel className="w-full">
           <CarouselContent className="-ml-2 md:-ml-4 pt-4">
-            {newLaunches.map((product) => (
-              <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/5">
-                <ProductCard
-                  product={product}
-                  onSave={handleSaveProduct}
-                  isAuthenticated={false}
-                />
-              </CarouselItem>
-            ))}
+            {newlyLaunchedProducts.length > 0 ? (
+              newlyLaunchedProducts.map((product) => (
+                <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <ProductCard
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      description: product.description || '',
+                      image: product.image_url || '/placeholder.svg',
+                      category: product.category?.name || 'Uncategorized',
+                      isFree: product.is_free || false,
+                      isFeatured: product.is_featured || false,
+                      originalPrice: product.original_price || undefined,
+                      discountedPrice: product.discounted_price || undefined,
+                      currency: (product.currency as 'USD' | 'INR') || 'USD',
+                      ctaText: product.cta_button_text || 'Learn More',
+                      launchDate: product.created_at,
+                      viewsCount: product.views_count || 0,
+                      permalink: product.slug,
+                      isAffiliate: !!product.affiliate_link,
+                      affiliateLink: product.affiliate_link || undefined,
+                      paymentLink: product.payment_link || undefined,
+                    }}
+                    onSave={handleSaveProduct}
+                    isAuthenticated={false}
+                  />
+                </CarouselItem>
+              ))
+            ) : (
+              // Fallback to mock data if no real data
+              mockProducts.slice(0, 3).map((product) => (
+                <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <ProductCard
+                    product={product}
+                    onSave={handleSaveProduct}
+                    isAuthenticated={false}
+                  />
+                </CarouselItem>
+              ))
+            )}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
@@ -210,14 +252,44 @@ const Homepage: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onSave={handleSaveProduct}
-                isAuthenticated={false}
-              />
-            ))}
+            {featuredProducts.length > 0 ? (
+              featuredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    description: product.description || '',
+                    image: product.image_url || '/placeholder.svg',
+                    category: product.category?.name || 'Uncategorized',
+                    isFree: product.is_free || false,
+                    isFeatured: product.is_featured || false,
+                    originalPrice: product.original_price || undefined,
+                    discountedPrice: product.discounted_price || undefined,
+                    currency: (product.currency as 'USD' | 'INR') || 'USD',
+                    ctaText: product.cta_button_text || 'Learn More',
+                    launchDate: product.created_at,
+                    viewsCount: product.views_count || 0,
+                    permalink: product.slug,
+                    isAffiliate: !!product.affiliate_link,
+                    affiliateLink: product.affiliate_link || undefined,
+                    paymentLink: product.payment_link || undefined,
+                  }}
+                  onSave={handleSaveProduct}
+                  isAuthenticated={false}
+                />
+              ))
+            ) : (
+              // Fallback to mock data
+              mockProducts.filter(p => p.isFeatured).map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onSave={handleSaveProduct}
+                  isAuthenticated={false}
+                />
+              ))
+            )}
           </div>
           
           <div className="text-center mt-12">
@@ -244,20 +316,43 @@ const Homepage: React.FC = () => {
         </div>
 
         <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-8">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="ai">AI Tools</TabsTrigger>
-            <TabsTrigger value="design">Design</TabsTrigger>
-            <TabsTrigger value="productivity">Productivity</TabsTrigger>
-            <TabsTrigger value="developer">Developer</TabsTrigger>
-            <TabsTrigger value="marketing">Marketing</TabsTrigger>
-          </TabsList>
+          <div className="flex flex-wrap gap-2 mb-8 justify-center">
+            <button
+              onClick={() => setActiveCategory('all')}
+              className={`px-4 py-2 rounded-lg border-2 transition-smooth font-medium ${
+                activeCategory === 'all'
+                  ? 'bg-gradient-primary text-white border-primary shadow-glow'
+                  : 'bg-card text-card-foreground border-border hover:border-primary/50'
+              }`}
+            >
+              All ({allFreeTools.length})
+            </button>
+            {freeToolCategories.map((category) => {
+              const categoryToolsCount = allFreeTools.filter(
+                product => product.category?.id === category.id
+              ).length;
+              
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.slug)}
+                  className={`px-4 py-2 rounded-lg border-2 transition-smooth font-medium ${
+                    activeCategory === category.slug
+                      ? 'bg-gradient-primary text-white border-primary shadow-glow'
+                      : 'bg-card text-card-foreground border-border hover:border-primary/50'
+                  }`}
+                >
+                  {category.name} ({categoryToolsCount})
+                </button>
+              );
+            })}
+          </div>
 
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                {freeTools.length} free tools found
+                {filteredFreeTools.length} free tools found
               </span>
             </div>
             
@@ -279,23 +374,73 @@ const Homepage: React.FC = () => {
             </div>
           </div>
 
-          <TabsContent value={activeCategory} className="mt-0">
-            <div className={`grid gap-6 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                : 'grid-cols-1'
-            }`}>
-              {freeTools.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  variant={viewMode === 'grid' ? 'card' : 'list'}
-                  onSave={handleSaveProduct}
-                  isAuthenticated={false}
-                />
-              ))}
-            </div>
-          </TabsContent>
+          <div className="mt-0">
+            {freeToolsLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="bg-card border border-border rounded-lg p-6 animate-pulse">
+                    <div className="w-full h-48 bg-muted rounded-lg mb-4"></div>
+                    <div className="h-4 bg-muted rounded mb-2"></div>
+                    <div className="h-3 bg-muted rounded w-3/4"></div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredFreeTools.length > 0 ? (
+              <div className={`grid gap-6 ${
+                viewMode === 'grid' 
+                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                  : 'grid-cols-1'
+              }`}>
+                {filteredFreeTools.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      description: product.description || '',
+                      image: product.image_url || '/placeholder.svg',
+                      category: product.category?.name || 'Uncategorized',
+                      isFree: product.is_free || false,
+                      isFeatured: product.is_featured || false,
+                      originalPrice: product.original_price || undefined,
+                      discountedPrice: product.discounted_price || undefined,
+                      currency: (product.currency as 'USD' | 'INR') || 'USD',
+                      ctaText: product.cta_button_text || 'Learn More',
+                      launchDate: product.created_at,
+                      viewsCount: product.views_count || 0,
+                      permalink: product.slug,
+                      isAffiliate: !!product.affiliate_link,
+                      affiliateLink: product.affiliate_link || undefined,
+                      paymentLink: product.payment_link || undefined,
+                    }}
+                    variant={viewMode === 'grid' ? 'card' : 'list'}
+                    onSave={handleSaveProduct}
+                    isAuthenticated={false}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-24 h-24 bg-muted rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Filter className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No free tools found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {activeCategory === 'all' 
+                    ? "There are no free tools available yet." 
+                    : `No free tools found in the ${freeToolCategories.find(c => c.slug === activeCategory)?.name || activeCategory} category.`
+                  }
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setActiveCategory('all')}
+                  className="bg-gradient-primary text-white border-primary hover:opacity-90"
+                >
+                  View All Categories
+                </Button>
+              </div>
+            )}
+          </div>
         </Tabs>
         
         <div className="text-center mt-12">

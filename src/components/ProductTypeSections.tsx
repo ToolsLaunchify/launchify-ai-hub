@@ -58,8 +58,8 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
     <section className="py-12 bg-muted/20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-4">Explore by Category</h2>
-          <p className="text-muted-foreground">Find exactly what you're looking for</p>
+          <h2 className="text-3xl font-bold mb-4">Browse by Tool Type</h2>
+          <p className="text-muted-foreground">Quick access to your favorite tool categories</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -70,14 +70,17 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
                   <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${type.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                     <type.icon className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors text-center">
                     {type.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm mb-2">
+                  <p className="text-muted-foreground text-sm mb-2 text-center">
                     {type.description}
                   </p>
                   <div className="text-sm font-semibold text-white bg-gradient-primary px-3 py-1 rounded-full">
-                    {type.count} Tools
+                    {type.id === 'ai_tools' ? 'View All Tools' : 
+                     type.id === 'software' ? 'View All Software' : 
+                     type.id === 'free_tools' ? 'View All Free Tools' : 
+                     'View All Digital Products'}
                   </div>
                 </CardContent>
               </Card>

@@ -7,6 +7,7 @@ import HeroSection from '@/components/HeroSection';
 import CombinedLaunchesSection from '@/components/CombinedLaunchesSection';
 import ProductsByCategorySection from '@/components/ProductsByCategorySection';
 import CategoriesSection from '@/components/CategoriesSection';
+import ProductTypeSections from '@/components/ProductTypeSections';
 import ProductCard from '@/components/ProductCard';
 import { useProducts, useFreeToolsByCategory } from '@/hooks/useProducts';
 
@@ -29,6 +30,9 @@ const Homepage: React.FC = () => {
 
       {/* Categories Section */}
       <CategoriesSection />
+
+      {/* Product Type Sections */}
+      <ProductTypeSections />
     </div>
   );
 };

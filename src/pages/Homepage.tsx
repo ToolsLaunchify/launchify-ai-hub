@@ -22,14 +22,14 @@ const Homepage: React.FC = () => {
       {/* Hero Section */}
       <HeroSection onSearch={handleSearch} />
 
+      {/* Browse by Tool Type - Right after Hero */}
+      <ProductTypeSections />
+
       {/* Combined Latest Launches & Featured Products */}
       <CombinedLaunchesSection />
 
       {/* Products by Category - Main Categories */}
       <ProductsByCategorySection />
-
-      {/* Browse by Tool Type - Moved before Categories */}
-      <ProductTypeSections />
 
       {/* Categories Section */}
       <CategoriesSection />

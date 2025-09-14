@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -162,21 +162,34 @@ const ToolTypePage: React.FC = () => {
 
         {/* Categories Grid */}
         {categories.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {categories.map((category) => (
               <Link key={category.id} to={`/category/${category.slug}`}>
-                <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer border-muted/20 hover:border-primary/20 h-full">
-                  <CardContent className="p-6 text-center h-full flex flex-col">
-                    <div className="text-4xl mb-4">{category.icon || '📂'}</div>
-                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                <Card className="bg-card border-border hover-lift transition-smooth cursor-pointer group">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">
+                      {category.icon || '📂'}
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
                       {category.name}
                     </h3>
-                    <p className="text-muted-foreground text-sm mb-4 flex-grow">
+                    <p className="text-sm text-muted-foreground mb-2">
                       {category.description}
                     </p>
-                    <Badge variant="outline" className="mt-auto">
-                      {category.product_count} {category.product_count === 1 ? 'Tool' : 'Tools'}
+                    <Badge 
+                      variant="secondary" 
+                      className="mb-4 text-xs font-medium bg-gradient-primary text-white"
+                    >
+                      {category.product_count} Tools
                     </Badge>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full bg-gradient-primary hover:opacity-90 text-white border-none"
+                    >
+                      Explore
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
                   </CardContent>
                 </Card>
               </Link>

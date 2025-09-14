@@ -48,21 +48,21 @@ const CombinedLaunchesSection: React.FC = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 bg-muted border">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 bg-card border-2 border-border rounded-lg p-1 shadow-sm">
             <TabsTrigger 
               value="latest" 
-              className="flex items-center space-x-2 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+              className="flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-300 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-glow data-[state=active]:scale-105 hover:bg-muted/50"
             >
-              <Badge variant={activeTab === 'latest' ? 'default' : 'secondary'} className="text-xs">
+              <Badge variant={activeTab === 'latest' ? 'default' : 'secondary'} className="text-xs bg-white/20 text-current border-0">
                 {latestProducts.length}
               </Badge>
-              <span>Latest Launches</span>
+              <span>New Launches</span>
             </TabsTrigger>
             <TabsTrigger 
               value="featured" 
-              className="flex items-center space-x-2 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+              className="flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-300 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-glow data-[state=active]:scale-105 hover:bg-muted/50"
             >
-              <Badge variant={activeTab === 'featured' ? 'default' : 'secondary'} className="text-xs">
+              <Badge variant={activeTab === 'featured' ? 'default' : 'secondary'} className="text-xs bg-white/20 text-current border-0">
                 {featuredProducts.length}
               </Badge>
               <span>Featured Tools</span>

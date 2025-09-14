@@ -256,8 +256,13 @@ const ProductsManagement: React.FC = () => {
 
     // Process file attachments - upload files to storage
     const processedFileAttachments = [];
+    
+    console.log('Processing file attachments:', fileAttachments);
+    
     for (const attachment of fileAttachments) {
-      if (attachment.fileObject) {
+      console.log('Processing attachment:', attachment);
+      
+      if (attachment.fileObject && attachment.fileObject instanceof File) {
         // Validate file
         const sizeValidation = validateFileSize(attachment.fileObject);
         if (!sizeValidation.isValid) {
@@ -269,20 +274,29 @@ const ProductsManagement: React.FC = () => {
           return;
         }
 
+        console.log('Uploading file:', attachment.fileObject.name);
+        
         // Upload file to storage
         const fileUrl = await uploadFileToStorage(attachment.fileObject, 'attachments');
+        
+        console.log('Upload result:', fileUrl);
+        
         if (fileUrl) {
-          processedFileAttachments.push({
+          const processedAttachment = {
             id: attachment.id || Math.random().toString(36).substring(2),
-            title: attachment.name || attachment.fileObject.name, // Add title for landing page
+            title: attachment.name || attachment.fileObject.name,
             name: attachment.name || attachment.fileObject.name,
             url: fileUrl,
             size: attachment.fileObject.size,
             type: attachment.fileObject.type,
-            description: attachment.description || '' // Add description field
-          });
+            description: attachment.description || ''
+          };
+          
+          console.log('Added processed attachment:', processedAttachment);
+          processedFileAttachments.push(processedAttachment);
         } else {
           // Upload failed - show error and stop form submission
+          console.error('Upload failed for:', attachment.fileObject.name);
           toast({
             title: "Upload failed",
             description: `Failed to upload ${attachment.name || attachment.fileObject.name}. Please try again.`,
@@ -292,17 +306,24 @@ const ProductsManagement: React.FC = () => {
         }
       } else if (attachment.url && attachment.name) {
         // Keep URL-based attachments
-        processedFileAttachments.push({
+        const processedAttachment = {
           id: attachment.id || Math.random().toString(36).substring(2),
-          title: attachment.name, // Add title for landing page
+          title: attachment.name,
           name: attachment.name,
           url: attachment.url,
           size: 0,
           type: 'url',
-          description: attachment.description || '' // Add description field
-        });
+          description: attachment.description || ''
+        };
+        
+        console.log('Added URL-based attachment:', processedAttachment);
+        processedFileAttachments.push(processedAttachment);
+      } else {
+        console.warn('Skipping invalid attachment:', attachment);
       }
     }
+    
+    console.log('Final processed file attachments:', processedFileAttachments);
 
     // Process video courses - add thumbnails for YouTube videos
     const processedVideoCourses = videoCourses.map(video => ({
@@ -355,6 +376,7 @@ const ProductsManagement: React.FC = () => {
       type: 'url', 
       name: '', 
       url: '',
+      description: '',
       fileObject: null 
     }]);
   };
@@ -677,6 +699,14 @@ const ProductsManagement: React.FC = () => {
                           onChange={(e) => updateFileAttachment(index, 'url', e.target.value)}
                         />
                       </div>
+                    </div>
+                    <div>
+                      <Label className="text-sm">Description (Optional)</Label>
+                      <Input
+                        placeholder="Brief description of the file"
+                        value={attachment.description || ''}
+                        onChange={(e) => updateFileAttachment(index, 'description', e.target.value)}
+                      />
                     </div>
                   </div>
                 ))}

@@ -25,6 +25,9 @@ export const uploadFileToStorage = async (
     const sizeValidation = validateFileSize(file);
     if (!sizeValidation.isValid) {
       console.error('File size validation failed:', sizeValidation.message);
+      toast.error('File too large', {
+        description: sizeValidation.message,
+      });
       return null;
     }
 
@@ -34,13 +37,16 @@ export const uploadFileToStorage = async (
 
     console.log(`Uploading file: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB) to bucket: ${bucket}`);
 
-    const { error: uploadError } = await supabase.storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(filePath, file);
 
     if (uploadError) {
       console.error('Upload error:', uploadError);
       console.error('File details:', { name: file.name, size: file.size, type: file.type });
+      toast.error('Upload failed', {
+        description: `Failed to upload ${file.name}: ${uploadError.message}`,
+      });
       return null;
     }
 
@@ -49,10 +55,31 @@ export const uploadFileToStorage = async (
       .getPublicUrl(filePath);
 
     console.log(`File uploaded successfully: ${data.publicUrl}`);
+    
+    // Verify the file was uploaded by checking if it exists
+    const { data: fileExists, error: checkError } = await supabase.storage
+      .from(bucket)
+      .list('', { search: fileName });
+    
+    if (checkError || !fileExists || fileExists.length === 0) {
+      console.error('File verification failed:', checkError);
+      toast.error('Upload verification failed', {
+        description: 'File upload may not have completed successfully',
+      });
+      return null;
+    }
+
+    toast.success('File uploaded successfully', {
+      description: `${file.name} has been uploaded`,
+    });
+    
     return data.publicUrl;
   } catch (error) {
     console.error('File upload error:', error);
     console.error('File details:', { name: file.name, size: file.size, type: file.type });
+    toast.error('Upload error', {
+      description: `An error occurred while uploading ${file.name}`,
+    });
     return null;
   }
 };

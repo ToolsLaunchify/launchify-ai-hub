@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import KeyFeaturesSection from '@/components/KeyFeaturesSection';
+import ProductGallery from '@/components/ProductGallery';
+import RelatedProducts from '@/components/RelatedProducts';
 import { toast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -441,32 +444,12 @@ const EnhancedProductDetailPage: React.FC = () => {
           </Button>
 
           <div className="grid lg:grid-cols-2 gap-12 mb-12">
-            {/* Product Image */}
+            {/* Product Image Gallery */}
             <div className="space-y-6">
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted/50 to-muted shadow-2xl">
-                <img
-                  src={product.image_url || '/placeholder.svg'}
-                  alt={product.name}
-                  className="w-full h-96 object-cover hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute top-6 left-6 flex flex-wrap gap-2">
-                  {product.is_featured && (
-                    <Badge className="bg-gradient-accent shadow-lg">Featured</Badge>
-                  )}
-                  {product.is_free && (
-                    <Badge className="bg-gradient-primary shadow-lg">Free</Badge>
-                  )}
-                  {product.is_newly_launched && (
-                    <Badge variant="secondary" className="shadow-lg">New Launch</Badge>
-                  )}
-                  {product.is_trending && (
-                    <Badge variant="outline" className="shadow-lg">Trending</Badge>
-                  )}
-                  {product.is_editors_choice && (
-                    <Badge className="bg-gradient-hero shadow-lg">Editor's Choice</Badge>
-                  )}
-                </div>
-              </div>
+              <ProductGallery 
+                images={product.image_url ? [product.image_url] : ['/placeholder.svg']} 
+                productName={product.name} 
+              />
             </div>
 
             {/* Product Info */}
@@ -640,10 +623,11 @@ const EnhancedProductDetailPage: React.FC = () => {
                             {file.description || 'Download file'}
                           </p>
                         </div>
-                        <Button 
+                         <Button 
                           onClick={() => handleDownload(file)}
                           variant="outline" 
                           size="sm"
+                          disabled={!file.url}
                         >
                           <Download className="h-4 w-4 mr-2" />
                           Download
@@ -818,6 +802,9 @@ const EnhancedProductDetailPage: React.FC = () => {
           onClose={() => setIsVideoModalOpen(false)} 
         />
       )}
+
+      {/* Related Products Section */}
+      <RelatedProducts currentProduct={product} maxProducts={3} />
     </div>
   );
 };

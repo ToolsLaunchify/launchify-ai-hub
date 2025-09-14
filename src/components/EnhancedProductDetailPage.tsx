@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,13 +16,24 @@ import {
   Gift,
   CheckCircle,
   Zap,
-  Shield
+  Shield,
+  Users,
+  Trophy,
+  ChevronRight,
+  FileText,
+  PlayCircle,
+  X,
+  Smartphone,
+  Globe,
+  Lock,
+  Headphones,
+  ArrowUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface Product {
   id: string;
@@ -57,9 +68,136 @@ interface Product {
   };
 }
 
+const VideoModal: React.FC<{ video: any; isOpen: boolean; onClose: () => void }> = ({ video, isOpen, onClose }) => {
+  const getVideoId = (url: string) => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+    return match ? match[1] : null;
+  };
+
+  const videoId = video.url ? getVideoId(video.url) : null;
+  const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '/placeholder.svg';
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl p-0">
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle className="flex items-center justify-between">
+            {video.title}
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogTitle>
+        </DialogHeader>
+        <div className="aspect-video">
+          {videoId ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}`}
+              title={video.title}
+              className="w-full h-full rounded-b-lg"
+              allowFullScreen
+            />
+          ) : (
+            <div className="w-full h-full bg-muted rounded-b-lg flex items-center justify-center">
+              <Play className="h-16 w-16 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const ScrollProgress: React.FC = () => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const updateScrollProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', updateScrollProgress);
+    return () => window.removeEventListener('scroll', updateScrollProgress);
+  }, []);
+
+  return (
+    <div className="fixed top-0 left-0 w-full h-1 bg-muted z-50">
+      <div 
+        className="h-full bg-gradient-primary transition-all duration-300"
+        style={{ width: `${scrollProgress}%` }}
+      />
+    </div>
+  );
+};
+
+const FloatingCTA: React.FC<{ product: Product; onCTAClick: () => void }> = ({ product, onCTAClick }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.scrollY > 800) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
+  }, []);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-40 animate-fade-in">
+      <Button
+        size="lg"
+        className="shadow-2xl bg-gradient-primary hover:scale-105 transition-transform"
+        onClick={onCTAClick}
+      >
+        {product.cta_button_text || 'Get Started'}
+        <ExternalLink className="ml-2 h-5 w-5" />
+      </Button>
+    </div>
+  );
+};
+
+const BackToTop: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      setIsVisible(window.scrollY > 400);
+    };
+
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      className="fixed bottom-6 left-6 z-40 shadow-lg"
+      onClick={scrollToTop}
+    >
+      <ArrowUp className="h-4 w-4" />
+    </Button>
+  );
+};
+
 const EnhancedProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', slug],
@@ -87,6 +225,17 @@ const EnhancedProductDetailPage: React.FC = () => {
     }
   };
 
+  const handleVideoClick = (video: any) => {
+    setSelectedVideo(video);
+    setIsVideoModalOpen(true);
+  };
+
+  const handleDownload = (file: any) => {
+    if (file.url) {
+      window.open(file.url, '_blank');
+    }
+  };
+
   const formatPrice = (price: number) => {
     return product?.currency === 'USD' ? `$${price}` : `₹${price}`;
   };
@@ -102,6 +251,35 @@ const EnhancedProductDetailPage: React.FC = () => {
     if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
     return `${Math.ceil(diffDays / 30)} months ago`;
   };
+
+  const getVideoThumbnail = (url: string) => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+    if (match) {
+      return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
+    }
+    return '/placeholder.svg';
+  };
+
+  // Generate dynamic features based on product type and category
+  const generateFeatures = () => {
+    const baseFeatures = [
+      { icon: Zap, title: "Lightning Fast", description: "Optimized for speed and performance" },
+      { icon: Shield, title: "Secure & Safe", description: "Enterprise-grade security standards" },
+      { icon: CheckCircle, title: "Easy to Use", description: "Intuitive interface for all skill levels" },
+    ];
+
+    if (product?.product_type === 'ai_tools') {
+      baseFeatures.push({ icon: Star, title: "AI-Powered", description: "Advanced machine learning capabilities" });
+    } else if (product?.product_type === 'software') {
+      baseFeatures.push({ icon: Globe, title: "Cross-Platform", description: "Works on all major platforms" });
+    } else {
+      baseFeatures.push({ icon: Gift, title: "Premium Quality", description: "High-quality digital content" });
+    }
+
+    return baseFeatures;
+  };
+
+  const keyFeatures = generateFeatures();
 
   if (isLoading) {
     return (
@@ -133,17 +311,14 @@ const EnhancedProductDetailPage: React.FC = () => {
     );
   }
 
-  const keyFeatures = [
-    { icon: Zap, title: "Lightning Fast", description: "Optimized for speed and performance" },
-    { icon: Shield, title: "Secure & Safe", description: "Enterprise-grade security standards" },
-    { icon: CheckCircle, title: "Easy to Use", description: "Intuitive interface for all skill levels" },
-    { icon: Star, title: "Regular Updates", description: "Continuous improvements and new features" }
-  ];
-
   return (
     <div className="min-h-screen bg-background">
+      <ScrollProgress />
+      <FloatingCTA product={product} onCTAClick={handleCTAClick} />
+      <BackToTop />
+
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+      <section className="bg-gradient-to-br from-primary/5 via-background to-secondary/5">
         <div className="container mx-auto px-4 py-8">
           <Button variant="ghost" asChild className="mb-6">
             <Link to="/" className="flex items-center space-x-2">
@@ -159,7 +334,7 @@ const EnhancedProductDetailPage: React.FC = () => {
                 <img
                   src={product.image_url || '/placeholder.svg'}
                   alt={product.name}
-                  className="w-full h-96 object-cover"
+                  className="w-full h-96 object-cover hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute top-6 left-6 flex flex-wrap gap-2">
                   {product.is_featured && (
@@ -189,7 +364,7 @@ const EnhancedProductDetailPage: React.FC = () => {
                     <Badge variant="secondary" className="text-sm px-3 py-1">{product.category.name}</Badge>
                   )}
                   {product.product_type && (
-                    <Badge variant="outline" className="text-sm px-3 py-1 capitalize">{product.product_type}</Badge>
+                    <Badge variant="outline" className="text-sm px-3 py-1 capitalize">{product.product_type.replace('_', ' ')}</Badge>
                   )}
                 </div>
                 <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
@@ -203,7 +378,7 @@ const EnhancedProductDetailPage: React.FC = () => {
               </div>
 
               {/* Stats */}
-              <div className="flex items-center space-x-8 text-sm">
+              <div className="flex items-center flex-wrap gap-6 text-sm">
                 <div className="flex items-center space-x-2 text-muted-foreground">
                   <Clock className="h-5 w-5" />
                   <span>{timeAgo(product.created_at)}</span>
@@ -248,17 +423,17 @@ const EnhancedProductDetailPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  className="flex-1 text-lg py-6 bg-gradient-primary hover:opacity-90 shadow-xl"
+                  className="flex-1 text-lg py-6 bg-gradient-primary hover:scale-105 transition-transform shadow-xl"
                   onClick={handleCTAClick}
                 >
                   <span>{product.cta_button_text || 'Get Started'}</span>
                   <ExternalLink className="ml-2 h-5 w-5" />
                 </Button>
-                <Button variant="outline" size="lg" className="py-6">
+                <Button variant="outline" size="lg" className="py-6 hover:scale-105 transition-transform">
                   <Bookmark className="mr-2 h-5 w-5" />
                   Save Tool
                 </Button>
-                <Button variant="outline" size="lg" className="py-6">
+                <Button variant="outline" size="lg" className="py-6 hover:scale-105 transition-transform">
                   <Share2 className="mr-2 h-5 w-5" />
                   Share
                 </Button>
@@ -266,28 +441,21 @@ const EnhancedProductDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Detailed Content */}
-      <div className="container mx-auto px-4 py-12">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 mb-12">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="features">Features</TabsTrigger>
-            <TabsTrigger value="resources">Resources</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-8">
-            {/* Rich Description */}
+      {/* Overview Section */}
+      <section id="overview" className="py-16 bg-gradient-to-br from-background to-muted/20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12">
+              About <span className="text-primary">{product.name}</span>
+            </h2>
+            
             {product.rich_description && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl">About {product.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <Card className="mb-12 border-primary/20">
+                <CardContent className="p-8">
                   <div 
-                    className="prose prose-lg max-w-none dark:prose-invert"
+                    className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground"
                     dangerouslySetInnerHTML={{ __html: product.rich_description }}
                   />
                 </CardContent>
@@ -297,10 +465,10 @@ const EnhancedProductDetailPage: React.FC = () => {
             {/* Key Features Grid */}
             <div className="grid md:grid-cols-2 gap-6">
               {keyFeatures.map((feature, index) => (
-                <Card key={index} className="border-primary/20 hover:border-primary/40 transition-colors">
+                <Card key={index} className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 hover:shadow-glow group">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
-                      <div className="p-3 rounded-lg bg-primary/10">
+                      <div className="p-3 rounded-lg bg-gradient-primary/10 group-hover:bg-gradient-primary/20 transition-colors">
                         <feature.icon className="h-6 w-6 text-primary" />
                       </div>
                       <div>
@@ -312,217 +480,282 @@ const EnhancedProductDetailPage: React.FC = () => {
                 </Card>
               ))}
             </div>
-          </TabsContent>
+          </div>
+        </div>
+      </section>
 
-          <TabsContent value="features" className="space-y-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">Key Features & Benefits</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">Core Features</h3>
-                    <ul className="space-y-3">
-                      {[
-                        "Advanced AI-powered functionality",
-                        "Intuitive user interface",
-                        "Real-time processing capabilities",
-                        "Cross-platform compatibility",
-                        "24/7 customer support"
-                      ].map((feature, index) => (
-                        <li key={index} className="flex items-center space-x-3">
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">Benefits</h3>
-                    <ul className="space-y-3">
-                      {[
-                        "Increase productivity by 50%",
-                        "Save hours of manual work",
-                        "Improve accuracy and quality",
-                        "Scale your operations efficiently",
-                        "Get results in minutes, not hours"
-                      ].map((benefit, index) => (
-                        <li key={index} className="flex items-center space-x-3">
-                          <Star className="h-5 w-5 text-yellow-500" />
-                          <span>{benefit}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="resources" className="space-y-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* File Attachments */}
-              {product.file_attachments && product.file_attachments.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Download className="h-5 w-5" />
-                      <span>Downloads & Resources</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {product.file_attachments.map((file: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <p className="font-medium">{file.name}</p>
-                          <p className="text-sm text-muted-foreground">{file.description}</p>
-                        </div>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-2" />
-                          Download
-                        </Button>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Video Courses */}
-              {product.video_courses && product.video_courses.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Play className="h-5 w-5" />
-                      <span>Video Tutorials</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {product.video_courses.map((video: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div>
-                          <p className="font-medium">{video.title}</p>
-                          <p className="text-sm text-muted-foreground">{video.duration}</p>
-                        </div>
-                        <Button size="sm" variant="outline">
-                          <Play className="h-4 w-4 mr-2" />
-                          Watch
-                        </Button>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Bonus Section */}
-              <Card className="md:col-span-2">
+      {/* Features Section */}
+      <section id="features" className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12">
+              Powerful <span className="text-primary">Features</span>
+            </h2>
+            
+            <div className="grid lg:grid-cols-2 gap-12 mb-16">
+              <Card className="border-primary/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Gift className="h-5 w-5" />
-                    <span>Bonus Content</span>
+                  <CardTitle className="text-xl flex items-center space-x-2">
+                    <Zap className="h-6 w-6 text-primary" />
+                    <span>Core Features</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {[
-                      { title: "Exclusive Templates", description: "10+ ready-to-use templates" },
-                      { title: "Community Access", description: "Join our private community" },
-                      { title: "Priority Support", description: "Get help when you need it" }
-                    ].map((bonus, index) => (
-                      <div key={index} className="text-center p-4 border rounded-lg bg-primary/5">
-                        <h4 className="font-semibold mb-2">{bonus.title}</h4>
-                        <p className="text-sm text-muted-foreground">{bonus.description}</p>
-                      </div>
-                    ))}
-                  </div>
+                <CardContent className="space-y-4">
+                  {[
+                    product.product_type === 'ai_tools' ? "Advanced AI-powered functionality" : "Professional-grade capabilities",
+                    "Intuitive user interface",
+                    "Real-time processing",
+                    "Cross-platform compatibility",
+                    "24/7 customer support",
+                    product.is_free ? "Completely free to use" : "Premium features included"
+                  ].map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center space-x-2">
+                    <Trophy className="h-6 w-6 text-primary" />
+                    <span>Key Benefits</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[
+                    "Increase productivity significantly",
+                    "Save hours of manual work",
+                    "Improve accuracy and quality",
+                    "Scale operations efficiently",
+                    "Get results faster",
+                    "Access premium support"
+                  ].map((benefit, index) => (
+                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <Star className="h-5 w-5 text-yellow-500 flex-shrink-0" />
+                      <span>{benefit}</span>
+                    </div>
+                  ))}
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+          </div>
+        </div>
+      </section>
 
-          <TabsContent value="details" className="space-y-8">
+      {/* Resources Section */}
+      {(product.file_attachments?.length > 0 || product.video_courses?.length > 0) && (
+        <section id="resources" className="py-16 bg-gradient-to-br from-muted/20 to-background">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-bold text-center mb-12">
+                Resources & <span className="text-primary">Downloads</span>
+              </h2>
+              
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* File Attachments */}
+                {product.file_attachments && product.file_attachments.length > 0 && (
+                  <Card className="border-primary/20">
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Download className="h-5 w-5 text-primary" />
+                        <span>Downloads & Files</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {product.file_attachments.map((file: any, index: number) => (
+                        <div key={index} className="group border rounded-lg p-4 hover:border-primary/40 transition-colors hover:shadow-md">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                                <FileText className="h-5 w-5 text-primary" />
+                              </div>
+                              <div>
+                                <p className="font-medium">{file.name || `Download ${index + 1}`}</p>
+                                <p className="text-sm text-muted-foreground">{file.description || 'Additional resource file'}</p>
+                                {file.size && <p className="text-xs text-muted-foreground">{file.size}</p>}
+                              </div>
+                            </div>
+                            <Button 
+                              size="sm" 
+                              className="bg-gradient-primary hover:scale-105 transition-transform"
+                              onClick={() => handleDownload(file)}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Download
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Video Courses */}
+                {product.video_courses && product.video_courses.length > 0 && (
+                  <Card className="border-primary/20">
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <PlayCircle className="h-5 w-5 text-primary" />
+                        <span>Video Tutorials</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {product.video_courses.map((video: any, index: number) => (
+                        <div key={index} className="group border rounded-lg overflow-hidden hover:border-primary/40 transition-colors hover:shadow-md">
+                          <div className="relative">
+                            <img 
+                              src={video.url ? getVideoThumbnail(video.url) : '/placeholder.svg'}
+                              alt={video.title || `Video ${index + 1}`}
+                              className="w-full h-32 object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                size="sm"
+                                className="bg-white/20 hover:bg-white/30 text-white border-white/20"
+                                onClick={() => handleVideoClick(video)}
+                              >
+                                <Play className="h-4 w-4 mr-2" />
+                                Play Video
+                              </Button>
+                            </div>
+                            <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                              {video.duration || '0:00'}
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <h4 className="font-medium mb-1">{video.title || `Video Tutorial ${index + 1}`}</h4>
+                            <p className="text-sm text-muted-foreground">{video.description || 'Learn how to get the most out of this tool'}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Details Section */}
+      <section id="details" className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12">
+              Product <span className="text-primary">Details</span>
+            </h2>
+            
             <div className="grid md:grid-cols-2 gap-8">
-              <Card>
+              <Card className="border-primary/20">
                 <CardHeader>
-                  <CardTitle>Product Information</CardTitle>
+                  <CardTitle>Specifications</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Category:</span>
-                    <span className="font-medium">{product.category?.name || 'Uncategorized'}</span>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Product Type</span>
+                    <span className="font-medium capitalize">{product.product_type?.replace('_', ' ') || 'Software'}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Type:</span>
-                    <span className="font-medium capitalize">{product.product_type || 'Software'}</span>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Category</span>
+                    <span className="font-medium">{product.category?.name || 'General'}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Launch Date:</span>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Launch Date</span>
                     <span className="font-medium">{new Date(product.created_at).toLocaleDateString()}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Pricing Model:</span>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Pricing</span>
                     <span className="font-medium">{product.is_free ? 'Free' : 'Paid'}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total Views:</span>
-                    <span className="font-medium">{(product.views_count || 0).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Saves:</span>
-                    <span className="font-medium">{(product.saves_count || 0).toLocaleString()}</span>
+                  <div className="flex justify-between py-2">
+                    <span className="text-muted-foreground">Support</span>
+                    <span className="font-medium">24/7 Available</span>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-primary/20">
                 <CardHeader>
-                  <CardTitle>Support & Updates</CardTitle>
+                  <CardTitle>Compatibility</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Regular updates included</span>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+                    <Globe className="h-5 w-5 text-primary" />
+                    <span>Web Browser</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>24/7 customer support</span>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+                    <Smartphone className="h-5 w-5 text-primary" />
+                    <span>Mobile Devices</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Community forum access</span>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+                    <Lock className="h-5 w-5 text-primary" />
+                    <span>Secure Access</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Video tutorials included</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>30-day money-back guarantee</span>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
+                    <Headphones className="h-5 w-5 text-primary" />
+                    <span>Customer Support</span>
                   </div>
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
+      </section>
 
-        {/* Final CTA Section */}
-        <Card className="mt-12 bg-gradient-to-r from-primary/10 via-background to-secondary/10 border-primary/20">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Ready to get started with {product.name}?</h2>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Join thousands of users who are already using this powerful tool to transform their workflow.
+      {/* Final CTA Section */}
+      <section className="py-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-6">
+              Ready to get started with <span className="text-primary">{product.name}</span>?
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Join thousands of users who are already benefiting from this amazing tool.
             </p>
-            <Button
-              size="lg"
-              className="text-lg px-8 py-6 bg-gradient-primary hover:opacity-90 shadow-xl"
-              onClick={handleCTAClick}
-            >
-              <span>{product.cta_button_text || 'Get Started Now'}</span>
-              <ExternalLink className="ml-2 h-5 w-5" />
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                size="lg"
+                className="text-lg py-6 px-8 bg-gradient-primary hover:scale-105 transition-transform shadow-xl"
+                onClick={handleCTAClick}
+              >
+                <span>{product.cta_button_text || 'Get Started Now'}</span>
+                <ExternalLink className="ml-2 h-5 w-5" />
+              </Button>
+              <Button variant="outline" size="lg" className="py-6 px-8 hover:scale-105 transition-transform">
+                <Bookmark className="mr-2 h-5 w-5" />
+                Save for Later
+              </Button>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-8 mt-12 text-sm text-muted-foreground">
+              <div className="flex items-center space-x-2">
+                <Users className="h-5 w-5" />
+                <span>{(product.views_count || 0).toLocaleString()}+ users</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Star className="h-5 w-5" />
+                <span>Top rated</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Shield className="h-5 w-5" />
+                <span>Secure & trusted</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <VideoModal
+          video={selectedVideo}
+          isOpen={isVideoModalOpen}
+          onClose={() => setIsVideoModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

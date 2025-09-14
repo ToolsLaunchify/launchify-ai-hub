@@ -31,6 +31,9 @@ interface Category {
   description: string;
   icon: string;
   sort_order: number;
+  parent_id?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface SortableItemProps {
@@ -122,7 +125,7 @@ export default function DraggableCategoriesList({
         sort_order: index + 1,
       }));
 
-      const { error } = await supabase.rpc('update_category_orders', {
+      const { error } = await supabase.rpc('update_category_orders' as any, {
         category_updates: updates
       });
 

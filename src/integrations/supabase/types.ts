@@ -201,6 +201,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_category_orders: {
+        Args: { category_updates: Json }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"

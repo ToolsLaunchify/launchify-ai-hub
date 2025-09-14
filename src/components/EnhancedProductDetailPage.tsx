@@ -47,8 +47,8 @@ interface Product {
   cta_button_text: string | null;
   views_count: number | null;
   saves_count: number | null;
-  file_attachments: any[] | null;
-  video_courses: any[] | null;
+  file_attachments: any;
+  video_courses: any;
   created_at: string;
   category?: {
     id: string;

@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
-import { ArrowRight, Grid, List, Filter } from 'lucide-react';
-import HeroSection from '@/components/HeroSection';
-import ProductCard from '@/components/ProductCard';
-import CategoriesSection from '@/components/CategoriesSection';
-import ProductTypeSections from '@/components/ProductTypeSections';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
+import { Grid, List, Filter } from 'lucide-react';
+import HeroSection from '@/components/HeroSection';
+import ProductTypeSections from '@/components/ProductTypeSections';
+import CombinedLaunchesSection from '@/components/CombinedLaunchesSection';
+import CategoriesSection from '@/components/CategoriesSection';
+import ProductCard from '@/components/ProductCard';
 import { useProducts, useFreeToolsByCategory } from '@/hooks/useProducts';
 
 // Mock data - Replace with actual data from Supabase

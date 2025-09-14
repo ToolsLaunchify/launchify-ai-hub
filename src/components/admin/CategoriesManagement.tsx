@@ -30,6 +30,7 @@ import {
   Folder,
   Hash
 } from 'lucide-react';
+import DraggableCategoriesList from './DraggableCategoriesList';
 
 interface Category {
   id: string;
@@ -250,44 +251,17 @@ const CategoriesManagement: React.FC = () => {
         </Dialog>
       </div>
 
-      {/* Categories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {categories.slice(0, 6).map((category) => (
-          <Card key={category.id} className="hover-lift">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="text-2xl">{category.icon}</div>
-                <div className="flex space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setEditingCategory(category);
-                      setIsDialogOpen(true);
-                    }}
-                  >
-                    <PenSquare className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => deleteCategoryMutation.mutate(category.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-              <CardTitle>{category.name}</CardTitle>
-              <CardDescription>{category.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Hash className="h-4 w-4 mr-1" />
-                <span>/{category.slug}</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Categories Grid with Drag and Drop */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-4">Drag to Reorder Categories</h3>
+        <DraggableCategoriesList
+          categories={categories}
+          onEdit={(category) => {
+            setEditingCategory(category);
+            setIsDialogOpen(true);
+          }}
+          onDelete={(id) => deleteCategoryMutation.mutate(id)}
+        />
       </div>
 
       {/* Categories Table */}

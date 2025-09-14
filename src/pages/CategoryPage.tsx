@@ -147,7 +147,7 @@ const CategoryPage: React.FC = () => {
                 ctaText: product.cta_button_text,
                 launchDate: product.created_at,
                 viewsCount: product.views_count,
-                permalink: `/product/${product.slug}`,
+                slug: product.slug,
                 isAffiliate: !!product.affiliate_link,
                 paymentLink: product.payment_link,
                 affiliateLink: product.affiliate_link,

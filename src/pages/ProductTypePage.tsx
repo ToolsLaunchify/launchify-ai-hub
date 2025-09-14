@@ -139,7 +139,7 @@ const ProductTypePage: React.FC = () => {
                 ctaText: product.cta_button_text || 'Learn More',
                 launchDate: product.created_at,
                 viewsCount: product.views_count || 0,
-                permalink: product.slug,
+                slug: product.slug,
                 isAffiliate: !!product.affiliate_link,
                 affiliateLink: product.affiliate_link || undefined,
                 paymentLink: product.payment_link || undefined,

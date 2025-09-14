@@ -43,7 +43,7 @@ const CategorySection: React.FC<CategorySectionProps> = ({
     launchDate: product.created_at,
     rating: 4.5,
     viewsCount: product.views_count || 0,
-    permalink: product.slug || product.id,
+    slug: product.slug || product.id,
     isAffiliate: !!product.affiliate_link,
     paymentLink: product.payment_link,
     affiliateLink: product.affiliate_link,

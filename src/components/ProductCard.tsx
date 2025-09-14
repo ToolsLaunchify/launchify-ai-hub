@@ -22,7 +22,7 @@ interface ProductCardProps {
     launchDate: string;
     rating?: number;
     viewsCount: number;
-    permalink: string;
+    slug: string;
     isAffiliate: boolean;
     paymentLink?: string;
     affiliateLink?: string;
@@ -54,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     launchDate,
     rating,
     viewsCount,
-    permalink,
+    slug,
     isAffiliate,
     paymentLink,
     affiliateLink
@@ -94,7 +94,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   if (variant === 'list') {
     return (
-      <Link to={`/product/${product.permalink || product.id}`} className="block group">
+      <Link to={`/product/${product.slug || product.id}`} className="block group">
         <Card className="card-hover border-glow">
           <div className="flex items-start p-4 space-x-4">
             <div className="flex-shrink-0">
@@ -203,7 +203,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   }
 
   return (
-    <Link to={`/product/${product.permalink || product.id}`} className="block group">
+    <Link to={`/product/${product.slug || product.id}`} className="block group">
       <Card className="card-hover border-glow group">
         <CardHeader className="p-0">
           <div className="relative overflow-hidden rounded-t-lg">

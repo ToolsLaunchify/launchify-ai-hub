@@ -370,7 +370,7 @@ const ProductsManagement: React.FC = () => {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div>
+                <div className="border border-border rounded-lg p-4 bg-card">
                   <Label htmlFor="name">Product Name *</Label>
                   <Input
                     id="name"
@@ -379,6 +379,7 @@ const ProductsManagement: React.FC = () => {
                     required
                     placeholder="e.g., Leonardo AI"
                   />
+                </div>
                 </div>
                 <div>
                   <Label htmlFor="category_id">Category</Label>
@@ -412,7 +413,7 @@ const ProductsManagement: React.FC = () => {
                 </div>
               </div>
 
-              <div>
+              <div className="border border-border rounded-lg p-4 bg-card">
                 <Label htmlFor="description">Short Description *</Label>
                 <Textarea
                   id="description"
@@ -423,7 +424,7 @@ const ProductsManagement: React.FC = () => {
                 />
               </div>
 
-              <div>
+              <div className="border border-border rounded-lg p-4 bg-card">
                 <Label>Detailed Description (Rich Text Editor)</Label>
                 <RichTextEditor
                   value={richDescription}

@@ -270,7 +270,7 @@ const ProductsManagement: React.FC = () => {
         }
 
         // Upload file to storage
-        const fileUrl = await uploadFileToStorage(attachment.fileObject);
+        const fileUrl = await uploadFileToStorage(attachment.fileObject, 'attachments');
         if (fileUrl) {
           processedFileAttachments.push({
             id: attachment.id || Math.random().toString(36).substring(2),
@@ -279,6 +279,14 @@ const ProductsManagement: React.FC = () => {
             size: attachment.fileObject.size,
             type: attachment.fileObject.type
           });
+        } else {
+          // Upload failed - show error and stop form submission
+          toast({
+            title: "Upload failed",
+            description: `Failed to upload ${attachment.name || attachment.fileObject.name}. Please try again.`,
+            variant: "destructive",
+          });
+          return;
         }
       } else if (attachment.url && attachment.name) {
         // Keep URL-based attachments

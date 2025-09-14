@@ -21,9 +21,18 @@ export const uploadFileToStorage = async (
   bucket: string = 'product-files'
 ): Promise<string | null> => {
   try {
+    // Validate file size before upload
+    const sizeValidation = validateFileSize(file);
+    if (!sizeValidation.isValid) {
+      console.error('File size validation failed:', sizeValidation.message);
+      return null;
+    }
+
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
     const filePath = fileName;
+
+    console.log(`Uploading file: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB) to bucket: ${bucket}`);
 
     const { error: uploadError } = await supabase.storage
       .from(bucket)
@@ -31,7 +40,7 @@ export const uploadFileToStorage = async (
 
     if (uploadError) {
       console.error('Upload error:', uploadError);
-      toast.error('Failed to upload file');
+      console.error('File details:', { name: file.name, size: file.size, type: file.type });
       return null;
     }
 
@@ -39,10 +48,11 @@ export const uploadFileToStorage = async (
       .from(bucket)
       .getPublicUrl(filePath);
 
+    console.log(`File uploaded successfully: ${data.publicUrl}`);
     return data.publicUrl;
   } catch (error) {
     console.error('File upload error:', error);
-    toast.error('Failed to upload file');
+    console.error('File details:', { name: file.name, size: file.size, type: file.type });
     return null;
   }
 };

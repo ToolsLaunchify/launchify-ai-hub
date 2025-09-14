@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 import { 
   Dialog, 
   DialogContent, 
@@ -39,7 +40,9 @@ import {
   Eye, 
   ExternalLink,
   Search,
-  Filter
+  Filter,
+  Upload,
+  X
 } from 'lucide-react';
 
 interface Product {
@@ -61,6 +64,10 @@ interface Product {
   views_count: number;
   saves_count: number;
   created_at: string;
+  custom_permalink: string;
+  file_attachments: any[];
+  video_courses: any[];
+  custom_code: string;
 }
 
 interface Category {
@@ -74,6 +81,10 @@ const ProductsManagement: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [richDescription, setRichDescription] = useState('');
+  const [fileAttachments, setFileAttachments] = useState<any[]>([]);
+  const [videoCourses, setVideoCourses] = useState<any[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -197,16 +208,55 @@ const ProductsManagement: React.FC = () => {
     }
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleImageUpload = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
+    let imageUrl = formData.get('image_url') as string;
+    
+    // Handle image upload if file is selected
+    if (imageFile) {
+      try {
+        imageUrl = await handleImageUpload(imageFile);
+      } catch (error: any) {
+        toast({
+          title: "Image upload failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    const customPermalink = formData.get('custom_permalink') as string;
+    const slug = customPermalink || (formData.get('name') as string).toLowerCase().replace(/\s+/g, '-');
+    
     const productData = {
       name: formData.get('name') as string,
-      slug: (formData.get('name') as string).toLowerCase().replace(/\s+/g, '-'),
+      slug: slug,
       description: formData.get('description') as string,
-      rich_description: formData.get('rich_description') as string,
-      image_url: formData.get('image_url') as string,
+      rich_description: richDescription,
+      image_url: imageUrl,
       category_id: formData.get('category_id') as string || null,
       original_price: formData.get('original_price') ? Number(formData.get('original_price')) : null,
       discounted_price: formData.get('discounted_price') ? Number(formData.get('discounted_price')) : null,
@@ -216,6 +266,10 @@ const ProductsManagement: React.FC = () => {
       affiliate_link: formData.get('affiliate_link') as string,
       payment_link: formData.get('payment_link') as string,
       cta_button_text: formData.get('cta_button_text') as string || 'Learn More',
+      custom_permalink: customPermalink,
+      file_attachments: fileAttachments,
+      video_courses: videoCourses,
+      custom_code: formData.get('custom_code') as string,
     };
 
     if (editingProduct) {
@@ -223,6 +277,56 @@ const ProductsManagement: React.FC = () => {
     } else {
       createProductMutation.mutate(productData);
     }
+  };
+
+  const addFileAttachment = () => {
+    setFileAttachments([...fileAttachments, { type: 'url', name: '', url: '' }]);
+  };
+
+  const removeFileAttachment = (index: number) => {
+    setFileAttachments(fileAttachments.filter((_, i) => i !== index));
+  };
+
+  const updateFileAttachment = (index: number, field: string, value: string) => {
+    const updated = [...fileAttachments];
+    updated[index] = { ...updated[index], [field]: value };
+    setFileAttachments(updated);
+  };
+
+  const addVideoCourse = () => {
+    setVideoCourses([...videoCourses, { title: '', url: '', platform: 'youtube' }]);
+  };
+
+  const removeVideoCourse = (index: number) => {
+    setVideoCourses(videoCourses.filter((_, i) => i !== index));
+  };
+
+  const updateVideoCourse = (index: number, field: string, value: string) => {
+    const updated = [...videoCourses];
+    updated[index] = { ...updated[index], [field]: value };
+    setVideoCourses(updated);
+  };
+
+  const resetForm = () => {
+    setRichDescription('');
+    setFileAttachments([]);
+    setVideoCourses([]);
+    setImageFile(null);
+    setEditingProduct(null);
+  };
+
+  const openEditDialog = (product: Product) => {
+    setEditingProduct(product);
+    setRichDescription(product.rich_description || '');
+    setFileAttachments(product.file_attachments || []);
+    setVideoCourses(product.video_courses || []);
+    setImageFile(null);
+    setIsDialogOpen(true);
+  };
+
+  const openAddDialog = () => {
+    resetForm();
+    setIsDialogOpen(true);
   };
 
   const getCategoryName = (categoryId: string) => {
@@ -240,12 +344,12 @@ const ProductsManagement: React.FC = () => {
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingProduct(null)}>
+            <Button onClick={openAddDialog}>
               <Plus className="mr-2 h-4 w-4" />
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingProduct ? 'Edit Product' : 'Add New Product'}
@@ -254,7 +358,7 @@ const ProductsManagement: React.FC = () => {
                 {editingProduct ? 'Update the product information below.' : 'Create a new product listing for your platform.'}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Product Name *</Label>
@@ -263,6 +367,7 @@ const ProductsManagement: React.FC = () => {
                     name="name"
                     defaultValue={editingProduct?.name || ''}
                     required
+                    placeholder="e.g., Leonardo AI"
                   />
                 </div>
                 <div>
@@ -289,48 +394,75 @@ const ProductsManagement: React.FC = () => {
                   name="description"
                   defaultValue={editingProduct?.description || ''}
                   required
+                  placeholder="Brief description of the product"
                 />
               </div>
 
               <div>
-                <Label htmlFor="rich_description">Detailed Description</Label>
-                <Textarea
-                  id="rich_description"
-                  name="rich_description"
-                  defaultValue={editingProduct?.rich_description || ''}
-                  rows={4}
+                <Label>Detailed Description (Rich Text Editor)</Label>
+                <RichTextEditor
+                  value={richDescription}
+                  onChange={setRichDescription}
+                  placeholder="Add detailed SEO-optimized description with formatting, links, and styling..."
                 />
               </div>
 
+              <div className="space-y-4">
+                <Label>Product Image</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="image_url">Image URL</Label>
+                    <Input
+                      id="image_url"
+                      name="image_url"
+                      type="url"
+                      defaultValue={editingProduct?.image_url || ''}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="image_upload">Or Upload Image</Label>
+                    <Input
+                      id="image_upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div>
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="custom_permalink">Custom Permalink</Label>
                 <Input
-                  id="image_url"
-                  name="image_url"
-                  type="url"
-                  defaultValue={editingProduct?.image_url || ''}
+                  id="custom_permalink"
+                  name="custom_permalink"
+                  defaultValue={editingProduct?.custom_permalink || ''}
+                  placeholder="leonardo-ai (will create domain.com/leonardo-ai)"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="original_price">Original Price</Label>
+                  <Label htmlFor="original_price">Original Price (Optional)</Label>
                   <Input
                     id="original_price"
                     name="original_price"
                     type="number"
                     step="0.01"
                     defaultValue={editingProduct?.original_price || ''}
+                    placeholder="99.99"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="discounted_price">Discounted Price</Label>
+                  <Label htmlFor="discounted_price">Discounted Price (Optional)</Label>
                   <Input
                     id="discounted_price"
                     name="discounted_price"
                     type="number"
                     step="0.01"
                     defaultValue={editingProduct?.discounted_price || ''}
+                    placeholder="49.99"
                   />
                 </div>
                 <div>
@@ -343,6 +475,7 @@ const ProductsManagement: React.FC = () => {
                       <SelectItem value="USD">USD</SelectItem>
                       <SelectItem value="EUR">EUR</SelectItem>
                       <SelectItem value="GBP">GBP</SelectItem>
+                      <SelectItem value="INR">INR</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -350,31 +483,125 @@ const ProductsManagement: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="affiliate_link">Affiliate Link</Label>
+                  <Label htmlFor="affiliate_link">Affiliate Link (Optional)</Label>
                   <Input
                     id="affiliate_link"
                     name="affiliate_link"
                     type="url"
                     defaultValue={editingProduct?.affiliate_link || ''}
+                    placeholder="https://affiliate-link.com"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="payment_link">Payment Link</Label>
+                  <Label htmlFor="payment_link">Payment Page Link (Optional)</Label>
                   <Input
                     id="payment_link"
                     name="payment_link"
                     type="url"
                     defaultValue={editingProduct?.payment_link || ''}
+                    placeholder="https://payment-page.com"
                   />
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="cta_button_text">CTA Button Text</Label>
+                <Label htmlFor="cta_button_text">CTA Button Name</Label>
                 <Input
                   id="cta_button_text"
                   name="cta_button_text"
                   defaultValue={editingProduct?.cta_button_text || 'Learn More'}
+                  placeholder="Learn More, Buy Now, Try Now, etc."
+                />
+              </div>
+
+              {/* File Attachments Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Upload Files / Document Links (Optional)</Label>
+                  <Button type="button" onClick={addFileAttachment} size="sm" variant="outline">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add File/Link
+                  </Button>
+                </div>
+                {fileAttachments.map((attachment, index) => (
+                  <div key={index} className="grid grid-cols-3 gap-2 items-end">
+                    <Input
+                      placeholder="File/Document name"
+                      value={attachment.name}
+                      onChange={(e) => updateFileAttachment(index, 'name', e.target.value)}
+                    />
+                    <Input
+                      placeholder="URL or upload link"
+                      value={attachment.url}
+                      onChange={(e) => updateFileAttachment(index, 'url', e.target.value)}
+                    />
+                    <Button 
+                      type="button" 
+                      onClick={() => removeFileAttachment(index)} 
+                      size="sm" 
+                      variant="destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Video Courses Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Video Courses (Optional)</Label>
+                  <Button type="button" onClick={addVideoCourse} size="sm" variant="outline">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Video Course
+                  </Button>
+                </div>
+                {videoCourses.map((video, index) => (
+                  <div key={index} className="grid grid-cols-4 gap-2 items-end">
+                    <Input
+                      placeholder="Video title"
+                      value={video.title}
+                      onChange={(e) => updateVideoCourse(index, 'title', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Video URL"
+                      value={video.url}
+                      onChange={(e) => updateVideoCourse(index, 'url', e.target.value)}
+                    />
+                    <Select 
+                      value={video.platform}
+                      onValueChange={(value) => updateVideoCourse(index, 'platform', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="youtube">YouTube</SelectItem>
+                        <SelectItem value="udemy">Udemy</SelectItem>
+                        <SelectItem value="vimeo">Vimeo</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button 
+                      type="button" 
+                      onClick={() => removeVideoCourse(index)} 
+                      size="sm" 
+                      variant="destructive"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <Label htmlFor="custom_code">Custom Code (Optional)</Label>
+                <Textarea
+                  id="custom_code"
+                  name="custom_code"
+                  defaultValue={editingProduct?.custom_code || ''}
+                  placeholder="Facebook Pixel code, Google Analytics, or other tracking codes"
+                  rows={4}
                 />
               </div>
 
@@ -519,10 +746,7 @@ const ProductsManagement: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {
-                            setEditingProduct(product);
-                            setIsDialogOpen(true);
-                          }}
+                          onClick={() => openEditDialog(product)}
                         >
                           <PenSquare className="h-4 w-4" />
                         </Button>

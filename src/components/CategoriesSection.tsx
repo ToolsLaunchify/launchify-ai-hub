@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -63,11 +64,9 @@ const CategoriesSection: React.FC = () => {
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
-            <Card 
-              key={category.id} 
-              className="bg-card border-border hover-lift transition-smooth cursor-pointer group"
-              onClick={() => window.location.href = `/category/${category.slug}`}
-            >
+            <Link key={category.id} to={`/category/${category.slug}`}>
+              <Card className="bg-card border-border hover-lift transition-smooth cursor-pointer group">
+              
               <CardContent className="p-6 text-center">
                 <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">
                   {category.icon}
@@ -83,7 +82,8 @@ const CategoriesSection: React.FC = () => {
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </CardContent>
-            </Card>
+              </Card>
+            </Link>
           ))}
         </div>
         

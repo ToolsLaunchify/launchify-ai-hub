@@ -62,8 +62,11 @@ export type Database = {
           created_at: string
           cta_button_text: string | null
           currency: string | null
+          custom_code: string | null
+          custom_permalink: string | null
           description: string | null
           discounted_price: number | null
+          file_attachments: Json | null
           id: string
           image_url: string | null
           is_featured: boolean | null
@@ -75,6 +78,7 @@ export type Database = {
           saves_count: number | null
           slug: string
           updated_at: string
+          video_courses: Json | null
           views_count: number | null
         }
         Insert: {
@@ -83,8 +87,11 @@ export type Database = {
           created_at?: string
           cta_button_text?: string | null
           currency?: string | null
+          custom_code?: string | null
+          custom_permalink?: string | null
           description?: string | null
           discounted_price?: number | null
+          file_attachments?: Json | null
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
@@ -96,6 +103,7 @@ export type Database = {
           saves_count?: number | null
           slug: string
           updated_at?: string
+          video_courses?: Json | null
           views_count?: number | null
         }
         Update: {
@@ -104,8 +112,11 @@ export type Database = {
           created_at?: string
           cta_button_text?: string | null
           currency?: string | null
+          custom_code?: string | null
+          custom_permalink?: string | null
           description?: string | null
           discounted_price?: number | null
+          file_attachments?: Json | null
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
@@ -117,6 +128,7 @@ export type Database = {
           saves_count?: number | null
           slug?: string
           updated_at?: string
+          video_courses?: Json | null
           views_count?: number | null
         }
         Relationships: [

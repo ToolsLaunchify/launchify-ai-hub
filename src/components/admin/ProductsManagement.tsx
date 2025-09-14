@@ -380,7 +380,6 @@ const ProductsManagement: React.FC = () => {
                     placeholder="e.g., Leonardo AI"
                   />
                 </div>
-                </div>
                 <div>
                   <Label htmlFor="category_id">Category</Label>
                   <Select name="category_id" defaultValue={editingProduct?.category_id || ''}>
@@ -396,21 +395,21 @@ const ProductsManagement: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
 
-                <div>
-                  <Label htmlFor="product_type">Product Type</Label>
-                  <Select name="product_type" defaultValue={editingProduct?.product_type || 'software'}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select product type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ai_tools">AI Tools</SelectItem>
-                      <SelectItem value="software">Software</SelectItem>
-                      <SelectItem value="free_tools">Free Tools</SelectItem>
-                      <SelectItem value="digital_products">Digital Products</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div>
+                <Label htmlFor="product_type">Product Type</Label>
+                <Select name="product_type" defaultValue={editingProduct?.product_type || 'software'}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select product type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ai_tools">AI Tools</SelectItem>
+                    <SelectItem value="software">Software</SelectItem>
+                    <SelectItem value="free_tools">Free Tools</SelectItem>
+                    <SelectItem value="digital_products">Digital Products</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

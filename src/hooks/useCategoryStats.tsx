@@ -19,6 +19,7 @@ export const useCategoryStats = () => {
         .from('categories')
         .select('*')
         .is('parent_id', null)
+        .order('sort_order', { ascending: true })
         .order('name');
 
       if (categoriesError) throw categoriesError;

@@ -38,6 +38,7 @@ interface Category {
   description: string;
   icon: string;
   parent_id: string | null;
+  sort_order: number;
   created_at: string;
   updated_at: string;
 }
@@ -55,6 +56,7 @@ const CategoriesManagement: React.FC = () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
+        .order('sort_order', { ascending: true })
         .order('name');
       if (error) throw error;
       return data as Category[];

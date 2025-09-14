@@ -107,7 +107,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <Link to={`/product/${product.id}`} className="block group">
+                <Link to={`/product/${product.permalink || product.id}`} className="block group">
                   <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors card-title">
                     {name}
                   </h3>
@@ -247,7 +247,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
         
-        <Link to={`/product/${product.id}`} className="block group">
+        <Link to={`/product/${product.permalink || product.id}`} className="block group">
           <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2 card-title">
             {name}
           </h3>

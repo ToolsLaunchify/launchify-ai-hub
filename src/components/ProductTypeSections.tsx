@@ -19,7 +19,8 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       icon: Zap,
       gradient: 'from-blue-500 to-purple-600',
       href: '/category/ai-tools',
-      count: productStats?.ai_tools || 0
+      count: productStats?.ai_tools || 0,
+      order: 1
     },
     {
       id: 'software',
@@ -28,7 +29,8 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       icon: Monitor,
       gradient: 'from-green-500 to-teal-600',
       href: '/category/software',
-      count: productStats?.software || 0
+      count: productStats?.software || 0,
+      order: 2
     },
     {
       id: 'free_tools',
@@ -37,7 +39,8 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       icon: Gift,
       gradient: 'from-orange-500 to-red-600',
       href: '/free-tools',
-      count: productStats?.free_tools || 0
+      count: productStats?.free_tools || 0,
+      order: 3
     },
     {
       id: 'digital_products',
@@ -46,9 +49,10 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       icon: Package,
       gradient: 'from-pink-500 to-purple-600',
       href: '/category/digital-products',
-      count: productStats?.digital_products || 0
+      count: productStats?.digital_products || 0,
+      order: 4
     }
-  ];
+  ].sort((a, b) => a.order - b.order);
 
   return (
     <section className="py-12 bg-muted/20">

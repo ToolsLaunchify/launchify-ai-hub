@@ -48,26 +48,51 @@ const CombinedLaunchesSection: React.FC = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 bg-card border-2 border-border rounded-lg p-1 shadow-sm">
-            <TabsTrigger 
-              value="latest" 
-              className="flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-300 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-glow data-[state=active]:scale-105 hover:bg-muted/50"
-            >
-              <Badge variant={activeTab === 'latest' ? 'default' : 'secondary'} className="text-xs bg-white/20 text-current border-0">
-                {latestProducts.length}
-              </Badge>
-              <span>New Launches</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="featured" 
-              className="flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-300 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-glow data-[state=active]:scale-105 hover:bg-muted/50"
-            >
-              <Badge variant={activeTab === 'featured' ? 'default' : 'secondary'} className="text-xs bg-white/20 text-current border-0">
-                {featuredProducts.length}
-              </Badge>
-              <span>Featured Tools</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="flex justify-center mb-8">
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setActiveTab('latest')}
+                className={`flex items-center space-x-2 px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 border-2 ${
+                  activeTab === 'latest'
+                    ? 'bg-gradient-primary text-white border-primary shadow-glow scale-105'
+                    : 'bg-card text-foreground border-border hover:border-primary/50 hover:bg-muted/50'
+                }`}
+              >
+                <Badge 
+                  variant="secondary" 
+                  className={`text-xs ${
+                    activeTab === 'latest' 
+                      ? 'bg-white/20 text-white border-0' 
+                      : 'bg-primary/10 text-primary border-0'
+                  }`}
+                >
+                  {latestProducts.length}
+                </Badge>
+                <span>New Launches</span>
+              </button>
+              
+              <button
+                onClick={() => setActiveTab('featured')}
+                className={`flex items-center space-x-2 px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 border-2 ${
+                  activeTab === 'featured'
+                    ? 'bg-gradient-primary text-white border-primary shadow-glow scale-105'
+                    : 'bg-card text-foreground border-border hover:border-primary/50 hover:bg-muted/50'
+                }`}
+              >
+                <Badge 
+                  variant="secondary" 
+                  className={`text-xs ${
+                    activeTab === 'featured' 
+                      ? 'bg-white/20 text-white border-0' 
+                      : 'bg-primary/10 text-primary border-0'
+                  }`}
+                >
+                  {featuredProducts.length}
+                </Badge>
+                <span>Featured Tools</span>
+              </button>
+            </div>
+          </div>
 
           <TabsContent value="latest" className="space-y-6">
             <div className="text-center mb-6">

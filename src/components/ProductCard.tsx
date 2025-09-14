@@ -94,24 +94,23 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   if (variant === 'list') {
     return (
-      <Card className="card-hover border-glow">
-        <div className="flex items-start p-4 space-x-4">
-          <div className="flex-shrink-0">
-            <img
-              src={image || '/placeholder.svg'}
-              alt={name}
-              className="w-16 h-16 rounded-lg object-cover bg-muted"
-            />
-          </div>
-          
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <Link to={`/product/${product.permalink || product.id}`} className="block group">
+      <Link to={`/product/${product.permalink || product.id}`} className="block group">
+        <Card className="card-hover border-glow">
+          <div className="flex items-start p-4 space-x-4">
+            <div className="flex-shrink-0">
+              <img
+                src={image || '/placeholder.svg'}
+                alt={name}
+                className="w-16 h-16 rounded-lg object-cover bg-muted"
+              />
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
                   <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors card-title">
                     {name}
                   </h3>
-                </Link>
                 
                 <div className="flex items-center space-x-2 mt-1 mb-2">
                   <Badge variant="secondary" className="text-xs">
@@ -169,7 +168,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={handleSave}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleSave(e);
+                    }}
                     className="h-8 w-8"
                     disabled={!isAuthenticated}
                   >
@@ -179,7 +182,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   <Button
                     variant={isFree ? "accent" : "hero"}
                     size="sm"
-                    onClick={handleCTAClick}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleCTAClick();
+                    }}
                     className="flex items-center space-x-1"
                   >
                     <span>{ctaText}</span>
@@ -191,29 +198,35 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
       </Card>
+      </Link>
     );
   }
 
   return (
-    <Card className="card-hover border-glow group">
-      <CardHeader className="p-0">
-        <div className="relative overflow-hidden rounded-t-lg">
-          <img
-            src={image || '/placeholder.svg'}
-            alt={name}
-            className="w-full h-48 object-cover bg-muted group-hover:scale-105 transition-transform duration-300"
-          />
-          <div className="absolute top-3 right-3 flex flex-col space-y-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSave}
-              className="h-8 w-8 bg-background/80 backdrop-blur hover:bg-background"
-              disabled={!isAuthenticated}
-            >
-              <Bookmark className="h-4 w-4" />
-            </Button>
-          </div>
+    <Link to={`/product/${product.permalink || product.id}`} className="block group">
+      <Card className="card-hover border-glow group">
+        <CardHeader className="p-0">
+          <div className="relative overflow-hidden rounded-t-lg">
+            <img
+              src={image || '/placeholder.svg'}
+              alt={name}
+              className="w-full h-48 object-cover bg-muted group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute top-3 right-3 flex flex-col space-y-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSave(e);
+                }}
+                className="h-8 w-8 bg-background/80 backdrop-blur hover:bg-background"
+                disabled={!isAuthenticated}
+              >
+                <Bookmark className="h-4 w-4" />
+              </Button>
+            </div>
           
           <div className="absolute top-3 left-3 flex flex-wrap gap-1">
             {isFeatured && (
@@ -247,11 +260,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
         
-        <Link to={`/product/${product.permalink || product.id}`} className="block group">
-          <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2 card-title">
-            {name}
-          </h3>
-        </Link>
+        <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2 card-title">
+          {name}
+        </h3>
         
         <p className="text-sm text-muted-foreground line-clamp-3 mb-3 card-text">
           {description}
@@ -286,7 +297,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <Button
             variant={isFree ? "accent" : "hero"}
             size="sm"
-            onClick={handleCTAClick}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCTAClick();
+            }}
             className="ml-auto flex items-center space-x-1"
           >
             <span>{ctaText}</span>
@@ -295,6 +310,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </CardFooter>
     </Card>
+    </Link>
   );
 };
 

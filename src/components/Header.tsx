@@ -34,14 +34,10 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
   const navItems = [
     { label: 'Home', href: '/' },
-    { label: 'New AI Tools', href: '/category/ai-tools' },
-    { label: 'New Software', href: '/category/software' },
-    { label: 'Digital Products', href: '/category/digital-products' },
-    { label: 'Most Saved', href: '/most-saved' },
-    { label: 'Most Used', href: '/most-used' },
+    { label: 'AI Tools', href: '/category/ai-tools' },
+    { label: 'Software', href: '/category/software' },
     { label: 'Free Tools', href: '/free-tools' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Featured', href: '/featured' },
+    { label: 'Digital Products', href: '/category/digital-products' },
   ];
 
   const categories = [
@@ -89,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
               </NavigationMenuList>
             </NavigationMenu>
 
-            {navItems.slice(1, 7).map((item) => (
+            {navItems.slice(1).map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
@@ -102,19 +98,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
             ))}
           </div>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:flex md:flex-1 md:max-w-sm md:mx-6">
-            <div className="relative w-full">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search tools, software..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 bg-muted/50 border-muted focus:border-primary"
-              />
-            </div>
-          </form>
 
           {/* Auth Buttons */}
           <div className="hidden md:flex md:items-center md:space-x-2">

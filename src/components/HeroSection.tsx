@@ -94,17 +94,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           </form>
           
           
-          {/* CTA Buttons */}
-          <div className="flex justify-center mb-12 animate-slide-up delay-300">
-            <Button 
-              size="lg" 
-              className="text-lg px-8 py-3 bg-gradient-primary hover:opacity-90"
-              onClick={() => window.location.href = '/categories'}
-            >
-              <Rocket className="mr-2 h-5 w-5" />
-              Explore Tools
-            </Button>
-          </div>
           
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 animate-slide-up delay-500">

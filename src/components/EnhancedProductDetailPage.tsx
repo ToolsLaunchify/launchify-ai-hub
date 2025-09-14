@@ -567,14 +567,14 @@ const EnhancedProductDetailPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Overview Section */}
+      {/* Product Details Section */}
       {product.rich_description && (
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold mb-8 text-center">Product Details</h2>
               <div 
-                className="prose prose-lg max-w-none"
+                className="prose prose-lg max-w-none prose-headings:text-foreground prose-h1:text-3xl prose-h1:font-bold prose-h1:mb-6 prose-h1:text-primary prose-h2:text-2xl prose-h2:font-semibold prose-h2:mb-4 prose-h2:text-foreground prose-h3:text-xl prose-h3:font-medium prose-h3:mb-3 prose-h3:text-foreground prose-p:text-muted-foreground prose-p:mb-4 prose-a:text-primary prose-strong:text-foreground prose-ul:text-muted-foreground prose-ol:text-muted-foreground prose-li:mb-2"
                 dangerouslySetInnerHTML={{ __html: product.rich_description }}
               />
             </div>
@@ -645,14 +645,14 @@ const EnhancedProductDetailPage: React.FC = () => {
                           onClick={() => handleVideoClick(video)}
                           className="relative"
                         >
-                           <img
-                             src={getVideoThumbnail(video.url)}
-                             alt={video.title}
-                             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/placeholder.svg';
-                            }}
-                          />
+                            <img
+                              src={getVideoThumbnail(video.url)}
+                              alt={video.title}
+                              className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-300"
+                             onError={(e) => {
+                               (e.target as HTMLImageElement).src = '/placeholder.svg';
+                             }}
+                           />
                           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
                             <div className="bg-white/90 rounded-full p-3 group-hover:scale-110 transition-transform duration-300">
                               <Play className="h-6 w-6 text-primary" />
@@ -677,7 +677,7 @@ const EnhancedProductDetailPage: React.FC = () => {
         </section>
       )}
 
-      {/* Details Section - Always show basic product info */}
+      {/* Technical Information Section - Always show basic product info */}
       <section className="py-16 bg-gradient-to-br from-secondary/5 to-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">

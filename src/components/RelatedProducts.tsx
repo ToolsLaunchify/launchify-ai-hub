@@ -105,7 +105,7 @@ export const RelatedProducts: React.FC<RelatedProductsProps> = ({
         {/* View All Button */}
         {currentProduct.category && (
           <div className="text-center mt-12">
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="hero" size="lg">
               <Link to={`/category/${currentProduct.category.slug}`}>
                 View All {currentProduct.category.name} Tools
                 <ExternalLink className="ml-2 h-4 w-4" />

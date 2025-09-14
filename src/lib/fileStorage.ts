@@ -89,7 +89,34 @@ export const validateFileType = (file: File, allowedTypes: string[]): boolean =>
   return allowedTypes.some(type => file.type.includes(type));
 };
 
-export const validateFileSize = (file: File, maxSizeMB: number): boolean => {
+export const getFileSizeLimit = (fileType: string): number => {
+  // Size limits in MB based on file type
+  if (fileType.includes('video') || fileType.includes('mp4') || fileType.includes('mov') || fileType.includes('avi')) {
+    return 200; // 200MB for video files
+  }
+  if (fileType.includes('zip') || fileType.includes('rar') || fileType.includes('7z') || 
+      fileType.includes('exe') || fileType.includes('msi') || fileType.includes('dmg')) {
+    return 500; // 500MB for software/archives
+  }
+  if (fileType.includes('pdf') || fileType.includes('doc') || fileType.includes('ppt') || 
+      fileType.includes('xls') || fileType.includes('txt')) {
+    return 100; // 100MB for documents
+  }
+  return 100; // 100MB default for other files
+};
+
+export const validateFileSize = (file: File, customMaxSizeMB?: number): { isValid: boolean; message: string } => {
+  const maxSizeMB = customMaxSizeMB || getFileSizeLimit(file.type);
   const maxSize = maxSizeMB * 1024 * 1024; // Convert MB to bytes
-  return file.size <= maxSize;
+  const isValid = file.size <= maxSize;
+  
+  if (!isValid) {
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    return {
+      isValid: false,
+      message: `File size (${fileSizeMB}MB) exceeds the limit of ${maxSizeMB}MB for ${file.type} files`
+    };
+  }
+  
+  return { isValid: true, message: '' };
 };

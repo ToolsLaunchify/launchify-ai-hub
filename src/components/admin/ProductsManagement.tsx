@@ -259,10 +259,11 @@ const ProductsManagement: React.FC = () => {
     for (const attachment of fileAttachments) {
       if (attachment.fileObject) {
         // Validate file
-        if (!validateFileSize(attachment.fileObject, 20)) {
+        const sizeValidation = validateFileSize(attachment.fileObject);
+        if (!sizeValidation.isValid) {
           toast({
             title: "File too large",
-            description: `${attachment.name} is larger than 20MB`,
+            description: sizeValidation.message,
             variant: "destructive",
           });
           return;
@@ -632,11 +633,12 @@ const ProductsManagement: React.FC = () => {
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              // Validate file size (20MB limit)
-                              if (!validateFileSize(file, 20)) {
+                              // Validate file size with type-specific limits
+                              const sizeValidation = validateFileSize(file);
+                              if (!sizeValidation.isValid) {
                                 toast({
                                   title: "File too large",
-                                  description: "File must be smaller than 20MB",
+                                  description: sizeValidation.message,
                                   variant: "destructive",
                                 });
                                 return;

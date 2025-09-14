@@ -328,7 +328,7 @@ const EnhancedProductDetailPage: React.FC = () => {
       window.open(file.url, '_blank');
       toast({
         title: "Download started",
-        description: `Downloading ${file.title || 'file'}...`
+        description: `Downloading ${file.title || file.name || 'file'}...`
       });
     } else {
       toast({
@@ -618,7 +618,7 @@ const EnhancedProductDetailPage: React.FC = () => {
                     {product.file_attachments.map((file: any, index: number) => (
                       <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                         <div>
-                          <h4 className="font-medium">{file.title || `File ${index + 1}`}</h4>
+                          <h4 className="font-medium">{file.title || file.name || `File ${index + 1}`}</h4>
                           <p className="text-sm text-muted-foreground">
                             {file.description || 'Download file'}
                           </p>

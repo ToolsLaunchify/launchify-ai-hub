@@ -274,10 +274,12 @@ const ProductsManagement: React.FC = () => {
         if (fileUrl) {
           processedFileAttachments.push({
             id: attachment.id || Math.random().toString(36).substring(2),
+            title: attachment.name || attachment.fileObject.name, // Add title for landing page
             name: attachment.name || attachment.fileObject.name,
             url: fileUrl,
             size: attachment.fileObject.size,
-            type: attachment.fileObject.type
+            type: attachment.fileObject.type,
+            description: attachment.description || '' // Add description field
           });
         } else {
           // Upload failed - show error and stop form submission
@@ -292,10 +294,12 @@ const ProductsManagement: React.FC = () => {
         // Keep URL-based attachments
         processedFileAttachments.push({
           id: attachment.id || Math.random().toString(36).substring(2),
+          title: attachment.name, // Add title for landing page
           name: attachment.name,
           url: attachment.url,
           size: 0,
-          type: 'url'
+          type: 'url',
+          description: attachment.description || '' // Add description field
         });
       }
     }

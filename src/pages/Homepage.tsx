@@ -197,7 +197,7 @@ const Homepage: React.FC = () => {
           <CarouselContent className="-ml-2 md:-ml-4 pt-4">
             {newlyLaunchedProducts.length > 0 ? (
               newlyLaunchedProducts.map((product) => (
-                <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={product.id} className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3">
                   <ProductCard
                     product={{
                       id: product.id,

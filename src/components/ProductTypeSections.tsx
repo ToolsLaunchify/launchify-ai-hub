@@ -2,12 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, Monitor, Gift, Package } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useProductStats } from '@/hooks/useProductStats';
 
 interface ProductTypeSectionProps {
   onTypeSelect?: (type: string) => void;
 }
 
 const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }) => {
+  const { data: productStats } = useProductStats();
+
   const productTypes = [
     {
       id: 'ai_tools',
@@ -15,7 +18,8 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Cutting-edge AI-powered solutions',
       icon: Zap,
       gradient: 'from-blue-500 to-purple-600',
-      href: '/category/ai-tools'
+      href: '/category/ai-tools',
+      count: productStats?.ai_tools || 0
     },
     {
       id: 'software',
@@ -23,7 +27,8 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Professional software solutions',
       icon: Monitor,
       gradient: 'from-green-500 to-teal-600',
-      href: '/category/software'
+      href: '/category/software',
+      count: productStats?.software || 0
     },
     {
       id: 'free_tools',
@@ -31,7 +36,8 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Useful tools at no cost',
       icon: Gift,
       gradient: 'from-orange-500 to-red-600',
-      href: '/category/free-tools'
+      href: '/category/free-tools',
+      count: productStats?.free_tools || 0
     },
     {
       id: 'digital_products',
@@ -39,7 +45,8 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Templates, assets, and downloads',
       icon: Package,
       gradient: 'from-pink-500 to-purple-600',
-      href: '/category/digital-products'
+      href: '/category/digital-products',
+      count: productStats?.digital_products || 0
     }
   ];
 
@@ -62,9 +69,12 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
                   <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
                     {type.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-muted-foreground text-sm mb-2">
                     {type.description}
                   </p>
+                  <div className="text-xs font-medium text-primary">
+                    {type.count} Tool{type.count !== 1 ? 's' : ''}
+                  </div>
                 </CardContent>
               </Card>
             </Link>

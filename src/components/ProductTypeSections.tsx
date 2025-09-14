@@ -69,36 +69,21 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {productTypes.map((type) => (
-            <div key={type.id} className="space-y-4">
-              <Link to={type.href}>
-                <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer border-muted/20 hover:border-primary/20">
-                  <CardContent className="p-6 text-center">
-                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${type.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      <type.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors text-center">
-                      {type.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm text-center">
-                      {type.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
-              <div className="flex justify-center">
-                <Link to={type.href}>
-                  <Button 
-                    variant="default" 
-                    className="bg-gradient-primary text-primary-foreground hover:shadow-glow hover:scale-105"
-                  >
-                    {type.id === 'ai_tools' ? 'View All Tools' : 
-                     type.id === 'software' ? 'View All Software' : 
-                     type.id === 'free_tools' ? 'View All Free Tools' : 
-                     'View All Digital Products'}
-                  </Button>
-                </Link>
-              </div>
-            </div>
+            <Link key={type.id} to={type.href}>
+              <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer border-muted/20 hover:border-primary/20">
+                <CardContent className="p-6 text-center">
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${type.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                    <type.icon className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors text-center">
+                    {type.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm text-center">
+                    {type.description}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>

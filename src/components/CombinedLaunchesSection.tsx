@@ -48,15 +48,21 @@ const CombinedLaunchesSection: React.FC = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="latest" className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 bg-muted border">
+            <TabsTrigger 
+              value="latest" 
+              className="flex items-center space-x-2 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+            >
+              <Badge variant={activeTab === 'latest' ? 'default' : 'secondary'} className="text-xs">
                 {latestProducts.length}
               </Badge>
               <span>Latest Launches</span>
             </TabsTrigger>
-            <TabsTrigger value="featured" className="flex items-center space-x-2">
-              <Badge variant="secondary" className="text-xs">
+            <TabsTrigger 
+              value="featured" 
+              className="flex items-center space-x-2 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300"
+            >
+              <Badge variant={activeTab === 'featured' ? 'default' : 'secondary'} className="text-xs">
                 {featuredProducts.length}
               </Badge>
               <span>Featured Tools</span>

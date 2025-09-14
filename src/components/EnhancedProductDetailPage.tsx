@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import KeyFeaturesSection from '@/components/KeyFeaturesSection';
+
 import ProductGallery from '@/components/ProductGallery';
 import RelatedProducts from '@/components/RelatedProducts';
 import { toast } from '@/hooks/use-toast';
@@ -167,8 +167,17 @@ const FloatingCTA: React.FC<{ product: Product; onCTAClick: () => void }> = ({ p
         variant="hero"
         className="shadow-2xl hover:shadow-3xl transition-all duration-300 rounded-full px-6 py-3"
       >
-        <Download className="mr-2 h-5 w-5" />
-        {product.cta_button_text || 'Get Started'}
+        {product.affiliate_link || product.payment_link ? (
+          <>
+            <ExternalLink className="mr-2 h-5 w-5" />
+            {product.cta_button_text || 'Visit Website'}
+          </>
+        ) : (
+          <>
+            <Play className="mr-2 h-5 w-5" />
+            {product.cta_button_text || 'Try Now'}
+          </>
+        )}
       </Button>
     </div>
   );
@@ -518,8 +527,17 @@ const EnhancedProductDetailPage: React.FC = () => {
                   className="flex-1 min-w-48 text-lg py-6"
                   variant="hero"
                 >
-                  <Download className="mr-2 h-5 w-5" />
-                  {product.cta_button_text || 'Download'}
+                  {product.affiliate_link || product.payment_link ? (
+                    <>
+                      <ExternalLink className="mr-2 h-5 w-5" />
+                      {product.cta_button_text || 'Visit Website'}
+                    </>
+                  ) : (
+                    <>
+                      <Play className="mr-2 h-5 w-5" />
+                      {product.cta_button_text || 'Try Now'}
+                    </>
+                  )}
                 </Button>
                 <Button 
                   onClick={handleSave}
@@ -554,7 +572,7 @@ const EnhancedProductDetailPage: React.FC = () => {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold mb-8 text-center">Overview</h2>
+              <h2 className="text-3xl font-bold mb-8 text-center">Product Details</h2>
               <div 
                 className="prose prose-lg max-w-none"
                 dangerouslySetInnerHTML={{ __html: product.rich_description }}
@@ -564,33 +582,6 @@ const EnhancedProductDetailPage: React.FC = () => {
         </section>
       )}
 
-      {/* Features Section - Only show if we have extracted features */}
-      {keyFeatures.length > 0 && (
-        <section className="py-16 bg-gradient-to-br from-secondary/5 to-primary/5">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Key Features</h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Features mentioned in the product description.
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {keyFeatures.map((feature, index) => (
-                <Card key={index} className="border-none bg-gradient-to-br from-card/50 to-card shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  <CardContent className="p-6 text-center">
-                    <div className="mb-4 mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
-                      <feature.icon className="h-8 w-8 text-primary-foreground" />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Resources Section - Only show if there are actual resources */}
       {((product.file_attachments && product.file_attachments.length > 0) || 
@@ -654,10 +645,10 @@ const EnhancedProductDetailPage: React.FC = () => {
                           onClick={() => handleVideoClick(video)}
                           className="relative"
                         >
-                          <img
-                            src={getVideoThumbnail(video.url)}
-                            alt={video.title}
-                            className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                           <img
+                             src={getVideoThumbnail(video.url)}
+                             alt={video.title}
+                             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = '/placeholder.svg';
                             }}
@@ -690,7 +681,7 @@ const EnhancedProductDetailPage: React.FC = () => {
       <section className="py-16 bg-gradient-to-br from-secondary/5 to-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Product Details</h2>
+            <h2 className="text-3xl font-bold mb-4">Technical Information</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Technical specifications and additional information.
             </p>
@@ -774,8 +765,17 @@ const EnhancedProductDetailPage: React.FC = () => {
               className="text-lg py-6 px-8"
               variant="hero"
             >
-              <Download className="mr-2 h-5 w-5" />
-              {product.cta_button_text || 'Get Started Now'}
+              {product.affiliate_link || product.payment_link ? (
+                <>
+                  <ExternalLink className="mr-2 h-5 w-5" />
+                  {product.cta_button_text || 'Visit Website'}
+                </>
+              ) : (
+                <>
+                  <Play className="mr-2 h-5 w-5" />
+                  {product.cta_button_text || 'Try Now'}
+                </>
+              )}
             </Button>
             <Button 
               onClick={handleSave}

@@ -18,7 +18,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Cutting-edge AI-powered solutions',
       icon: Zap,
       gradient: 'from-blue-500 to-purple-600',
-      href: '/category/ai-tools',
+      href: '/type/ai-tools',
       count: productStats?.ai_tools || 0
     },
     {
@@ -27,7 +27,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Professional software solutions',
       icon: Monitor,
       gradient: 'from-green-500 to-teal-600',
-      href: '/category/software',
+      href: '/type/software',
       count: productStats?.software || 0
     },
     {
@@ -36,7 +36,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Useful tools at no cost',
       icon: Gift,
       gradient: 'from-orange-500 to-red-600',
-      href: '/category/free-tools',
+      href: '/type/free-tools',
       count: productStats?.free_tools || 0
     },
     {
@@ -45,7 +45,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
       description: 'Templates, assets, and downloads',
       icon: Package,
       gradient: 'from-pink-500 to-purple-600',
-      href: '/category/digital-products',
+      href: '/type/digital-products',
       count: productStats?.digital_products || 0
     }
   ];
@@ -72,7 +72,7 @@ const ProductTypeSections: React.FC<ProductTypeSectionProps> = ({ onTypeSelect }
                   <p className="text-muted-foreground text-sm mb-2">
                     {type.description}
                   </p>
-                  <div className="text-xs font-medium text-primary">
+                  <div className="text-sm font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full">
                     {type.count} Tool{type.count !== 1 ? 's' : ''}
                   </div>
                 </CardContent>

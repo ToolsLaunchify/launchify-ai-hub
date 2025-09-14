@@ -57,10 +57,14 @@ const CategoriesSection: React.FC = () => {
                 <p className="text-sm text-muted-foreground mb-2">
                   {category.description}
                 </p>
-                <Badge variant="secondary" className="mb-4">
-                  {category.product_count} tools
+                <Badge variant="secondary" className="mb-4 text-xs font-medium">
+                  {category.product_count} Tool{category.product_count !== 1 ? 's' : ''}
                 </Badge>
-                <Button variant="ghost" size="sm" className="w-full group-hover:bg-primary/10">
+                <Button 
+                  variant="hero" 
+                  size="sm" 
+                  className="w-full bg-gradient-primary hover:opacity-90 text-white"
+                >
                   Explore
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>

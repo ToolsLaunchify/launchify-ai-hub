@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import ProductGallery from '@/components/ProductGallery';
 import RelatedProducts from '@/components/RelatedProducts';
+import RichTextDisplay from '@/components/ui/rich-text-display';
 import { toast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
@@ -573,9 +574,9 @@ const EnhancedProductDetailPage: React.FC = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold mb-8 text-center">Product Details</h2>
-              <div 
-                className="prose prose-lg max-w-none prose-headings:text-foreground prose-h1:text-3xl prose-h1:font-bold prose-h1:mb-6 prose-h1:text-primary prose-h2:text-2xl prose-h2:font-semibold prose-h2:mb-4 prose-h2:text-foreground prose-h3:text-xl prose-h3:font-medium prose-h3:mb-3 prose-h3:text-foreground prose-p:text-muted-foreground prose-p:mb-4 prose-a:text-primary prose-strong:text-foreground prose-ul:text-muted-foreground prose-ol:text-muted-foreground prose-li:mb-2"
-                dangerouslySetInnerHTML={{ __html: product.rich_description }}
+              <RichTextDisplay 
+                content={product.rich_description}
+                className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-8 shadow-lg"
               />
             </div>
           </div>

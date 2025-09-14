@@ -56,24 +56,16 @@ const CategorySection: React.FC<CategorySectionProps> = ({
   return (
     <section className={`py-16 ${bgClass}`}>
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
+        <div className="text-center mb-8">
+          <div className="flex justify-center items-center space-x-4 mb-4">
             <div className="p-3 bg-gradient-primary rounded-xl shadow-glow">
               {icon}
             </div>
-            <div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                {title}
-              </h2>
-              <p className="text-muted-foreground mt-1">{description}</p>
-            </div>
           </div>
-          <Link to={`/category/${slug}`}>
-            <Button variant="outline" className="group">
-              View All
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
+          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
+            {title}
+          </h2>
+          <p className="text-muted-foreground">{description}</p>
         </div>
 
         <Carousel className="w-full">
@@ -90,6 +82,15 @@ const CategorySection: React.FC<CategorySectionProps> = ({
           <CarouselPrevious className="left-4" />
           <CarouselNext className="right-4" />
         </Carousel>
+        
+        <div className="text-center mt-8">
+          <Link to={`/category/${slug}`}>
+            <Button className="bg-gradient-primary hover:opacity-90 text-white border-none px-8 py-3">
+              View All {title}
+              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   );

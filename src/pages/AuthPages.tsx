@@ -98,10 +98,12 @@ const AuthPages: React.FC<AuthPageProps> = ({ mode }) => {
         } else {
           toast({
             title: "Account Created Successfully!",
-            description: "Please check your email to verify your account.",
+            description: "Redirecting to login page...",
           });
-          // Keep user on signup page to show them the success message
-          // They will be redirected automatically when they verify their email
+          // Redirect to login page after successful signup
+          setTimeout(() => {
+            navigate('/login');
+          }, 2000);
         }
       }
     } catch (error) {

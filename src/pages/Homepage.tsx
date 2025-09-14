@@ -3,6 +3,7 @@ import { ArrowRight, Grid, List, Filter, Clock, Star, Bookmark } from 'lucide-re
 import HeroSection from '@/components/HeroSection';
 import ProductCard from '@/components/ProductCard';
 import CategoriesSection from '@/components/CategoriesSection';
+import ProductTypeSections from '@/components/ProductTypeSections';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -163,6 +164,9 @@ const Homepage: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <HeroSection onSearch={handleSearch} />
+      
+      {/* Product Type Sections */}
+      <ProductTypeSections />
       
       {/* New Launches Section */}
       <section className="py-16 container mx-auto px-4">

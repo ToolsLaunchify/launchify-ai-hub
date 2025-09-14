@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Rocket, TrendingUp, Zap } from 'lucide-react';
+import { Search, Rocket, TrendingUp, Zap, Monitor, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useProductStats } from '@/hooks/useProductStats';
 
 interface HeroSectionProps {
   onSearch?: (query: string) => void;
@@ -9,6 +10,7 @@ interface HeroSectionProps {
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { data: productStats } = useProductStats();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,9 +18,26 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
   };
 
   const stats = [
-    { label: 'AI Tools', value: '500+', icon: Zap },
-    { label: 'Software Listed', value: '1,200+', icon: Rocket },
-    { label: 'Daily Visitors', value: '10K+', icon: TrendingUp },
+    { 
+      label: 'AI Tools', 
+      value: productStats?.ai_tools ? `${productStats.ai_tools}+` : '0', 
+      icon: Zap 
+    },
+    { 
+      label: 'Software', 
+      value: productStats?.software ? `${productStats.software}+` : '0', 
+      icon: Monitor 
+    },
+    { 
+      label: 'Free Tools', 
+      value: productStats?.free_tools ? `${productStats.free_tools}+` : '0', 
+      icon: Gift 
+    },
+    { 
+      label: 'Digital Products', 
+      value: productStats?.digital_products ? `${productStats.digital_products}+` : '0', 
+      icon: Rocket 
+    },
   ];
 
   const popularSearches = [
@@ -42,13 +61,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           {/* Main Heading */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             Discover the Latest{' '}
-            <span className="text-gradient-primary">AI & Software</span>{' '}
+            <span className="text-gradient-primary">AI Tools & Software</span>{' '}
             Launches
           </h1>
           
           {/* Subheading */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Find cutting-edge tools, software, and digital products that boost your productivity and creativity
+            Find cutting-edge AI Tools, Software, Free Tools and Digital Products that boost your productivity and creativity
           </p>
           
           {/* Search Bar */}
@@ -74,24 +93,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
             </div>
           </form>
           
-          {/* Popular Searches */}
-          <div className="mb-12 animate-slide-up delay-200">
-            <p className="text-sm text-muted-foreground mb-3">Popular searches:</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {popularSearches.map((search) => (
-                <button
-                  key={search}
-                  onClick={() => {
-                    setSearchQuery(search);
-                    onSearch?.(search);
-                  }}
-                  className="px-3 py-1 text-sm bg-muted/50 hover:bg-muted rounded-full transition-colors hover:text-primary"
-                >
-                  {search}
-                </button>
-              ))}
-            </div>
-          </div>
           
           {/* CTA Buttons */}
           <div className="flex justify-center mb-12 animate-slide-up delay-300">
@@ -106,7 +107,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           </div>
           
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-slide-up delay-500">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 animate-slide-up delay-500">
             {stats.map((stat, index) => (
               <div key={stat.label} className="text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-primary rounded-full mb-3">

@@ -53,11 +53,16 @@ interface Product {
   rich_description: string;
   image_url: string;
   category_id: string;
+  product_type: string;
   original_price: number;
   discounted_price: number;
   currency: string;
   is_featured: boolean;
   is_free: boolean;
+  is_newly_launched: boolean;
+  is_popular: boolean;
+  is_trending: boolean;
+  is_editors_choice: boolean;
   affiliate_link: string;
   payment_link: string;
   cta_button_text: string;
@@ -258,11 +263,16 @@ const ProductsManagement: React.FC = () => {
       rich_description: richDescription,
       image_url: imageUrl,
       category_id: formData.get('category_id') as string || null,
+      product_type: formData.get('product_type') as string || 'software',
       original_price: formData.get('original_price') ? Number(formData.get('original_price')) : null,
       discounted_price: formData.get('discounted_price') ? Number(formData.get('discounted_price')) : null,
       currency: formData.get('currency') as string || 'USD',
       is_featured: formData.get('is_featured') === 'on',
       is_free: formData.get('is_free') === 'on',
+      is_newly_launched: formData.get('is_newly_launched') === 'on',
+      is_popular: formData.get('is_popular') === 'on',
+      is_trending: formData.get('is_trending') === 'on',
+      is_editors_choice: formData.get('is_editors_choice') === 'on',
       affiliate_link: formData.get('affiliate_link') as string,
       payment_link: formData.get('payment_link') as string,
       cta_button_text: formData.get('cta_button_text') as string || 'Learn More',
@@ -287,7 +297,7 @@ const ProductsManagement: React.FC = () => {
     setFileAttachments(fileAttachments.filter((_, i) => i !== index));
   };
 
-  const updateFileAttachment = (index: number, field: string, value: string) => {
+  const updateFileAttachment = (index: number, field: string, value: string | File) => {
     const updated = [...fileAttachments];
     updated[index] = { ...updated[index], [field]: value };
     setFileAttachments(updated);
@@ -382,6 +392,21 @@ const ProductsManagement: React.FC = () => {
                           {category.name}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="product_type">Product Type</Label>
+                  <Select name="product_type" defaultValue={editingProduct?.product_type || 'software'}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select product type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ai_tools">AI Tools</SelectItem>
+                      <SelectItem value="software">Software</SelectItem>
+                      <SelectItem value="free_tools">Free Tools</SelectItem>
+                      <SelectItem value="digital_products">Digital Products</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -524,25 +549,48 @@ const ProductsManagement: React.FC = () => {
                   </Button>
                 </div>
                 {fileAttachments.map((attachment, index) => (
-                  <div key={index} className="grid grid-cols-3 gap-2 items-end">
-                    <Input
-                      placeholder="File/Document name"
-                      value={attachment.name}
-                      onChange={(e) => updateFileAttachment(index, 'name', e.target.value)}
-                    />
-                    <Input
-                      placeholder="URL or upload link"
-                      value={attachment.url}
-                      onChange={(e) => updateFileAttachment(index, 'url', e.target.value)}
-                    />
-                    <Button 
-                      type="button" 
-                      onClick={() => removeFileAttachment(index)} 
-                      size="sm" 
-                      variant="destructive"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                  <div key={index} className="space-y-2 p-4 border rounded-lg">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        placeholder="File/Document name"
+                        value={attachment.name}
+                        onChange={(e) => updateFileAttachment(index, 'name', e.target.value)}
+                      />
+                      <Button 
+                        type="button" 
+                        onClick={() => removeFileAttachment(index)} 
+                        size="sm" 
+                        variant="destructive"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label className="text-sm">Upload File</Label>
+                        <Input
+                          type="file"
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              // Handle file upload to Supabase storage
+                              const fileName = `${Date.now()}-${file.name}`;
+                              updateFileAttachment(index, 'fileName', fileName);
+                              updateFileAttachment(index, 'fileObject', file);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm">Or Enter URL</Label>
+                        <Input
+                          placeholder="https://example.com/file.pdf"
+                          value={attachment.url}
+                          onChange={(e) => updateFileAttachment(index, 'url', e.target.value)}
+                        />
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -605,22 +653,60 @@ const ProductsManagement: React.FC = () => {
                 />
               </div>
 
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="is_featured"
-                    name="is_featured"
-                    defaultChecked={editingProduct?.is_featured || false}
-                  />
-                  <Label htmlFor="is_featured">Featured Product</Label>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_featured"
+                      name="is_featured"
+                      defaultChecked={editingProduct?.is_featured || false}
+                    />
+                    <Label htmlFor="is_featured">Featured Product</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_free"
+                      name="is_free"
+                      defaultChecked={editingProduct?.is_free || false}
+                    />
+                    <Label htmlFor="is_free">Free Product</Label>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="is_free"
-                    name="is_free"
-                    defaultChecked={editingProduct?.is_free || false}
-                  />
-                  <Label htmlFor="is_free">Free Product</Label>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_newly_launched"
+                      name="is_newly_launched"
+                      defaultChecked={editingProduct?.is_newly_launched || false}
+                    />
+                    <Label htmlFor="is_newly_launched">Newly Launched</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_popular"
+                      name="is_popular"
+                      defaultChecked={editingProduct?.is_popular || false}
+                    />
+                    <Label htmlFor="is_popular">Popular</Label>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_trending"
+                      name="is_trending"
+                      defaultChecked={editingProduct?.is_trending || false}
+                    />
+                    <Label htmlFor="is_trending">Trending</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="is_editors_choice"
+                      name="is_editors_choice"
+                      defaultChecked={editingProduct?.is_editors_choice || false}
+                    />
+                    <Label htmlFor="is_editors_choice">Editor's Choice</Label>
+                  </div>
                 </div>
               </div>
 

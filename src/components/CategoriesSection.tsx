@@ -1,33 +1,13 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ArrowRight } from 'lucide-react';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  icon: string;
-}
+import { useCategoryStats } from '@/hooks/useCategoryStats';
 
 const CategoriesSection: React.FC = () => {
-  const { data: categories = [], isLoading } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .is('parent_id', null)
-        .order('name');
-      
-      if (error) throw error;
-      return data as Category[];
-    }
-  });
+  const { data: categories = [], isLoading } = useCategoryStats();
 
   if (isLoading) {
     return (
@@ -74,9 +54,12 @@ const CategoriesSection: React.FC = () => {
                 <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
                   {category.name}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground mb-2">
                   {category.description}
                 </p>
+                <Badge variant="secondary" className="mb-4">
+                  {category.product_count} tools
+                </Badge>
                 <Button variant="ghost" size="sm" className="w-full group-hover:bg-primary/10">
                   Explore
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

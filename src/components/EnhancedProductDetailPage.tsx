@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -27,7 +29,9 @@ import {
   Globe,
   Lock,
   Headphones,
-  ArrowUp
+  ArrowUp,
+  BookmarkPlus,
+  BookmarkCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -74,15 +78,14 @@ const VideoModal: React.FC<{ video: any; isOpen: boolean; onClose: () => void }>
     return match ? match[1] : null;
   };
 
-  const videoId = video.url ? getVideoId(video.url) : null;
-  const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '/placeholder.svg';
+  const videoId = video?.url ? getVideoId(video.url) : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl p-0">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="flex items-center justify-between">
-            {video.title}
+            {video?.title || 'Video'}
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
@@ -92,13 +95,16 @@ const VideoModal: React.FC<{ video: any; isOpen: boolean; onClose: () => void }>
           {videoId ? (
             <iframe
               src={`https://www.youtube.com/embed/${videoId}`}
-              title={video.title}
+              title={video?.title || 'Video'}
               className="w-full h-full rounded-b-lg"
               allowFullScreen
             />
           ) : (
             <div className="w-full h-full bg-muted rounded-b-lg flex items-center justify-center">
-              <Play className="h-16 w-16 text-muted-foreground" />
+              <div className="text-center">
+                <PlayCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Invalid video URL</p>
+              </div>
             </div>
           )}
         </div>
@@ -112,10 +118,10 @@ const ScrollProgress: React.FC = () => {
 
   useEffect(() => {
     const updateScrollProgress = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (scrollTop / docHeight) * 100;
-      setScrollProgress(progress);
+      const scrollPx = document.documentElement.scrollTop;
+      const winHeightPx = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (scrollPx / winHeightPx) * 100;
+      setScrollProgress(scrolled);
     };
 
     window.addEventListener('scroll', updateScrollProgress);
@@ -123,9 +129,9 @@ const ScrollProgress: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 w-full h-1 bg-muted z-50">
+    <div className="fixed top-0 left-0 w-full h-1 bg-secondary/20 z-50">
       <div 
-        className="h-full bg-gradient-primary transition-all duration-300"
+        className="h-full bg-gradient-primary transition-all duration-150 ease-out"
         style={{ width: `${scrollProgress}%` }}
       />
     </div>
@@ -133,14 +139,14 @@ const ScrollProgress: React.FC = () => {
 };
 
 const FloatingCTA: React.FC<{ product: Product; onCTAClick: () => void }> = ({ product, onCTAClick }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.scrollY > 800) {
-        setIsVisible(true);
+      if (window.pageYOffset > 300) {
+        setVisible(true);
       } else {
-        setIsVisible(false);
+        setVisible(false);
       }
     };
 
@@ -148,28 +154,33 @@ const FloatingCTA: React.FC<{ product: Product; onCTAClick: () => void }> = ({ p
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
-  if (!isVisible) return null;
+  if (!visible) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 animate-fade-in">
-      <Button
-        size="lg"
-        className="shadow-2xl bg-gradient-primary hover:scale-105 transition-transform"
+    <div className="fixed bottom-6 right-6 z-50">
+      <Button 
         onClick={onCTAClick}
+        size="lg"
+        variant="hero"
+        className="shadow-2xl hover:shadow-3xl transition-all duration-300 rounded-full px-6 py-3"
       >
+        <Download className="mr-2 h-5 w-5" />
         {product.cta_button_text || 'Get Started'}
-        <ExternalLink className="ml-2 h-5 w-5" />
       </Button>
     </div>
   );
 };
 
 const BackToTop: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const toggleVisibility = () => {
-      setIsVisible(window.scrollY > 400);
+      if (window.pageYOffset > 300) {
+        setVisible(true);
+      } else {
+        setVisible(false);
+      }
     };
 
     window.addEventListener('scroll', toggleVisibility);
@@ -177,17 +188,20 @@ const BackToTop: React.FC = () => {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
-  if (!isVisible) return null;
+  if (!visible) return null;
 
   return (
     <Button
+      onClick={scrollToTop}
       variant="outline"
       size="icon"
-      className="fixed bottom-6 left-6 z-40 shadow-lg"
-      onClick={scrollToTop}
+      className="fixed bottom-6 left-6 z-50 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
     >
       <ArrowUp className="h-4 w-4" />
     </Button>
@@ -195,9 +209,11 @@ const BackToTop: React.FC = () => {
 };
 
 const EnhancedProductDetailPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams();
+  const { user } = useAuth();
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', slug],
@@ -217,11 +233,85 @@ const EnhancedProductDetailPage: React.FC = () => {
     enabled: !!slug,
   });
 
+  // Check if product is saved on component mount
+  useEffect(() => {
+    if (user && product) {
+      const savedProducts = JSON.parse(localStorage.getItem(`saved_products_${user.id}`) || '[]');
+      setIsSaved(savedProducts.includes(product.id));
+    }
+  }, [user, product]);
+
   const handleCTAClick = () => {
     if (product?.affiliate_link) {
       window.open(product.affiliate_link, '_blank');
     } else if (product?.payment_link) {
       window.open(product.payment_link, '_blank');
+    } else {
+      toast({
+        title: "No link available",
+        description: "This product doesn't have a direct link configured.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSave = () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save products for later.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const savedProducts = JSON.parse(localStorage.getItem(`saved_products_${user.id}`) || '[]');
+    
+    if (isSaved) {
+      // Remove from saved
+      const updatedSaved = savedProducts.filter((id: string) => id !== product?.id);
+      localStorage.setItem(`saved_products_${user.id}`, JSON.stringify(updatedSaved));
+      setIsSaved(false);
+      toast({
+        title: "Removed from saved",
+        description: "Product removed from your saved list."
+      });
+    } else {
+      // Add to saved
+      const updatedSaved = [...savedProducts, product?.id];
+      localStorage.setItem(`saved_products_${user.id}`, JSON.stringify(updatedSaved));
+      setIsSaved(true);
+      toast({
+        title: "Saved for later",
+        description: "Product added to your saved list."
+      });
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: product?.name || 'Check out this tool',
+      text: product?.description || 'Amazing tool I found',
+      url: window.location.href
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared successfully",
+          description: "Thank you for sharing!"
+        });
+      } catch (error) {
+        // User cancelled sharing
+      }
+    } else {
+      // Fallback to copying URL
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied",
+        description: "Product link copied to clipboard."
+      });
     }
   };
 
@@ -231,8 +321,18 @@ const EnhancedProductDetailPage: React.FC = () => {
   };
 
   const handleDownload = (file: any) => {
-    if (file.url) {
+    if (file?.url) {
       window.open(file.url, '_blank');
+      toast({
+        title: "Download started",
+        description: `Downloading ${file.title || 'file'}...`
+      });
+    } else {
+      toast({
+        title: "Download not available",
+        description: "This file doesn't have a valid download link.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -260,26 +360,39 @@ const EnhancedProductDetailPage: React.FC = () => {
     return '/placeholder.svg';
   };
 
-  // Generate dynamic features based on product type and category
-  const generateFeatures = () => {
-    const baseFeatures = [
-      { icon: Zap, title: "Lightning Fast", description: "Optimized for speed and performance" },
-      { icon: Shield, title: "Secure & Safe", description: "Enterprise-grade security standards" },
-      { icon: CheckCircle, title: "Easy to Use", description: "Intuitive interface for all skill levels" },
+  // Extract real features from rich_description if available
+  const extractFeaturesFromDescription = () => {
+    if (!product?.rich_description) return [];
+
+    const features = [];
+    const description = product.rich_description.toLowerCase();
+    
+    // Look for common feature keywords in the description
+    const featureMap = [
+      { keywords: ['fast', 'speed', 'quick', 'rapid'], icon: Zap, title: "Fast Performance" },
+      { keywords: ['secure', 'security', 'safe', 'protection'], icon: Shield, title: "Secure & Safe" },
+      { keywords: ['easy', 'simple', 'intuitive', 'user-friendly'], icon: CheckCircle, title: "Easy to Use" },
+      { keywords: ['ai', 'artificial intelligence', 'machine learning', 'smart'], icon: Star, title: "AI-Powered" },
+      { keywords: ['cross-platform', 'multi-platform', 'compatible'], icon: Globe, title: "Cross-Platform" },
+      { keywords: ['premium', 'quality', 'professional', 'advanced'], icon: Trophy, title: "Premium Quality" },
+      { keywords: ['support', 'help', 'assistance', 'customer service'], icon: Headphones, title: "Great Support" },
+      { keywords: ['mobile', 'responsive', 'smartphone', 'tablet'], icon: Smartphone, title: "Mobile-Friendly" }
     ];
 
-    if (product?.product_type === 'ai_tools') {
-      baseFeatures.push({ icon: Star, title: "AI-Powered", description: "Advanced machine learning capabilities" });
-    } else if (product?.product_type === 'software') {
-      baseFeatures.push({ icon: Globe, title: "Cross-Platform", description: "Works on all major platforms" });
-    } else {
-      baseFeatures.push({ icon: Gift, title: "Premium Quality", description: "High-quality digital content" });
-    }
+    featureMap.forEach(feature => {
+      if (feature.keywords.some(keyword => description.includes(keyword))) {
+        features.push({
+          icon: feature.icon,
+          title: feature.title,
+          description: "Based on product description"
+        });
+      }
+    });
 
-    return baseFeatures;
+    return features.slice(0, 4); // Limit to 4 features
   };
 
-  const keyFeatures = generateFeatures();
+  const keyFeatures = extractFeaturesFromDescription();
 
   if (isLoading) {
     return (
@@ -399,20 +512,15 @@ const EnhancedProductDetailPage: React.FC = () => {
                   <CardContent className="p-6">
                     <h3 className="text-lg font-semibold mb-3">Pricing</h3>
                     <div className="flex items-center space-x-4">
-                      {product.original_price && product.original_price !== product.discounted_price && (
-                        <span className="text-2xl text-muted-foreground line-through">
-                          {formatPrice(product.original_price)}
-                        </span>
-                      )}
                       {product.discounted_price && (
                         <span className="text-3xl font-bold text-primary">
                           {formatPrice(product.discounted_price)}
                         </span>
                       )}
-                      {product.original_price && product.discounted_price && product.original_price !== product.discounted_price && (
-                        <Badge className="bg-green-500 text-white">
-                          Save {Math.round(((product.original_price - product.discounted_price) / product.original_price) * 100)}%
-                        </Badge>
+                      {product.original_price && (
+                        <span className={`text-xl ${product.discounted_price ? 'line-through text-muted-foreground' : 'font-bold text-primary'}`}>
+                          {formatPrice(product.original_price)}
+                        </span>
                       )}
                     </div>
                   </CardContent>
@@ -420,20 +528,35 @@ const EnhancedProductDetailPage: React.FC = () => {
               )}
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="flex-1 text-lg py-6 bg-gradient-primary hover:scale-105 transition-transform shadow-xl"
-                  onClick={handleCTAClick}
+              <div className="flex flex-wrap gap-4">
+                <Button 
+                  onClick={handleCTAClick} 
+                  size="lg" 
+                  className="flex-1 min-w-48 text-lg py-6"
+                  variant="hero"
                 >
-                  <span>{product.cta_button_text || 'Get Started'}</span>
-                  <ExternalLink className="ml-2 h-5 w-5" />
+                  <Download className="mr-2 h-5 w-5" />
+                  {product.cta_button_text || 'Download'}
                 </Button>
-                <Button variant="outline" size="lg" className="py-6 hover:scale-105 transition-transform">
-                  <Bookmark className="mr-2 h-5 w-5" />
-                  Save Tool
+                <Button 
+                  onClick={handleSave}
+                  variant="premium" 
+                  size="lg" 
+                  className="text-lg py-6"
+                >
+                  {isSaved ? (
+                    <BookmarkCheck className="mr-2 h-5 w-5" />
+                  ) : (
+                    <BookmarkPlus className="mr-2 h-5 w-5" />
+                  )}
+                  {isSaved ? 'Saved' : 'Save Tool'}
                 </Button>
-                <Button variant="outline" size="lg" className="py-6 hover:scale-105 transition-transform">
+                <Button 
+                  onClick={handleShare}
+                  variant="outline" 
+                  size="lg" 
+                  className="text-lg py-6"
+                >
                   <Share2 className="mr-2 h-5 w-5" />
                   Share
                 </Button>
@@ -444,316 +567,255 @@ const EnhancedProductDetailPage: React.FC = () => {
       </section>
 
       {/* Overview Section */}
-      <section id="overview" className="py-16 bg-gradient-to-br from-background to-muted/20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">
-              About <span className="text-primary">{product.name}</span>
-            </h2>
-            
-            {product.rich_description && (
-              <Card className="mb-12 border-primary/20">
-                <CardContent className="p-8">
-                  <div 
-                    className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground"
-                    dangerouslySetInnerHTML={{ __html: product.rich_description }}
-                  />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Key Features Grid */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {keyFeatures.map((feature, index) => (
-                <Card key={index} className="border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 hover:shadow-glow group">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="p-3 rounded-lg bg-gradient-primary/10 group-hover:bg-gradient-primary/20 transition-colors">
-                        <feature.icon className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                        <p className="text-muted-foreground">{feature.description}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">
-              Powerful <span className="text-primary">Features</span>
-            </h2>
-            
-            <div className="grid lg:grid-cols-2 gap-12 mb-16">
-              <Card className="border-primary/20">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center space-x-2">
-                    <Zap className="h-6 w-6 text-primary" />
-                    <span>Core Features</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {[
-                    product.product_type === 'ai_tools' ? "Advanced AI-powered functionality" : "Professional-grade capabilities",
-                    "Intuitive user interface",
-                    "Real-time processing",
-                    "Cross-platform compatibility",
-                    "24/7 customer support",
-                    product.is_free ? "Completely free to use" : "Premium features included"
-                  ].map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card className="border-primary/20">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center space-x-2">
-                    <Trophy className="h-6 w-6 text-primary" />
-                    <span>Key Benefits</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {[
-                    "Increase productivity significantly",
-                    "Save hours of manual work",
-                    "Improve accuracy and quality",
-                    "Scale operations efficiently",
-                    "Get results faster",
-                    "Access premium support"
-                  ].map((benefit, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                      <Star className="h-5 w-5 text-yellow-500 flex-shrink-0" />
-                      <span>{benefit}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Resources Section */}
-      {(product.file_attachments?.length > 0 || product.video_courses?.length > 0) && (
-        <section id="resources" className="py-16 bg-gradient-to-br from-muted/20 to-background">
+      {product.rich_description && (
+        <section className="py-16">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">
-                Resources & <span className="text-primary">Downloads</span>
-              </h2>
-              
-              <div className="grid lg:grid-cols-2 gap-8">
-                {/* File Attachments */}
-                {product.file_attachments && product.file_attachments.length > 0 && (
-                  <Card className="border-primary/20">
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <Download className="h-5 w-5 text-primary" />
-                        <span>Downloads & Files</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {product.file_attachments.map((file: any, index: number) => (
-                        <div key={index} className="group border rounded-lg p-4 hover:border-primary/40 transition-colors hover:shadow-md">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                <FileText className="h-5 w-5 text-primary" />
-                              </div>
-                              <div>
-                                <p className="font-medium">{file.name || `Download ${index + 1}`}</p>
-                                <p className="text-sm text-muted-foreground">{file.description || 'Additional resource file'}</p>
-                                {file.size && <p className="text-xs text-muted-foreground">{file.size}</p>}
-                              </div>
-                            </div>
-                            <Button 
-                              size="sm" 
-                              className="bg-gradient-primary hover:scale-105 transition-transform"
-                              onClick={() => handleDownload(file)}
-                            >
-                              <Download className="h-4 w-4 mr-2" />
-                              Download
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Video Courses */}
-                {product.video_courses && product.video_courses.length > 0 && (
-                  <Card className="border-primary/20">
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <PlayCircle className="h-5 w-5 text-primary" />
-                        <span>Video Tutorials</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {product.video_courses.map((video: any, index: number) => (
-                        <div key={index} className="group border rounded-lg overflow-hidden hover:border-primary/40 transition-colors hover:shadow-md">
-                          <div className="relative">
-                            <img 
-                              src={video.url ? getVideoThumbnail(video.url) : '/placeholder.svg'}
-                              alt={video.title || `Video ${index + 1}`}
-                              className="w-full h-32 object-cover"
-                            />
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                size="sm"
-                                className="bg-white/20 hover:bg-white/30 text-white border-white/20"
-                                onClick={() => handleVideoClick(video)}
-                              >
-                                <Play className="h-4 w-4 mr-2" />
-                                Play Video
-                              </Button>
-                            </div>
-                            <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                              {video.duration || '0:00'}
-                            </div>
-                          </div>
-                          <div className="p-4">
-                            <h4 className="font-medium mb-1">{video.title || `Video Tutorial ${index + 1}`}</h4>
-                            <p className="text-sm text-muted-foreground">{video.description || 'Learn how to get the most out of this tool'}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl font-bold mb-8 text-center">Overview</h2>
+              <div 
+                className="prose prose-lg max-w-none"
+                dangerouslySetInnerHTML={{ __html: product.rich_description }}
+              />
             </div>
           </div>
         </section>
       )}
 
-      {/* Details Section */}
-      <section id="details" className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">
-              Product <span className="text-primary">Details</span>
-            </h2>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="border-primary/20">
-                <CardHeader>
-                  <CardTitle>Specifications</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Product Type</span>
-                    <span className="font-medium capitalize">{product.product_type?.replace('_', ' ') || 'Software'}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Category</span>
-                    <span className="font-medium">{product.category?.name || 'General'}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Launch Date</span>
-                    <span className="font-medium">{new Date(product.created_at).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Pricing</span>
-                    <span className="font-medium">{product.is_free ? 'Free' : 'Paid'}</span>
-                  </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-muted-foreground">Support</span>
-                    <span className="font-medium">24/7 Available</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-primary/20">
-                <CardHeader>
-                  <CardTitle>Compatibility</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-                    <Globe className="h-5 w-5 text-primary" />
-                    <span>Web Browser</span>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-                    <Smartphone className="h-5 w-5 text-primary" />
-                    <span>Mobile Devices</span>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-                    <Lock className="h-5 w-5 text-primary" />
-                    <span>Secure Access</span>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-                    <Headphones className="h-5 w-5 text-primary" />
-                    <span>Customer Support</span>
-                  </div>
-                </CardContent>
-              </Card>
+      {/* Features Section - Only show if we have extracted features */}
+      {keyFeatures.length > 0 && (
+        <section className="py-16 bg-gradient-to-br from-secondary/5 to-primary/5">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Key Features</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Features mentioned in the product description.
+              </p>
             </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {keyFeatures.map((feature, index) => (
+                <Card key={index} className="border-none bg-gradient-to-br from-card/50 to-card shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <CardContent className="p-6 text-center">
+                    <div className="mb-4 mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
+                      <feature.icon className="h-8 w-8 text-primary-foreground" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                    <p className="text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Resources Section - Only show if there are actual resources */}
+      {((product.file_attachments && product.file_attachments.length > 0) || 
+        (product.video_courses && product.video_courses.length > 0)) && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Resources & Downloads</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Access all the resources you need to get started.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* File Downloads */}
+              {product.file_attachments && product.file_attachments.length > 0 && (
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <FileText className="h-6 w-6" />
+                      <span>File Downloads</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {product.file_attachments.map((file: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                        <div>
+                          <h4 className="font-medium">{file.title || `File ${index + 1}`}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {file.description || 'Download file'}
+                          </p>
+                        </div>
+                        <Button 
+                          onClick={() => handleDownload(file)}
+                          variant="outline" 
+                          size="sm"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Video Tutorials */}
+              {product.video_courses && product.video_courses.length > 0 && (
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <PlayCircle className="h-6 w-6" />
+                      <span>Video Tutorials</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {product.video_courses.map((video: any, index: number) => (
+                      <div key={index} className="relative group cursor-pointer rounded-lg overflow-hidden">
+                        <div 
+                          onClick={() => handleVideoClick(video)}
+                          className="relative"
+                        >
+                          <img
+                            src={getVideoThumbnail(video.url)}
+                            alt={video.title}
+                            className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/placeholder.svg';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
+                            <div className="bg-white/90 rounded-full p-3 group-hover:scale-110 transition-transform duration-300">
+                              <Play className="h-6 w-6 text-primary" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-3">
+                          <h4 className="font-medium">{video.title}</h4>
+                          {video.description && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {video.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Details Section - Always show basic product info */}
+      <section className="py-16 bg-gradient-to-br from-secondary/5 to-primary/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Product Details</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Technical specifications and additional information.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle>Specifications</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-muted-foreground">Category</h4>
+                    <p className="capitalize">{product.category?.name || 'General'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-muted-foreground">Type</h4>
+                    <p className="capitalize">{product.product_type?.replace('_', ' ') || 'Software'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-muted-foreground">Launch Date</h4>
+                    <p>{new Date(product.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-muted-foreground">Pricing</h4>
+                    <p>{product.is_free ? 'Free' : 'Premium'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-muted-foreground">Views</h4>
+                    <p>{(product.views_count || 0).toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-muted-foreground">Saves</h4>
+                    <p>{(product.saves_count || 0).toLocaleString()}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle>Platform Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <Globe className="h-5 w-5 text-primary" />
+                  <span>Web-based Platform</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Smartphone className="h-5 w-5 text-primary" />
+                  <span>Mobile Responsive</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Shield className="h-5 w-5 text-primary" />
+                  <span>Secure & Reliable</span>
+                </div>
+                {product.is_free && (
+                  <div className="flex items-center space-x-3">
+                    <Gift className="h-5 w-5 text-primary" />
+                    <span>Free to Use</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-6">
-              Ready to get started with <span className="text-primary">{product.name}</span>?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of users who are already benefiting from this amazing tool.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button
-                size="lg"
-                className="text-lg py-6 px-8 bg-gradient-primary hover:scale-105 transition-transform shadow-xl"
-                onClick={handleCTAClick}
-              >
-                <span>{product.cta_button_text || 'Get Started Now'}</span>
-                <ExternalLink className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="lg" className="py-6 px-8 hover:scale-105 transition-transform">
-                <Bookmark className="mr-2 h-5 w-5" />
-                Save for Later
-              </Button>
-            </div>
-            
-            <div className="flex items-center justify-center space-x-8 mt-12 text-sm text-muted-foreground">
-              <div className="flex items-center space-x-2">
-                <Users className="h-5 w-5" />
-                <span>{(product.views_count || 0).toLocaleString()}+ users</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Star className="h-5 w-5" />
-                <span>Top rated</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Shield className="h-5 w-5" />
-                <span>Secure & trusted</span>
-              </div>
-            </div>
+      <section className="py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Join thousands of users who are already benefiting from this amazing tool.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button 
+              onClick={handleCTAClick} 
+              size="lg" 
+              className="text-lg py-6 px-8"
+              variant="hero"
+            >
+              <Download className="mr-2 h-5 w-5" />
+              {product.cta_button_text || 'Get Started Now'}
+            </Button>
+            <Button 
+              onClick={handleSave}
+              variant="outline" 
+              size="lg" 
+              className="text-lg py-6 px-8"
+            >
+              {isSaved ? (
+                <BookmarkCheck className="mr-2 h-5 w-5" />
+              ) : (
+                <BookmarkPlus className="mr-2 h-5 w-5" />
+              )}
+              {isSaved ? 'Saved for Later' : 'Save for Later'}
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Video Modal */}
       {selectedVideo && (
-        <VideoModal
-          video={selectedVideo}
-          isOpen={isVideoModalOpen}
-          onClose={() => setIsVideoModalOpen(false)}
+        <VideoModal 
+          video={selectedVideo} 
+          isOpen={isVideoModalOpen} 
+          onClose={() => setIsVideoModalOpen(false)} 
         />
       )}
     </div>

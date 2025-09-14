@@ -254,6 +254,22 @@ const ProductsManagement: React.FC = () => {
       }
     }
 
+    // Validate that all file attachments have valid data before proceeding
+    const invalidAttachments = fileAttachments.filter(att => 
+      !att.name || att.name.trim() === '' || 
+      (!att.url && !att.fileObject) ||
+      (att.url && att.url.trim() === '')
+    );
+    
+    if (invalidAttachments.length > 0) {
+      toast({
+        title: "Invalid attachments",
+        description: "Please complete all attachment fields or remove empty attachments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Process file attachments - upload files to storage
     const processedFileAttachments = [];
     
@@ -281,7 +297,7 @@ const ProductsManagement: React.FC = () => {
         
         console.log('Upload result:', fileUrl);
         
-        if (fileUrl) {
+        if (fileUrl && fileUrl.trim() !== '') {
           const processedAttachment = {
             id: attachment.id || Math.random().toString(36).substring(2),
             title: attachment.name || attachment.fileObject.name,
@@ -304,7 +320,7 @@ const ProductsManagement: React.FC = () => {
           });
           return;
         }
-      } else if (attachment.url && attachment.name) {
+      } else if (attachment.url && attachment.url.trim() !== '' && attachment.name && attachment.name.trim() !== '') {
         // Keep URL-based attachments
         const processedAttachment = {
           id: attachment.id || Math.random().toString(36).substring(2),
@@ -421,7 +437,16 @@ const ProductsManagement: React.FC = () => {
   const openEditDialog = (product: Product) => {
     setEditingProduct(product);
     setRichDescription(product.rich_description || '');
-    setFileAttachments(product.file_attachments || []);
+    
+    // Filter out invalid attachments with empty names or URLs
+    const validAttachments = (product.file_attachments || []).filter(att => 
+      att && 
+      att.name && att.name.trim() !== '' && 
+      att.url && att.url.trim() !== ''
+    );
+    console.log('Loading valid attachments for edit:', validAttachments);
+    setFileAttachments(validAttachments);
+    
     setVideoCourses(product.video_courses || []);
     setImageFile(null);
     setIsDialogOpen(true);

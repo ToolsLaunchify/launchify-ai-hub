@@ -18,7 +18,7 @@ export interface VideoAttachment {
 
 export const uploadFileToStorage = async (
   file: File,
-  bucket: string = 'product-files'
+  bucket: string = 'attachments'
 ): Promise<string | null> => {
   try {
     // Validate file size before upload

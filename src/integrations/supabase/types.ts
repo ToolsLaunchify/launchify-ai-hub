@@ -69,11 +69,17 @@ export type Database = {
           file_attachments: Json | null
           id: string
           image_url: string | null
+          is_editors_choice: boolean | null
           is_featured: boolean | null
           is_free: boolean | null
+          is_newly_launched: boolean | null
+          is_popular: boolean | null
+          is_trending: boolean | null
           name: string
           original_price: number | null
           payment_link: string | null
+          product_tags: string[] | null
+          product_type: string | null
           rich_description: string | null
           saves_count: number | null
           slug: string
@@ -94,11 +100,17 @@ export type Database = {
           file_attachments?: Json | null
           id?: string
           image_url?: string | null
+          is_editors_choice?: boolean | null
           is_featured?: boolean | null
           is_free?: boolean | null
+          is_newly_launched?: boolean | null
+          is_popular?: boolean | null
+          is_trending?: boolean | null
           name: string
           original_price?: number | null
           payment_link?: string | null
+          product_tags?: string[] | null
+          product_type?: string | null
           rich_description?: string | null
           saves_count?: number | null
           slug: string
@@ -119,11 +131,17 @@ export type Database = {
           file_attachments?: Json | null
           id?: string
           image_url?: string | null
+          is_editors_choice?: boolean | null
           is_featured?: boolean | null
           is_free?: boolean | null
+          is_newly_launched?: boolean | null
+          is_popular?: boolean | null
+          is_trending?: boolean | null
           name?: string
           original_price?: number | null
           payment_link?: string | null
+          product_tags?: string[] | null
+          product_type?: string | null
           rich_description?: string | null
           saves_count?: number | null
           slug?: string
@@ -164,7 +182,13 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      product_stats: {
+        Row: {
+          count: number | null
+          product_type: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {

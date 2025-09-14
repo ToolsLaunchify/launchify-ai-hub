@@ -61,10 +61,10 @@ const CategorySection: React.FC<CategorySectionProps> = ({
             <div className="p-3 bg-gradient-primary rounded-xl shadow-glow">
               {icon}
             </div>
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
+              {title}
+            </h2>
           </div>
-          <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
-            {title}
-          </h2>
           <p className="text-muted-foreground">{description}</p>
         </div>
 

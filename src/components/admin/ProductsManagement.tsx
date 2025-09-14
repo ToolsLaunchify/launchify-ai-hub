@@ -254,32 +254,50 @@ const ProductsManagement: React.FC = () => {
       }
     }
 
-    // Validate that all file attachments have valid data before proceeding
-    const invalidAttachments = fileAttachments.filter(att => {
-      const hasName = att.name && att.name.trim() !== '';
+    // Enhanced validation with auto-fixing for file attachments
+    const validatedAttachments = [];
+    
+    for (const att of fileAttachments) {
       const hasFile = att.fileObject instanceof File;
       const hasValidUrl = att.url && att.url.trim() !== '' && att.url.startsWith('http');
       
-      // An attachment is invalid if it has no name, or if it has neither a file nor a valid URL
-      return !hasName || (!hasFile && !hasValidUrl);
-    });
-    
-    if (invalidAttachments.length > 0) {
-      console.log('Invalid attachments found:', invalidAttachments);
-      toast({
-        title: "Invalid attachments",
-        description: "Please add a name and either upload a file or provide a valid URL for all attachments, or remove incomplete ones.",
-        variant: "destructive",
+      // Auto-fix name if missing but file/URL exists
+      let attachmentName = att.name && att.name.trim() !== '' ? att.name : '';
+      
+      if (!attachmentName && hasFile) {
+        attachmentName = att.fileObject.name;
+      } else if (!attachmentName && hasValidUrl) {
+        const urlParts = att.url.split('/');
+        attachmentName = urlParts[urlParts.length - 1] || 'Downloaded File';
+      }
+      
+      // Check if attachment has valid data
+      if (!attachmentName || (!hasFile && !hasValidUrl)) {
+        toast({
+          title: "Invalid attachments",
+          description: "Please provide a name and either upload a file or enter a valid URL for all attachments, or remove incomplete ones.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Update the attachment with fixed name
+      validatedAttachments.push({
+        ...att,
+        name: attachmentName,
+        title: attachmentName // Keep both for compatibility
       });
-      return;
     }
+    
+    // Update fileAttachments with validated data
+    setFileAttachments(validatedAttachments);
 
     // Process file attachments - upload files to storage
     const processedFileAttachments = [];
     
     console.log('Processing file attachments:', fileAttachments);
     
-    for (const attachment of fileAttachments) {
+    for (const attachment of validatedAttachments) {
       console.log('Processing attachment:', attachment);
       
       if (attachment.fileObject && attachment.fileObject instanceof File) {
@@ -406,18 +424,57 @@ const ProductsManagement: React.FC = () => {
     setFileAttachments(fileAttachments.filter((_, i) => i !== index));
   };
 
-  const updateFileAttachment = (index: number, field: string, value: string | File | null) => {
+  const updateFileAttachment = async (index: number, field: string, value: string | File | null) => {
     const updated = [...fileAttachments];
-    updated[index] = { ...updated[index], [field]: value };
     
-    // Keep title and name in sync for compatibility
-    if (field === 'name') {
-      updated[index] = { ...updated[index], title: value as string };
-    } else if (field === 'title') {
-      updated[index] = { ...updated[index], name: value as string };
+    if (field === 'fileObject' && value instanceof File) {
+      // Immediately update the name when a file is selected
+      updated[index] = { 
+        ...updated[index], 
+        [field]: value,
+        name: value.name,
+        title: value.name
+      };
+      setFileAttachments(updated);
+      
+      // Upload the file
+      try {
+        const uploadedUrl = await uploadFileToStorage(value, 'attachments');
+        if (uploadedUrl) {
+          updated[index] = {
+            ...updated[index],
+            url: uploadedUrl,
+            size: value.size,
+            type: value.type
+          };
+          setFileAttachments(updated);
+          
+          toast({
+            title: 'File uploaded successfully',
+            description: `${value.name} has been uploaded`,
+          });
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast({
+          title: 'Upload failed',
+          description: 'Failed to upload file. Please try again.',
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      updated[index] = { ...updated[index], [field]: value };
+      
+      // Keep title and name in sync for compatibility
+      if (field === 'name') {
+        updated[index] = { ...updated[index], title: value as string };
+      } else if (field === 'title') {
+        updated[index] = { ...updated[index], name: value as string };
+      }
+      
+      setFileAttachments(updated);
     }
-    
-    setFileAttachments(updated);
   };
 
   const addVideoCourse = () => {
@@ -711,28 +768,24 @@ const ProductsManagement: React.FC = () => {
                           type="file"
                           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.mp4,.mov,.avi"
                            onChange={(e) => {
-                             const file = e.target.files?.[0];
-                             if (file) {
-                               // Validate file size with type-specific limits
-                               const sizeValidation = validateFileSize(file);
-                               if (!sizeValidation.isValid) {
-                                 toast({
-                                   title: "File too large",
-                                   description: sizeValidation.message,
-                                   variant: "destructive",
-                                 });
-                                 e.target.value = ''; // Clear the input
-                                 return;
-                               }
-                               
-                               // Store file object for later upload and auto-populate name if empty
-                               updateFileAttachment(index, 'fileObject', file);
-                               if (!attachment.name || attachment.name.trim() === '') {
-                                 updateFileAttachment(index, 'name', file.name);
-                               }
-                               updateFileAttachment(index, 'url', ''); // Clear URL when file is selected
-                             }
-                           }}
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                // Validate file size with type-specific limits
+                                const sizeValidation = validateFileSize(file);
+                                if (!sizeValidation.isValid) {
+                                  toast({
+                                    title: "File too large",
+                                    description: sizeValidation.message,
+                                    variant: "destructive",
+                                  });
+                                  e.target.value = ''; // Clear the input
+                                  return;
+                                }
+                                
+                                // Update file and auto-populate name
+                                updateFileAttachment(index, 'fileObject', file);
+                              }
+                            }}
                         />
                         {attachment.fileObject && (
                           <div className="text-xs text-muted-foreground mt-1">
@@ -888,7 +941,7 @@ const ProductsManagement: React.FC = () => {
                   Cancel
                 </Button>
                 <Button type="submit">
-                  {editingProduct ? 'Update Product' : 'Create Product'}
+                  Save Product
                 </Button>
               </div>
             </form>

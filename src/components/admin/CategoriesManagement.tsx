@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 import DraggableCategoriesList from './DraggableCategoriesList';
 
-interface Category {
+interface AdminCategory {
   id: string;
   name: string;
   slug: string;
@@ -46,7 +46,7 @@ interface Category {
 
 const CategoriesManagement: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -60,7 +60,7 @@ const CategoriesManagement: React.FC = () => {
         .order('sort_order', { ascending: true })
         .order('name');
       if (error) throw error;
-      return data as Category[];
+      return data as AdminCategory[];
     }
   });
 
@@ -255,9 +255,14 @@ const CategoriesManagement: React.FC = () => {
       <div className="mb-8">
         <h3 className="text-lg font-semibold mb-4">Drag to Reorder Categories</h3>
         <DraggableCategoriesList
-          categories={categories}
+          categories={categories.map(cat => ({
+            ...cat,
+            parent_id: cat.parent_id || null,
+            created_at: cat.created_at || '',
+            updated_at: cat.updated_at || ''
+          }))}
           onEdit={(category) => {
-            setEditingCategory(category);
+            setEditingCategory(category as AdminCategory);
             setIsDialogOpen(true);
           }}
           onDelete={(id) => deleteCategoryMutation.mutate(id)}

@@ -24,7 +24,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-interface Category {
+interface DndCategory {
   id: string;
   name: string;
   slug: string;
@@ -37,8 +37,8 @@ interface Category {
 }
 
 interface SortableItemProps {
-  category: Category;
-  onEdit: (category: Category) => void;
+  category: DndCategory;
+  onEdit: (category: DndCategory) => void;
   onDelete: (id: string) => void;
 }
 
@@ -98,8 +98,8 @@ function SortableItem({ category, onEdit, onDelete }: SortableItemProps) {
 }
 
 interface DraggableCategoriesListProps {
-  categories: Category[];
-  onEdit: (category: Category) => void;
+  categories: DndCategory[];
+  onEdit: (category: DndCategory) => void;
   onDelete: (id: string) => void;
 }
 
@@ -119,7 +119,7 @@ export default function DraggableCategoriesList({
   const { toast } = useToast();
 
   const reorderMutation = useMutation({
-    mutationFn: async (reorderedCategories: Category[]) => {
+    mutationFn: async (reorderedCategories: DndCategory[]) => {
       const updates = reorderedCategories.map((category, index) => ({
         id: category.id,
         sort_order: index + 1,

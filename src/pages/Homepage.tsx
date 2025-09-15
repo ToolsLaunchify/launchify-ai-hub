@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import HeroSection from '@/components/HeroSection';
 import CombinedLaunchesSection from '@/components/CombinedLaunchesSection';
-import ProductsByCategorySection from '@/components/ProductsByCategorySection';
-import CategoriesSection from '@/components/CategoriesSection';
-import ProductTypeSections from '@/components/ProductTypeSections';
+import AdvancedProductTypeSection from '@/components/AdvancedProductTypeSection';
+import InteractiveCategoryMatrix from '@/components/InteractiveCategoryMatrix';
+import SmartCategoryExplorer from '@/components/SmartCategoryExplorer';
 import AdvancedBrowseSection from '@/components/AdvancedBrowseSection';
 import VersionToggle from '@/components/VersionToggle';
 import HomepageClassic from './HomepageClassic';
@@ -44,17 +44,17 @@ const Homepage: React.FC = () => {
         {/* Advanced Browse Section - New Premium Experience */}
         <AdvancedBrowseSection />
 
-        {/* Browse by Tool Type - Right after Hero */}
-        <ProductTypeSections />
+        {/* Advanced Product Type Section - Modern Interactive Design */}
+        <AdvancedProductTypeSection />
 
         {/* Combined Latest Launches & Featured Products */}
         <CombinedLaunchesSection />
 
-        {/* Products by Category - Main Categories */}
-        <ProductsByCategorySection />
+        {/* Interactive Category Matrix - Advanced Product Discovery */}
+        <InteractiveCategoryMatrix />
 
-        {/* Categories Section */}
-        <CategoriesSection />
+        {/* Smart Category Explorer - Enhanced Categories Section */}
+        <SmartCategoryExplorer />
       </div>
       
       {/* Version Toggle */}

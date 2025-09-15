@@ -129,7 +129,7 @@ const InteractiveCategoryMatrix: React.FC = () => {
                 <TabsTrigger 
                   key={type.id} 
                   value={type.id}
-                  className="relative rounded-xl py-3 px-2 md:px-4 text-xs md:text-sm data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:bg-card/50 data-[state=inactive]:text-muted-foreground hover:bg-card/70 transition-all duration-300 group border border-border/20"  
+                  className="relative rounded-xl py-3 px-2 md:px-4 text-xs md:text-sm data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:bg-gradient-to-br data-[state=inactive]:from-card data-[state=inactive]:to-card/80 data-[state=inactive]:text-foreground data-[state=inactive]:border-primary/30 hover:bg-card/70 hover:border-primary/50 transition-all duration-300 group border-2 shadow-sm"  
                 >
                   <div className="flex flex-col md:flex-row items-center justify-center md:space-x-2 space-y-1 md:space-y-0 min-h-[60px] md:min-h-[48px]">
                     <type.icon className="w-4 h-4 md:w-5 md:h-5 group-data-[state=active]:scale-110 transition-transform" />

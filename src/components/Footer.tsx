@@ -42,10 +42,10 @@ const Footer: React.FC = () => {
 
   const topCategories = categories.slice(0, 6);
   const resourceLinks = footerSections.resources || [
-    { label: 'Blog', href: '/blog' },
-    { label: 'Free Tools', href: '/free-tools' },
-    { label: 'Featured Products', href: '/featured' },
-    { label: 'Most Saved', href: '/most-saved' },
+    { label: 'Browse All', href: '/browse' },
+    { label: 'AI Tools', href: '/type/ai-tools' },
+    { label: 'Software', href: '/type/software' },
+    { label: 'Free Tools', href: '/type/free-tools' },
   ];
 
   return (
@@ -198,7 +198,7 @@ const Footer: React.FC = () => {
         
         {/* Bottom Section */}
         <div className="border-t border-border/40 mt-16 pt-8">
-          <div className="flex flex-col md:flex-row justify-center items-center text-center gap-4">
+          <div className="flex flex-col items-center text-center gap-4">
             <p className="text-muted-foreground text-sm">
               © {currentYear} Tools Launchify. All rights reserved.
             </p>

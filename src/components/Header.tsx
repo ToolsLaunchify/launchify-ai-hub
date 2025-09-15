@@ -35,10 +35,10 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
   };
 
   const productTypes = [
-    { name: 'AI Tools', href: '/product-type/ai-tools', description: 'Artificial Intelligence powered tools' },
-    { name: 'Software', href: '/product-type/software', description: 'Desktop and web applications' },
-    { name: 'Free Tools', href: '/product-type/free-tools', description: 'Completely free resources' },
-    { name: 'Digital Products', href: '/product-type/digital-products', description: 'Courses, templates, and digital assets' },
+    { name: 'AI Tools', href: '/type/ai-tools', description: 'Artificial Intelligence powered tools' },
+    { name: 'Software', href: '/type/software', description: 'Desktop and web applications' },
+    { name: 'Free Tools', href: '/type/free-tools', description: 'Completely free resources' },
+    { name: 'Digital Products', href: '/type/digital-products', description: 'Courses, templates, and digital assets' },
   ];
 
   return (
@@ -60,17 +60,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
         {/* Desktop Navigation */}
         <NavigationMenu className="hidden md:flex mr-6">
           <NavigationMenuList className="space-x-2">
-            <NavigationMenuItem>
-              <Link
-                to="/"
-                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
-                  isActive('/') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
-                }`}
-              >
-                <Home className="w-4 h-4 mr-2" />
-                Home
-              </Link>
-            </NavigationMenuItem>
             
             <NavigationMenuItem>
               <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground">
@@ -149,19 +138,8 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
           </NavigationMenuList>
         </NavigationMenu>
 
-        {/* Search */}
-        <div className="flex-1 max-w-lg">
-          <form onSubmit={handleSearch} className="relative group">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-            <Input
-              placeholder="Search for AI tools, software, and more..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-muted/30 border border-border/50 rounded-xl focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary/50 transition-all placeholder:text-muted-foreground/70 hover:bg-muted/50"
-            />
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
-          </form>
-        </div>
+        {/* Spacer */}
+        <div className="flex-1"></div>
 
         {/* User Menu */}
         <div className="flex items-center space-x-4 ml-4">
@@ -262,16 +240,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
                 {/* Mobile Navigation */}
                 <nav className="space-y-2">
-                  <Link
-                    to="/"
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive('/') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
-                    }`}
-                  >
-                    <Home className="h-4 w-4" />
-                    <span>Home</span>
-                  </Link>
 
                   <div className="space-y-2">
                     <div className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">

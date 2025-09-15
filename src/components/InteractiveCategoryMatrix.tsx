@@ -124,7 +124,7 @@ const InteractiveCategoryMatrix: React.FC = () => {
         {/* Product Type Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-8">
-            <TabsList className="grid w-full max-w-2xl grid-cols-2 md:grid-cols-4 bg-transparent border-0 p-1.5 rounded-2xl shadow-none">
+            <TabsList className="grid w-full max-w-2xl grid-cols-2 md:grid-cols-4 bg-transparent border-0 p-1.5 rounded-2xl shadow-none gap-2">
               {productTypes.map((type) => (
                 <TabsTrigger 
                   key={type.id} 

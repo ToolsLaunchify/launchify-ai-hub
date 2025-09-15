@@ -239,48 +239,19 @@ const InteractiveCategoryMatrix: React.FC = () => {
                 </div>
 
                 {filteredProducts.length > 0 ? (
-                  <div className="space-y-6">
-                    {/* Stats Bar */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gradient-to-r from-card/50 to-card/30 rounded-xl border border-border/30">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-primary">{filteredProducts.length}</div>
-                        <div className="text-xs text-muted-foreground">Total Products</div>
+                  <div className={
+                    filters.viewMode === 'grid' 
+                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+                      : "space-y-4"
+                  }>
+                    {filteredProducts.map((product) => (
+                      <div key={product.id} className="group">
+                        <ProductCard
+                          product={convertToMockProduct(product)}
+                          variant={filters.viewMode === 'grid' ? 'card' : 'list'}
+                        />
                       </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-green-500">
-                          {filteredProducts.filter(p => p.is_free).length}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Free Tools</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-blue-500">
-                          {filteredProducts.filter(p => !p.is_free).length}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Premium Tools</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-purple-500">
-                          {filteredProducts.filter(p => p.is_featured).length}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Featured</div>
-                      </div>
-                    </div>
-
-                    {/* Products Display */}
-                    <div className={
-                      filters.viewMode === 'grid' 
-                        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
-                        : "space-y-4"
-                    }>
-                      {filteredProducts.map((product) => (
-                        <div key={product.id} className="group">
-                          <ProductCard
-                            product={convertToMockProduct(product)}
-                            variant={filters.viewMode === 'grid' ? 'card' : 'list'}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    ))}
                   </div>
                 ) : (
                   <Card className="p-12 text-center bg-gradient-to-br from-card/50 to-card/30 border-border/30">

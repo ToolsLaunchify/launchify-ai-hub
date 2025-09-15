@@ -57,48 +57,48 @@ export const RelatedProducts: React.FC<RelatedProductsProps> = ({
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {relatedProducts.map((product) => (
-            <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-              <div className="relative overflow-hidden rounded-t-lg">
-                <img
-                  src={product.image_url || '/placeholder.svg'}
-                  alt={product.name}
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute top-4 left-4 flex gap-2">
-                  {product.is_free && (
-                    <Badge className="bg-gradient-primary shadow-lg">Free</Badge>
-                  )}
-                  {product.is_featured && (
-                    <Badge className="bg-gradient-accent shadow-lg">Featured</Badge>
-                  )}
+            <Link key={product.id} to={`/${product.slug}`} className="block">
+              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer">
+                <div className="relative overflow-hidden rounded-t-lg">
+                  <img
+                    src={product.image_url || '/placeholder.svg'}
+                    alt={product.name}
+                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 left-4 flex gap-2">
+                    {product.is_free && (
+                      <Badge className="bg-gradient-primary shadow-lg">Free</Badge>
+                    )}
+                    {product.is_featured && (
+                      <Badge className="bg-gradient-accent shadow-lg">Featured</Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
-              
-              <CardHeader>
-                <CardTitle className="group-hover:text-primary transition-colors line-clamp-2">
-                  {product.name}
-                </CardTitle>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground line-clamp-3">
-                  {product.description || 'Discover this amazing tool and enhance your productivity.'}
-                </p>
                 
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="text-xs">
-                    {product.category?.name || 'General'}
-                  </Badge>
+                <CardHeader>
+                  <CardTitle className="group-hover:text-primary transition-colors line-clamp-2">
+                    {product.name}
+                  </CardTitle>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground line-clamp-3">
+                    {product.description || 'Discover this amazing tool and enhance your productivity.'}
+                  </p>
                   
-                  <Button asChild variant="ghost" size="sm" className="group/btn">
-                    <Link to={`/${product.slug}`}>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="text-xs">
+                      {product.category?.name || 'General'}
+                    </Badge>
+                    
+                    <Button variant="hero" size="sm" className="group/btn">
                       View Details
                       <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 

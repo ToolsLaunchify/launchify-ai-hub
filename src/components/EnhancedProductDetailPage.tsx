@@ -7,6 +7,8 @@ import { useAuth } from '@/hooks/useAuth';
 import ProductGallery from '@/components/ProductGallery';
 import RelatedProducts from '@/components/RelatedProducts';
 import RichTextDisplay from '@/components/ui/rich-text-display';
+import SEOHead from '@/components/SEOHead';
+import Breadcrumb from '@/components/Breadcrumb';
 import { toast } from '@/hooks/use-toast';
 import { useSavedProducts } from '@/hooks/useSavedProducts';
 import { 
@@ -70,6 +72,14 @@ interface Product {
   file_attachments: any;
   video_courses: any;
   created_at: string;
+  // SEO fields
+  meta_title?: string | null;
+  meta_description?: string | null;
+  keywords?: string[] | null;
+  canonical_url?: string | null;
+  og_image_url?: string | null;
+  alt_text?: string | null;
+  schema_markup?: any;
   category?: {
     id: string;
     name: string;
@@ -406,9 +416,38 @@ const EnhancedProductDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        metaTitle={product.meta_title || `${product.name} - Tools Launchify`}
+        metaDescription={product.meta_description || product.description || `Discover ${product.name}, an amazing ${product.category?.name || 'productivity'} tool to boost your workflow.`}
+        keywords={product.keywords || [product.name, product.category?.name || 'productivity', 'tools', 'software']}
+        canonicalUrl={product.canonical_url || `${window.location.origin}/${product.slug}`}
+        ogImageUrl={product.og_image_url || product.image_url}
+        productData={{
+          name: product.name,
+          description: product.description,
+          image_url: product.image_url,
+          original_price: product.original_price,
+          discounted_price: product.discounted_price,
+          currency: product.currency,
+          category: product.category,
+          is_free: product.is_free
+        }}
+        structuredData={product.schema_markup}
+      />
       <ScrollProgress />
       <FloatingCTA product={product} onCTAClick={handleCTAClick} />
       <BackToTop />
+      
+      {/* Breadcrumb Navigation */}
+      <div className="container mx-auto px-4 pt-4">
+        <Breadcrumb
+          items={[
+            { label: 'Products', href: '/' },
+            ...(product.category ? [{ label: product.category.name, href: `/category/${product.category.slug}` }] : []),
+            { label: product.name }
+          ]}
+        />
+      </div>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary/5 via-background to-secondary/5">
@@ -645,79 +684,6 @@ const EnhancedProductDetailPage: React.FC = () => {
         </section>
       )}
 
-      {/* Technical Information Section - Always show basic product info */}
-      <section className="py-16 bg-gradient-to-br from-secondary/5 to-primary/5">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Technical Information</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Technical specifications and additional information.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle>Specifications</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-medium text-muted-foreground">Category</h4>
-                    <p className="capitalize">{product.category?.name || 'General'}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-muted-foreground">Type</h4>
-                    <p className="capitalize">{product.product_type?.replace('_', ' ') || 'Software'}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-muted-foreground">Launch Date</h4>
-                    <p>{new Date(product.created_at).toLocaleDateString()}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-muted-foreground">Pricing</h4>
-                    <p>{product.is_free ? 'Free' : 'Premium'}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-muted-foreground">Views</h4>
-                    <p>{(product.views_count || 0).toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-muted-foreground">Saves</h4>
-                    <p>{(product.saves_count || 0).toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle>Platform Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Globe className="h-5 w-5 text-primary" />
-                  <span>Web-based Platform</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Smartphone className="h-5 w-5 text-primary" />
-                  <span>Mobile Responsive</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Shield className="h-5 w-5 text-primary" />
-                  <span>Secure & Reliable</span>
-                </div>
-                {product.is_free && (
-                  <div className="flex items-center space-x-3">
-                    <Gift className="h-5 w-5 text-primary" />
-                    <span>Free to Use</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* Final CTA Section */}
       <section className="py-16">

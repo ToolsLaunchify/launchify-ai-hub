@@ -61,6 +61,8 @@ export type Database = {
       products: {
         Row: {
           affiliate_link: string | null
+          alt_text: string | null
+          canonical_url: string | null
           category_id: string | null
           created_at: string
           cta_button_text: string | null
@@ -78,13 +80,18 @@ export type Database = {
           is_newly_launched: boolean | null
           is_popular: boolean | null
           is_trending: boolean | null
+          keywords: string[] | null
+          meta_description: string | null
+          meta_title: string | null
           name: string
+          og_image_url: string | null
           original_price: number | null
           payment_link: string | null
           product_tags: string[] | null
           product_type: string | null
           rich_description: string | null
           saves_count: number | null
+          schema_markup: Json | null
           slug: string
           updated_at: string
           video_courses: Json | null
@@ -92,6 +99,8 @@ export type Database = {
         }
         Insert: {
           affiliate_link?: string | null
+          alt_text?: string | null
+          canonical_url?: string | null
           category_id?: string | null
           created_at?: string
           cta_button_text?: string | null
@@ -109,13 +118,18 @@ export type Database = {
           is_newly_launched?: boolean | null
           is_popular?: boolean | null
           is_trending?: boolean | null
+          keywords?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
           name: string
+          og_image_url?: string | null
           original_price?: number | null
           payment_link?: string | null
           product_tags?: string[] | null
           product_type?: string | null
           rich_description?: string | null
           saves_count?: number | null
+          schema_markup?: Json | null
           slug: string
           updated_at?: string
           video_courses?: Json | null
@@ -123,6 +137,8 @@ export type Database = {
         }
         Update: {
           affiliate_link?: string | null
+          alt_text?: string | null
+          canonical_url?: string | null
           category_id?: string | null
           created_at?: string
           cta_button_text?: string | null
@@ -140,13 +156,18 @@ export type Database = {
           is_newly_launched?: boolean | null
           is_popular?: boolean | null
           is_trending?: boolean | null
+          keywords?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
           name?: string
+          og_image_url?: string | null
           original_price?: number | null
           payment_link?: string | null
           product_tags?: string[] | null
           product_type?: string | null
           rich_description?: string | null
           saves_count?: number | null
+          schema_markup?: Json | null
           slug?: string
           updated_at?: string
           video_courses?: Json | null

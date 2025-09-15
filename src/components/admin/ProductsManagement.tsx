@@ -74,6 +74,14 @@ interface Product {
   file_attachments: any[];
   video_courses: any[];
   custom_code: string;
+  // SEO fields
+  meta_title?: string;
+  meta_description?: string;
+  keywords?: string[];
+  canonical_url?: string;
+  og_image_url?: string;
+  alt_text?: string;
+  schema_markup?: any;
 }
 
 interface Category {
@@ -879,7 +887,80 @@ const ProductsManagement: React.FC = () => {
                 />
               </div>
 
+              {/* SEO Section */}
               <div className="space-y-4">
+                <h3 className="text-lg font-semibold">SEO Optimization</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="meta_title">Meta Title (Recommended: 50-60 characters)</Label>
+                    <Input
+                      id="meta_title"
+                      name="meta_title"
+                      defaultValue={editingProduct?.meta_title || ''}
+                      placeholder={`${editingProduct?.name || 'Product Name'} - Tools Launchify`}
+                      maxLength={60}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="alt_text">Image Alt Text</Label>
+                    <Input
+                      id="alt_text"
+                      name="alt_text"
+                      defaultValue={editingProduct?.alt_text || ''}
+                      placeholder="Screenshot of the product interface"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="meta_description">Meta Description (Recommended: 150-160 characters)</Label>
+                  <Textarea
+                    id="meta_description"
+                    name="meta_description"
+                    defaultValue={editingProduct?.meta_description || ''}
+                    placeholder="Brief description of your product for search engines"
+                    maxLength={160}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="keywords">SEO Keywords (comma-separated)</Label>
+                    <Input
+                      id="keywords"
+                      name="keywords"
+                      defaultValue={editingProduct?.keywords?.join(', ') || ''}
+                      placeholder="productivity, automation, workflow"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="canonical_url">Canonical URL (Optional)</Label>
+                    <Input
+                      id="canonical_url"
+                      name="canonical_url"
+                      defaultValue={editingProduct?.canonical_url || ''}
+                      placeholder="https://example.com/product-slug"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="og_image_url">Social Media Image URL (Optional)</Label>
+                  <Input
+                    id="og_image_url"
+                    name="og_image_url"
+                    defaultValue={editingProduct?.og_image_url || ''}
+                    placeholder="URL for custom social media sharing image"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Product Flags</h3>
                 <div className="flex items-center space-x-6">
                   <div className="flex items-center space-x-2">
                     <Switch

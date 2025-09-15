@@ -33,9 +33,6 @@ const CategoryPreview: React.FC<CategoryPreviewProps> = ({ category, products })
                 {category.name}
               </CardTitle>
             </div>
-            <Badge className="bg-gradient-accent text-white border-none text-sm px-3 py-1 flex-shrink-0">
-              {category.product_count}
-            </Badge>
           </div>
         </CardHeader>
 

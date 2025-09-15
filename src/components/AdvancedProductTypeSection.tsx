@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Zap, Monitor, Gift, Package, ArrowRight, TrendingUp, Users, Grid, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useProductStats } from '@/hooks/useProductStats';
-import { useCategoryStats } from '@/hooks/useCategoryStats';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CategoryModalProps {
   typeId: string;
@@ -23,13 +23,62 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   gradient,
   count
 }) => {
-  const { data: categories = [] } = useCategoryStats();
-  
-  // Get relevant categories for this product type by checking if they have products of this type
-  const relevantCategories = categories.filter(category => {
-    // This is a simple approach - in a real app you might want to add a more sophisticated mapping
-    return category.product_count > 0;
-  }).slice(0, 12);
+  const [relevantCategories, setRelevantCategories] = React.useState<any[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchCategoriesForProductType = async () => {
+      setIsLoading(true);
+      try {
+        // Query to get categories that have products of the specific product type
+        const { data, error } = await supabase
+          .from('categories')
+          .select(`
+            id,
+            name,
+            slug,
+            description,
+            icon,
+            products!inner(
+              id,
+              product_type
+            )
+          `)
+          .eq('products.product_type', productType)
+          .is('parent_id', null)
+          .order('name');
+
+        if (error) throw error;
+
+        // Group by categories and count products
+        const categoryMap = new Map();
+        
+        data?.forEach((item: any) => {
+          const categoryId = item.id;
+          if (!categoryMap.has(categoryId)) {
+            categoryMap.set(categoryId, {
+              id: item.id,
+              name: item.name,
+              slug: item.slug,
+              description: item.description,
+              icon: item.icon,
+              product_count: 0
+            });
+          }
+          categoryMap.get(categoryId).product_count += 1;
+        });
+
+        setRelevantCategories(Array.from(categoryMap.values()).slice(0, 12));
+      } catch (error) {
+        console.error('Error fetching categories for product type:', error);
+        setRelevantCategories([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategoriesForProductType();
+  }, [productType]);
 
   return (
     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -44,39 +93,73 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
       
       <div className="space-y-6 pt-4">
         {/* Categories Grid */}
-        <div>
-          <h4 className="text-lg font-semibold mb-4 flex items-center">
-            <TrendingUp className="w-5 h-5 mr-2 text-primary" />
-            Popular Categories ({relevantCategories.length})
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {relevantCategories.map((category) => (
-              <Link 
-                key={category.id} 
-                to={`/category/${category.slug}`}
-                className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors border border-border/50 hover:border-primary/50 group"
-              >
-                <div className="flex items-center space-x-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                    <span className="text-white text-lg">{category.icon || '📁'}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium group-hover:text-primary transition-colors truncate">{category.name}</p>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {category.description || 'Explore tools in this category'}
-                    </p>
+        {isLoading ? (
+          <div>
+            <h4 className="text-lg font-semibold mb-4 flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+              Loading Categories...
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="p-4 rounded-lg bg-muted/30 animate-pulse">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-muted rounded-lg" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-muted rounded" />
+                      <div className="h-3 bg-muted/70 rounded w-3/4" />
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 flex-shrink-0 ml-3">
-                  <Badge className="bg-gradient-accent text-white border-none text-xs px-2 py-1 whitespace-nowrap">
-                    {category.product_count}
-                  </Badge>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-              </Link>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div>
+            <h4 className="text-lg font-semibold mb-4 flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+              {title} Categories ({relevantCategories.length})
+            </h4>
+            {relevantCategories.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {relevantCategories.map((category) => (
+                  <Link 
+                    key={category.id} 
+                    to={`/category/${category.slug}`}
+                    className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors border border-border/50 hover:border-primary/50 group"
+                  >
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
+                      <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                        <span className="text-white text-lg">{category.icon || '📁'}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium group-hover:text-primary transition-colors truncate">{category.name}</p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {category.description || `Explore ${title.toLowerCase()} in this category`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2 flex-shrink-0 ml-3">
+                      <Badge className="bg-gradient-accent text-white border-none text-xs px-2 py-1 whitespace-nowrap">
+                        {category.product_count}
+                      </Badge>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                  <Grid className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No Categories Found</h3>
+                <p className="text-muted-foreground">
+                  No categories available for {title.toLowerCase()} at the moment.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* View All Button */}
         <div className="pt-4 border-t border-border/50">

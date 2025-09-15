@@ -218,25 +218,6 @@ const InteractiveCategoryMatrix: React.FC = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Quick Category Access */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  {relevantCategories.map((category) => (
-                    <Link 
-                      key={category.id} 
-                      to={`/category/${category.slug}`}
-                      className="flex flex-col items-center p-3 rounded-xl bg-muted/20 hover:bg-muted/40 transition-colors group"
-                    >
-                      <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                        <span className="text-white text-lg">{category.icon || '📁'}</span>
-                      </div>
-                      <span className="text-sm font-medium text-center">{category.name}</span>
-                      <Badge variant="secondary" className="text-xs mt-1">
-                        {category.product_count}
-                      </Badge>
-                    </Link>
-                  ))}
-                </div>
               </div>
 
               {/* Products Grid */}

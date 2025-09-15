@@ -13,14 +13,15 @@ export const useProductStats = () => {
   return useQuery({
     queryKey: ['product-stats'],
     queryFn: async (): Promise<ProductStats> => {
-      // Get product counts by type
+      // Get all products to count by type accurately
       const { data: productData, error: productError } = await supabase
         .from('products')
         .select('product_type');
 
       if (productError) throw productError;
 
-      const stats = productData.reduce((acc, product) => {
+      // Count products by type
+      const stats = (productData || []).reduce((acc, product) => {
         const type = product.product_type || 'software';
         acc[type as keyof Omit<ProductStats, 'total'>] = (acc[type as keyof Omit<ProductStats, 'total'>] || 0) + 1;
         acc.total += 1;

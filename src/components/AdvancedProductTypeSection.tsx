@@ -30,45 +30,39 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
     const fetchCategoriesForProductType = async () => {
       setIsLoading(true);
       try {
-        // Query to get categories that have products of the specific product type
-        const { data, error } = await supabase
+        // First get all categories
+        const { data: categoriesData, error: categoriesError } = await supabase
           .from('categories')
-          .select(`
-            id,
-            name,
-            slug,
-            description,
-            icon,
-            products!inner(
-              id,
-              product_type
-            )
-          `)
-          .eq('products.product_type', productType)
+          .select('id, name, slug, description, icon')
           .is('parent_id', null)
           .order('name');
 
-        if (error) throw error;
+        if (categoriesError) throw categoriesError;
 
-        // Group by categories and count products
-        const categoryMap = new Map();
-        
-        data?.forEach((item: any) => {
-          const categoryId = item.id;
-          if (!categoryMap.has(categoryId)) {
-            categoryMap.set(categoryId, {
-              id: item.id,
-              name: item.name,
-              slug: item.slug,
-              description: item.description,
-              icon: item.icon,
-              product_count: 0
-            });
-          }
-          categoryMap.get(categoryId).product_count += 1;
-        });
+        // Then get product counts for each category filtered by product type
+        const categoriesWithCounts = await Promise.all(
+          categoriesData.map(async (category) => {
+            const { count, error: countError } = await supabase
+              .from('products')
+              .select('*', { count: 'exact', head: true })
+              .eq('category_id', category.id)
+              .eq('product_type', productType);
 
-        setRelevantCategories(Array.from(categoryMap.values()).slice(0, 12));
+            if (countError) throw countError;
+
+            return {
+              ...category,
+              product_count: count || 0
+            };
+          })
+        );
+
+        // Filter out categories with no products of this type and limit results
+        const filteredCategories = categoriesWithCounts
+          .filter(category => category.product_count > 0)
+          .slice(0, 12);
+
+        setRelevantCategories(filteredCategories);
       } catch (error) {
         console.error('Error fetching categories for product type:', error);
         setRelevantCategories([]);

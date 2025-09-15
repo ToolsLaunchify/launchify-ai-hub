@@ -57,21 +57,21 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
               <Link 
                 key={category.id} 
                 to={`/category/${category.slug}`}
-                className="flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors border border-border/50 hover:border-primary/50 group"
+                className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors border border-border/50 hover:border-primary/50 group"
               >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
                     <span className="text-white text-lg">{category.icon || '📁'}</span>
                   </div>
-                  <div>
-                    <p className="font-medium group-hover:text-primary transition-colors">{category.name}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium group-hover:text-primary transition-colors truncate">{category.name}</p>
                     <p className="text-sm text-muted-foreground truncate">
                       {category.description || 'Explore tools in this category'}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Badge className="bg-gradient-accent text-white border-none">
+                <div className="flex items-center space-x-2 flex-shrink-0 ml-3">
+                  <Badge className="bg-gradient-accent text-white border-none text-xs px-2 py-1 whitespace-nowrap">
                     {category.product_count}
                   </Badge>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />

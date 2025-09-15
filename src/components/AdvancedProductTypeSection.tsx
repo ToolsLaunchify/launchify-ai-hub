@@ -238,17 +238,6 @@ const AdvancedProductTypeSection: React.FC = () => {
                       </div>
                     </div>
                     
-                    {/* Stats & Actions */}
-                    <div className="text-right">
-                      <div className="mb-4">
-                        <div className="text-3xl font-bold text-gradient-primary mb-1">
-                          {type.count}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Available Tools
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Action Buttons */}

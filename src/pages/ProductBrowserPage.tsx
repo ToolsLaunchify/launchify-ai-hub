@@ -120,7 +120,7 @@ const ProductBrowserPage: React.FC = () => {
                     className={`w-full justify-between h-auto p-4 rounded-xl transition-all duration-200 hover:shadow-md ${
                       selectedCategory === category.id 
                         ? 'bg-gradient-primary text-primary-foreground shadow-lg transform scale-[1.02]' 
-                        : 'hover:bg-muted/50 hover:border-primary/20 border border-transparent'
+                        : 'hover:bg-primary/15 hover:text-primary hover:border-primary/30 border border-transparent'
                     }`}
                     onClick={() => {
                       setSelectedCategory(category.id);

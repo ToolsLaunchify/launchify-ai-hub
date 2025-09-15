@@ -25,9 +25,26 @@ const InteractiveCategoryMatrix: React.FC = () => {
   });
 
   const { data: categories = [] } = useCategoryStats();
+  
+  // Map frontend tool types to database product_type values
+  const getProductTypeForQuery = (toolType: string) => {
+    switch (toolType) {
+      case 'ai_tools':
+        return 'ai_tools';
+      case 'software':
+        return 'software';
+      case 'free_tools':
+        return 'free_tools';
+      case 'digital_products':
+        return 'digital_products';
+      default:
+        return toolType;
+    }
+  };
+
   const { data: products = [] } = useProducts({ 
-    productType: activeTab, 
-    limit: 12,
+    productType: getProductTypeForQuery(activeTab), 
+    limit: 24, // Increased limit to show more products
     isFree: filters.priceFilter === 'free' ? true : filters.priceFilter === 'paid' ? false : undefined
   });
 
@@ -226,42 +243,85 @@ const InteractiveCategoryMatrix: React.FC = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-xl font-semibold">Featured {type.title}</h4>
-                    <p className="text-muted-foreground">{filteredProducts.length} products found</p>
+                    <h4 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                      {type.title} Collection
+                    </h4>
+                    <p className="text-muted-foreground mt-1">
+                      {filteredProducts.length} {type.title.toLowerCase()} available
+                    </p>
                   </div>
                   <Link to={`/type/${type.id.replace('_', '-')}`}>
-                    <Button variant="outline" className="hover:bg-primary hover:text-white transition-colors">
-                      View All <ArrowRight className="ml-2 w-4 h-4" />
+                    <Button variant="premium" className="hover:scale-105 transition-all duration-300">
+                      Explore All {type.title} <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                   </Link>
                 </div>
 
                 {filteredProducts.length > 0 ? (
-                  <div className={
-                    filters.viewMode === 'grid' 
-                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
-                      : "space-y-4"
-                  }>
-                    {filteredProducts.map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={convertToMockProduct(product)}
-                        variant={filters.viewMode === 'grid' ? 'card' : 'list'}
-                      />
-                    ))}
+                  <div className="space-y-6">
+                    {/* Stats Bar */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gradient-to-r from-card/50 to-card/30 rounded-xl border border-border/30">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-primary">{filteredProducts.length}</div>
+                        <div className="text-xs text-muted-foreground">Total Products</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-green-500">
+                          {filteredProducts.filter(p => p.is_free).length}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Free Tools</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-blue-500">
+                          {filteredProducts.filter(p => !p.is_free).length}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Premium Tools</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-purple-500">
+                          {filteredProducts.filter(p => p.is_featured).length}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Featured</div>
+                      </div>
+                    </div>
+
+                    {/* Products Display */}
+                    <div className={
+                      filters.viewMode === 'grid' 
+                        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+                        : "space-y-4"
+                    }>
+                      {filteredProducts.map((product) => (
+                        <div key={product.id} className="group">
+                          <ProductCard
+                            product={convertToMockProduct(product)}
+                            variant={filters.viewMode === 'grid' ? 'card' : 'list'}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : (
-                  <Card className="p-12 text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
-                      <type.icon className="w-8 h-8 text-muted-foreground" />
+                  <Card className="p-12 text-center bg-gradient-to-br from-card/50 to-card/30 border-border/30">
+                    <div className="w-20 h-20 mx-auto mb-6 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
+                      <type.icon className="w-10 h-10 text-white" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">No products found</h3>
-                    <p className="text-muted-foreground mb-4">
+                    <h3 className="text-xl font-bold mb-3 text-foreground">No {type.title} Found</h3>
+                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                      We're constantly adding new {type.title.toLowerCase()} to our collection. 
                       Try adjusting your filters or check back later for new products.
                     </p>
-                    <Button variant="outline">
-                      Clear Filters
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setFilters(prev => ({ ...prev, priceFilter: 'all', sortBy: 'newest' }))}
+                      >
+                        Clear Filters
+                      </Button>
+                      <Button variant="premium">
+                        Browse All Categories
+                      </Button>
+                    </div>
                   </Card>
                 )}
               </div>

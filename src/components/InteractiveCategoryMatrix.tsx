@@ -124,12 +124,12 @@ const InteractiveCategoryMatrix: React.FC = () => {
         {/* Product Type Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-center mb-8">
-            <TabsList className="grid w-full max-w-2xl grid-cols-2 md:grid-cols-4 bg-card/80 backdrop-blur-sm border border-border/30 p-1.5 rounded-2xl shadow-lg">
+            <TabsList className="grid w-full max-w-2xl grid-cols-2 md:grid-cols-4 bg-transparent border-0 p-1.5 rounded-2xl shadow-none">
               {productTypes.map((type) => (
                 <TabsTrigger 
                   key={type.id} 
                   value={type.id}
-                  className="relative rounded-xl py-3 px-2 md:px-4 text-xs md:text-sm data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground hover:bg-muted/30 transition-all duration-300 group"  
+                  className="relative rounded-xl py-3 px-2 md:px-4 text-xs md:text-sm data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:bg-card/50 data-[state=inactive]:text-muted-foreground hover:bg-card/70 transition-all duration-300 group border border-border/20"  
                 >
                   <div className="flex flex-col md:flex-row items-center justify-center md:space-x-2 space-y-1 md:space-y-0 min-h-[60px] md:min-h-[48px]">
                     <type.icon className="w-4 h-4 md:w-5 md:h-5 group-data-[state=active]:scale-110 transition-transform" />

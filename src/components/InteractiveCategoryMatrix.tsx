@@ -142,9 +142,9 @@ const InteractiveCategoryMatrix: React.FC = () => {
 
           {/* Active Tab Content */}
           {productTypes.map((type) => (
-            <TabsContent key={type.id} value={type.id} className="space-y-8">
+            <TabsContent key={type.id} value={type.id} className="space-y-8 mt-12">
               {/* Category Navigation Bar */}
-              <div className="bg-card rounded-2xl p-6 shadow-md border border-border/50 mt-8">
+              <div className="bg-card rounded-2xl p-6 shadow-md border border-border/50">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-4">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${type.gradient} flex items-center justify-center shadow-lg`}>

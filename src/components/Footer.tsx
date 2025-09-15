@@ -164,7 +164,7 @@ const Footer: React.FC = () => {
                 ))}
                 <li className="pt-2">
                   <Link
-                    to="/categories"
+                    to="/browse"
                     className="text-primary hover:text-primary/80 transition-colors text-sm font-medium flex items-center gap-2"
                   >
                     View all categories

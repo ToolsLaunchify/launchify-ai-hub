@@ -114,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                 <div className="mt-4 pt-3 border-t">
                   <NavigationMenuLink asChild>
                     <Link
-                      to="/categories"
+                      to="/browse"
                       className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-center text-sm font-medium"
                     >
                       View All Categories
@@ -277,7 +277,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                       </Link>
                     ))}
                     <Link
-                      to="/categories"
+                      to="/browse"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-primary hover:text-primary/80"
                     >

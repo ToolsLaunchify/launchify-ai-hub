@@ -206,12 +206,13 @@ const AdvancedProductTypeSection: React.FC = () => {
           {productTypes.map((type, index) => (
               <Card 
                 key={type.id} 
-                className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 animate-fade-in"
+                className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 animate-fade-in hover-scale cursor-pointer"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${type.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-300`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${type.gradient} opacity-5 group-hover:opacity-15 transition-all duration-500`} />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
-                <CardContent className="p-8 relative">
+                <CardContent className="p-8 relative transform transition-transform duration-300 group-hover:scale-[1.02]">
                   {/* Header Section */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center space-x-4">

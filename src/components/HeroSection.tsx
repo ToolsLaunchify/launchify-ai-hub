@@ -101,20 +101,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           
           
           
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 animate-slide-up delay-500">
-            {stats.map((stat, index) => (
-              <div key={stat.label} className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-primary rounded-full mb-3">
-                  <stat.icon className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <div className="text-3xl font-bold text-gradient-primary mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>

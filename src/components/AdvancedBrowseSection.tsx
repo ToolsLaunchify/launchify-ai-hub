@@ -28,7 +28,7 @@ const AdvancedBrowseSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 bg-gradient-hero">
+    <section className="pt-8 pb-16 bg-gradient-hero">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Header */}

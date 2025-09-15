@@ -18,15 +18,14 @@ const CategoryPreview: React.FC<CategoryPreviewProps> = ({ category, products })
 
   return (
     <Link to={`/category/${category.slug}`}>
-      <Card className="group relative h-[200px] overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer bg-gradient-card hover:scale-[1.02]">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <Card className="group relative h-[200px] overflow-hidden border-2 border-border/20 hover:border-primary/50 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer bg-gradient-card hover:scale-[1.02] hover:bg-gradient-to-br hover:from-primary/5 hover:via-transparent hover:to-accent/5">
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
           <ArrowRight className="w-4 h-4 text-primary" />
         </div>
         
-        <CardHeader className="relative pb-2">
+        <CardHeader className="relative pb-3">
           <div className="flex items-start space-x-3">
-            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 border border-white/20">
               <span className="text-white text-lg">{category.icon || '📁'}</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -37,12 +36,15 @@ const CategoryPreview: React.FC<CategoryPreviewProps> = ({ category, products })
                 {category.description || 'Explore tools in this category'}
               </p>
             </div>
+            <Badge className="bg-gradient-accent text-white border-none text-xs px-2 py-1 flex-shrink-0">
+              {category.product_count}
+            </Badge>
           </div>
         </CardHeader>
 
-        <CardContent className="relative pt-0 pb-4 flex flex-col justify-between h-[calc(100%-80px)]">
-          {/* Featured Tools Preview - Fixed Layout */}
-          <div className="space-y-2 mb-4">
+        <CardContent className="relative pt-0 pb-4 flex flex-col justify-between h-[calc(100%-95px)]">
+          {/* Featured Tools Preview */}
+          <div className="space-y-2">
             <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center">
               <Star className="w-3 h-3 mr-1" />
               Featured Tools
@@ -51,7 +53,7 @@ const CategoryPreview: React.FC<CategoryPreviewProps> = ({ category, products })
               {sampleProducts.slice(0, 2).map((product) => (
                 <div 
                   key={product.id}
-                  className="flex items-center p-1.5 rounded-md bg-muted/20 group-hover:bg-muted/30 transition-colors"
+                  className="flex items-center p-1.5 rounded-md bg-muted/20 group-hover:bg-muted/40 transition-colors"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="w-5 h-5 bg-gradient-primary rounded-sm mr-2 flex items-center justify-center">
@@ -75,7 +77,7 @@ const CategoryPreview: React.FC<CategoryPreviewProps> = ({ category, products })
             </div>
           </div>
 
-          {/* Bottom Info - Fixed Position */}
+          {/* Bottom Info */}
           <div className="flex items-center justify-between border-t border-border/20 pt-2 mt-auto">
             <div className="flex items-center space-x-3 text-xs text-muted-foreground">
               <span className="flex items-center">
@@ -87,9 +89,9 @@ const CategoryPreview: React.FC<CategoryPreviewProps> = ({ category, products })
                 Updated
               </span>
             </div>
-            <Badge className="bg-gradient-accent text-white border-none text-xs">
-              {category.product_count} {category.product_count === 1 ? 'Tool' : 'Tools'}
-            </Badge>
+            <div className="text-xs font-medium text-primary">
+              {category.product_count === 1 ? '1 Tool' : `${category.product_count} Tools`}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -214,12 +216,11 @@ const SmartCategoryExplorer: React.FC = () => {
           {filteredCategories.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredCategories.map((category) => (
-                <Link key={category.id} to={`/category/${category.slug}`}>
-                  <CategoryPreview 
-                    category={category} 
-                    products={productsByCategory[category.id] || []}
-                  />
-                </Link>
+                <CategoryPreview 
+                  key={category.id}
+                  category={category} 
+                  products={productsByCategory[category.id] || []}
+                />
               ))}
             </div>
           ) : (

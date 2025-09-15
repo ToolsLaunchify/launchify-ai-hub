@@ -212,46 +212,6 @@ const SmartCategoryExplorer: React.FC = () => {
           </div>
         </div>
 
-        {/* Top Categories Highlight */}
-        {viewMode === 'all' && !searchQuery && (
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold mb-6 flex items-center">
-              <TrendingUp className="w-6 h-6 mr-3 text-primary" />
-              Most Popular Categories
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {topCategories.map((category) => (
-                <Card key={category.id} className="bg-gradient-card border-0 shadow-lg hover:shadow-xl transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center">
-                        <span className="text-white text-2xl">{category.icon || '📁'}</span>
-                      </div>
-                      <div>
-                        <h4 className="text-xl font-bold">{category.name}</h4>
-                        <p className="text-muted-foreground text-sm">
-                          {category.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Badge className="bg-gradient-accent text-white border-none">
-                        #{Math.floor(Math.random() * 3) + 1} Most Popular
-                      </Badge>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-gradient-primary">
-                          {category.product_count}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Tools</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Categories Grid */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">

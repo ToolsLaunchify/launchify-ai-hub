@@ -17,11 +17,16 @@ import {
   TrendingUp,
   Star,
   Bookmark,
-  Mail
+  Mail,
+  BookOpen,
+  Settings2
 } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CategoriesManagement from '@/components/admin/CategoriesManagement';
 import UsersManagement from '@/components/admin/UsersManagement';
+import PagesManagement from '@/components/admin/PagesManagement';
+import BlogManagement from '@/components/admin/BlogManagement';
+import FooterManagement from '@/components/admin/FooterManagement';
 import { AdvancedAnalyticsDashboard } from '@/components/admin/AdvancedAnalyticsDashboard';
 import { LeadsManagement } from '@/components/admin/LeadsManagement';
 import { useRealAdminStats } from '@/hooks/useRealAdminStats';
@@ -88,7 +93,7 @@ const AdminDashboard: React.FC = () => {
 
         {/* Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-8 bg-muted/50 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-9 mb-8 bg-muted/50 p-1 rounded-lg">
             <TabsTrigger 
               value="overview" 
               className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
@@ -109,6 +114,27 @@ const AdminDashboard: React.FC = () => {
             >
               <Settings className="h-4 w-4" />
               Categories
+            </TabsTrigger>
+            <TabsTrigger 
+              value="pages" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <PenSquare className="h-4 w-4" />
+              Pages
+            </TabsTrigger>
+            <TabsTrigger 
+              value="blog" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <BookOpen className="h-4 w-4" />
+              Blog
+            </TabsTrigger>
+            <TabsTrigger 
+              value="footer" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <Settings2 className="h-4 w-4" />
+              Footer
             </TabsTrigger>
             <TabsTrigger 
               value="users" 
@@ -243,6 +269,21 @@ const AdminDashboard: React.FC = () => {
           {/* Categories Tab */}
           <TabsContent value="categories">
             <CategoriesManagement />
+          </TabsContent>
+
+          {/* Pages Tab */}
+          <TabsContent value="pages">
+            <PagesManagement />
+          </TabsContent>
+
+          {/* Blog Tab */}
+          <TabsContent value="blog">
+            <BlogManagement />
+          </TabsContent>
+
+          {/* Footer Tab */}
+          <TabsContent value="footer">
+            <FooterManagement />
           </TabsContent>
 
           {/* Users Tab */}

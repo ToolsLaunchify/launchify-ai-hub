@@ -128,18 +128,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
             <NavigationMenuItem>
               <Link
-                to="/search"
-                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
-                  isActive('/search') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
-                }`}
-              >
-                <Search className="w-4 h-4 mr-2" />
-                Search
-              </Link>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <Link
                 to="/type/ai-tools"
                 className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
                   isActive('/type/ai-tools') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
@@ -147,6 +135,18 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
               >
                 <span className="text-purple-500 mr-2">🤖</span>
                 AI Tools
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/type/software"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
+                  isActive('/type/software') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                <span className="text-blue-500 mr-2">💻</span>
+                Software
               </Link>
             </NavigationMenuItem>
 

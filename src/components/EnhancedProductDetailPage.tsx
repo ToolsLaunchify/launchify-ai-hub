@@ -11,6 +11,7 @@ import SEOHead from '@/components/SEOHead';
 import Breadcrumb from '@/components/Breadcrumb';
 import { toast } from '@/hooks/use-toast';
 import { useSavedProducts } from '@/hooks/useSavedProducts';
+import { useClickTracking } from '@/hooks/useClickTracking';
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -55,6 +56,7 @@ interface Product {
   image_url: string | null;
   category_id: string | null;
   product_type: string | null;
+  revenue_type?: 'affiliate' | 'payment' | 'free' | 'mixed' | null;
   is_free: boolean | null;
   is_featured: boolean | null;
   is_newly_launched: boolean | null;
@@ -80,6 +82,12 @@ interface Product {
   og_image_url?: string | null;
   alt_text?: string | null;
   schema_markup?: any;
+  focus_keyword?: string | null;
+  related_keywords?: string[] | null;
+  seo_title?: string | null;
+  social_title?: string | null;
+  social_description?: string | null;
+  twitter_image_url?: string | null;
   category?: {
     id: string;
     name: string;
@@ -259,11 +267,50 @@ const EnhancedProductDetailPage: React.FC = () => {
 
   // Product save state is handled by useSavedProducts hook
 
-  const handleCTAClick = () => {
-    if (product?.affiliate_link) {
-      window.open(product.affiliate_link, '_blank');
-    } else if (product?.payment_link) {
-      window.open(product.payment_link, '_blank');
+  const handleCTAClick = async () => {
+    if (!product) return;
+    
+    const { trackClick } = useClickTracking();
+    
+    // Determine which link to use based on revenue_type priority
+    let targetUrl = '';
+    let clickType: 'affiliate' | 'payment' = 'affiliate';
+    
+    if (product.revenue_type === 'affiliate' && product.affiliate_link) {
+      targetUrl = product.affiliate_link;
+      clickType = 'affiliate';
+    } else if (product.revenue_type === 'payment' && product.payment_link) {
+      targetUrl = product.payment_link;
+      clickType = 'payment';
+    } else if (product.revenue_type === 'mixed') {
+      // For mixed type, prioritize affiliate link if available, then payment link
+      if (product.affiliate_link) {
+        targetUrl = product.affiliate_link;
+        clickType = 'affiliate';
+      } else if (product.payment_link) {
+        targetUrl = product.payment_link;
+        clickType = 'payment';
+      }
+    } else {
+      // Fallback to any available link
+      if (product.affiliate_link) {
+        targetUrl = product.affiliate_link;
+        clickType = 'affiliate';
+      } else if (product.payment_link) {
+        targetUrl = product.payment_link;
+        clickType = 'payment';
+      }
+    }
+    
+    if (targetUrl) {
+      // Track the click
+      await trackClick({
+        product_id: product.id,
+        click_type: clickType,
+      });
+      
+      // Open the link
+      window.open(targetUrl, '_blank');
     } else {
       toast({
         title: "No link available",

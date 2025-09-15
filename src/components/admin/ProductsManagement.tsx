@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import RichTextEditor from '@/components/ui/rich-text-editor';
+import { RevenueTypeIndicator } from '@/components/RevenueTypeIndicator';
 import { 
   Dialog, 
   DialogContent, 
@@ -74,6 +75,8 @@ interface Product {
   file_attachments: any[];
   video_courses: any[];
   custom_code: string;
+  // Revenue tracking
+  revenue_type?: 'affiliate' | 'payment' | 'free' | 'mixed';
   // SEO fields
   meta_title?: string;
   meta_description?: string;
@@ -82,6 +85,16 @@ interface Product {
   og_image_url?: string;
   alt_text?: string;
   schema_markup?: any;
+  focus_keyword?: string;
+  related_keywords?: string[];
+  content_score?: number;
+  seo_title?: string;
+  social_title?: string;
+  social_description?: string;
+  twitter_image_url?: string;
+  structured_data_type?: string;
+  faq_data?: any[];
+  howto_data?: any[];
 }
 
 interface Category {
@@ -391,6 +404,7 @@ const ProductsManagement: React.FC = () => {
       image_url: imageUrl,
       category_id: formData.get('category_id') as string || null,
       product_type: formData.get('product_type') as string || 'software',
+      revenue_type: formData.get('revenue_type') as 'affiliate' | 'payment' | 'free' | 'mixed' || 'free',
       original_price: formData.get('original_price') ? Number(formData.get('original_price')) : null,
       discounted_price: formData.get('discounted_price') ? Number(formData.get('discounted_price')) : null,
       currency: formData.get('currency') as string || 'USD',
@@ -407,6 +421,19 @@ const ProductsManagement: React.FC = () => {
       file_attachments: processedFileAttachments,
       video_courses: processedVideoCourses,
       custom_code: formData.get('custom_code') as string,
+      // SEO fields
+      meta_title: formData.get('meta_title') as string,
+      meta_description: formData.get('meta_description') as string,
+      keywords: (formData.get('keywords') as string)?.split(',').map(k => k.trim()).filter(k => k) || [],
+      canonical_url: formData.get('canonical_url') as string,
+      og_image_url: formData.get('og_image_url') as string,
+      // Advanced SEO fields
+      focus_keyword: formData.get('focus_keyword') as string,
+      related_keywords: (formData.get('related_keywords') as string)?.split(',').map(k => k.trim()).filter(k => k) || [],
+      seo_title: formData.get('seo_title') as string,
+      social_title: formData.get('social_title') as string,
+      social_description: formData.get('social_description') as string,
+      twitter_image_url: formData.get('twitter_image_url') as string,
     };
 
     if (editingProduct) {
@@ -614,6 +641,25 @@ const ProductsManagement: React.FC = () => {
                     <SelectItem value="digital_products">Digital Products</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Revenue Type Selection */}
+              <div>
+                <Label htmlFor="revenue_type">Revenue Type *</Label>
+                <Select name="revenue_type" defaultValue={editingProduct?.revenue_type || 'free'}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select revenue type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="affiliate">Affiliate Commission</SelectItem>
+                    <SelectItem value="payment">Direct Payment (Razorpay)</SelectItem>
+                    <SelectItem value="free">Free Product</SelectItem>
+                    <SelectItem value="mixed">Both Affiliate & Payment</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="text-sm text-muted-foreground mt-1">
+                  This determines which link gets priority and helps track revenue sources
+                </div>
               </div>
 
               <div>
@@ -957,6 +1003,72 @@ const ProductsManagement: React.FC = () => {
                     placeholder="URL for custom social media sharing image"
                   />
                 </div>
+
+                {/* Advanced SEO Fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="focus_keyword">Focus Keyword</Label>
+                    <Input
+                      id="focus_keyword"
+                      name="focus_keyword"
+                      defaultValue={editingProduct?.focus_keyword || ''}
+                      placeholder="Main keyword to target"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="seo_title">SEO Title (If different from Meta Title)</Label>
+                    <Input
+                      id="seo_title"
+                      name="seo_title"
+                      defaultValue={editingProduct?.seo_title || ''}
+                      placeholder="Alternative title for search engines"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="related_keywords">Related Keywords (comma-separated)</Label>
+                  <Input
+                    id="related_keywords"
+                    name="related_keywords"
+                    defaultValue={editingProduct?.related_keywords?.join(', ') || ''}
+                    placeholder="LSI keywords, synonyms, related terms"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="social_title">Social Media Title</Label>
+                    <Input
+                      id="social_title"
+                      name="social_title"
+                      defaultValue={editingProduct?.social_title || ''}
+                      placeholder="Title for social media sharing"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="twitter_image_url">Twitter Image URL</Label>
+                    <Input
+                      id="twitter_image_url"
+                      name="twitter_image_url"
+                      defaultValue={editingProduct?.twitter_image_url || ''}
+                      placeholder="Custom image for Twitter cards"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="social_description">Social Media Description</Label>
+                  <Textarea
+                    id="social_description"
+                    name="social_description"
+                    defaultValue={editingProduct?.social_description || ''}
+                    placeholder="Description for social media sharing"
+                    rows={2}
+                  />
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -1075,6 +1187,7 @@ const ProductsManagement: React.FC = () => {
                 <TableRow>
                   <TableHead>Product</TableHead>
                   <TableHead>Category</TableHead>
+                  <TableHead>Revenue Type</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Views</TableHead>
@@ -1102,6 +1215,12 @@ const ProductsManagement: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell>{getCategoryName(product.category_id)}</TableCell>
+                    <TableCell>
+                      <RevenueTypeIndicator 
+                        revenueType={product.revenue_type || 'free'} 
+                        size="sm" 
+                      />
+                    </TableCell>
                     <TableCell>
                       {product.is_free ? (
                         <Badge variant="secondary">Free</Badge>

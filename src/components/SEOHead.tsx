@@ -19,6 +19,12 @@ interface SEOHeadProps {
     is_free?: boolean;
     rating?: number;
     reviews_count?: number;
+    seo_title?: string;
+    social_title?: string;
+    social_description?: string;
+    twitter_image_url?: string;
+    focus_keyword?: string;
+    related_keywords?: string[];
   };
   structuredData?: any;
 }
@@ -79,15 +85,21 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 
   const finalStructuredData = structuredData || generateProductStructuredData();
 
+  // Enhanced meta title and description using SEO fields
+  const finalTitle = productData?.seo_title || metaTitle || title || 'Tools Launchify - Discover Amazing Tools';
+  const finalDescription = productData?.social_description || metaDescription || 'Discover amazing tools and boost your productivity with our curated collection of the best digital tools.';
+  const finalSocialTitle = productData?.social_title || finalTitle;
+  const finalTwitterImage = productData?.twitter_image_url || ogImageUrl || productData?.image_url || `${siteUrl}/placeholder.svg`;
+
   return (
     <Helmet>
       {/* Basic Meta Tags */}
-      <title>{metaTitle || title || 'Tools Launchify - Discover Amazing Tools'}</title>
-      <meta name="description" content={metaDescription || 'Discover amazing tools and boost your productivity with our curated collection of the best digital tools.'} />
+      <title>{finalTitle}</title>
+      <meta name="description" content={finalDescription} />
       
       {/* Keywords */}
-      {keywords.length > 0 && (
-        <meta name="keywords" content={keywords.join(', ')} />
+      {(keywords.length > 0 || productData?.related_keywords?.length) && (
+        <meta name="keywords" content={[...keywords, ...(productData?.related_keywords || [])].join(', ')} />
       )}
       
       {/* Canonical URL */}
@@ -96,17 +108,17 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={productData ? 'product' : 'website'} />
       <meta property="og:url" content={currentUrl} />
-      <meta property="og:title" content={metaTitle || title || 'Tools Launchify'} />
-      <meta property="og:description" content={metaDescription || 'Discover amazing tools and boost your productivity'} />
+      <meta property="og:title" content={finalSocialTitle} />
+      <meta property="og:description" content={finalDescription} />
       <meta property="og:image" content={ogImageUrl || productData?.image_url || `${siteUrl}/placeholder.svg`} />
       <meta property="og:site_name" content="Tools Launchify" />
       
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={currentUrl} />
-      <meta name="twitter:title" content={metaTitle || title || 'Tools Launchify'} />
-      <meta name="twitter:description" content={metaDescription || 'Discover amazing tools and boost your productivity'} />
-      <meta name="twitter:image" content={ogImageUrl || productData?.image_url || `${siteUrl}/placeholder.svg`} />
+      <meta name="twitter:title" content={finalSocialTitle} />
+      <meta name="twitter:description" content={finalDescription} />
+      <meta name="twitter:image" content={finalTwitterImage} />
       
       {/* Additional Meta Tags */}
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />

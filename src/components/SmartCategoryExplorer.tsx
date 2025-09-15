@@ -319,8 +319,8 @@ const SmartCategoryExplorer: React.FC = () => {
                     Advanced Search
                   </Button>
                 </Link>
-                <Link to="/products">
-                  <Button variant="outline" className="hover:bg-primary hover:text-white transition-colors">
+                <Link to="/browse">
+                  <Button className="bg-gradient-primary hover:opacity-90 text-white border-none">
                     Browse All Tools
                   </Button>
                 </Link>

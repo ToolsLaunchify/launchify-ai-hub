@@ -123,12 +123,12 @@ const InteractiveCategoryMatrix: React.FC = () => {
 
         {/* Product Type Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:w-2/3 mx-auto mb-8 bg-muted/30 p-1 rounded-2xl">
+          <TabsList className="grid w-full grid-cols-4 lg:w-2/3 mx-auto mb-8 bg-card border border-border/50 p-1 rounded-2xl shadow-md">
             {productTypes.map((type) => (
               <TabsTrigger 
                 key={type.id} 
                 value={type.id}
-                className="relative rounded-xl py-3 px-4 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+                className="relative rounded-xl py-3 px-4 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:border-primary/50 data-[state=inactive]:bg-muted/50 data-[state=inactive]:text-muted-foreground data-[state=inactive]:border data-[state=inactive]:border-border transition-all duration-300"
               >
                 <div className="flex items-center space-x-2">
                   <type.icon className="w-4 h-4" />

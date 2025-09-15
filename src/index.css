@@ -286,3 +286,21 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Enhanced Tab Styles for Better Visibility */
+[data-state="inactive"] {
+  @apply bg-muted/50 text-muted-foreground border border-border/50 hover:bg-muted/70 hover:text-foreground hover:border-border;
+}
+
+/* Interactive Elements */
+.story-link {
+  @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+}
+
+.hover-scale {
+  @apply transition-transform duration-200 hover:scale-105;
+}
+
+.pulse {
+  @apply animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite];
+}

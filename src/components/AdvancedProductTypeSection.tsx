@@ -1,96 +1,140 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Monitor, Gift, Package, ArrowRight, TrendingUp, Users, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { Zap, Monitor, Gift, Package, ArrowRight, TrendingUp, Users, Star, Grid, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useProductStats } from '@/hooks/useProductStats';
 import { useCategoryStats } from '@/hooks/useCategoryStats';
 import { useProducts } from '@/hooks/useProducts';
 
-interface ExpandedTypeProps {
+interface CategoryModalProps {
   typeId: string;
   productType: string;
-  isExpanded: boolean;
-  onToggle: () => void;
+  title: string;
+  gradient: string;
+  count: number;
 }
 
-const ExpandedTypeContent: React.FC<ExpandedTypeProps> = ({ 
+const CategoryModal: React.FC<CategoryModalProps> = ({ 
   typeId, 
   productType, 
-  isExpanded, 
-  onToggle 
+  title,
+  gradient,
+  count
 }) => {
   const { data: categories = [] } = useCategoryStats();
-  const { data: products = [] } = useProducts({ productType, limit: 6 });
+  const { data: products = [] } = useProducts({ productType, limit: 8 });
   
-  // Get relevant categories for this product type
-  const relevantCategories = categories.slice(0, 4);
-
-  if (!isExpanded) return null;
+  // Get relevant categories for this product type - filter by actual product type
+  const relevantCategories = categories.filter(category => {
+    // Get products of this category to check if they match the product type
+    const categoryProducts = products.filter(p => p.category_id === category.id);
+    return categoryProducts.length > 0;
+  }).slice(0, 8);
 
   return (
-    <div className="mt-6 animate-fade-in">
-      <div className="border-t border-border/50 pt-6">
-        {/* Top Categories */}
-        <div className="mb-6">
-          <h4 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center">
-            <TrendingUp className="w-4 h-4 mr-2" />
-            Popular Categories
+    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="flex items-center space-x-3 text-2xl">
+          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+            <Grid className="h-5 w-5 text-white" />
+          </div>
+          <span>Explore {title} Categories</span>
+        </DialogTitle>
+      </DialogHeader>
+      
+      <div className="space-y-6 pt-4">
+        {/* Categories Grid */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4 flex items-center">
+            <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+            Popular Categories ({relevantCategories.length})
           </h4>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {relevantCategories.map((category) => (
               <Link 
                 key={category.id} 
                 to={`/category/${category.slug}`}
-                className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-xs"
+                className="flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors border border-border/50 hover:border-primary/50 group"
               >
-                <span className="font-medium">{category.name}</span>
-                <Badge variant="secondary" className="text-xs">
-                  {category.product_count}
-                </Badge>
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="text-white text-lg">{category.icon || '📁'}</span>
+                  </div>
+                  <div>
+                    <p className="font-medium group-hover:text-primary transition-colors">{category.name}</p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {category.description || 'Explore tools in this category'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge className="bg-gradient-accent text-white border-none">
+                    {category.product_count}
+                  </Badge>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
               </Link>
             ))}
           </div>
         </div>
 
-        {/* Sample Products */}
-        <div className="mb-4">
-          <h4 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center">
-            <Star className="w-4 h-4 mr-2" />
-            Featured Products
+        {/* Featured Products */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4 flex items-center">
+            <Star className="w-5 h-5 mr-2 text-primary" />
+            Featured Products ({products.length})
           </h4>
-          <div className="grid grid-cols-1 gap-2">
-            {products.slice(0, 3).map((product) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {products.slice(0, 6).map((product) => (
               <Link 
                 key={product.id} 
                 to={`/product/${product.slug}`}
-                className="flex items-center p-2 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors group"
+                className="flex items-center p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors border border-border/30 hover:border-primary/30 group"
               >
-                <div className="w-8 h-8 bg-gradient-primary rounded-md mr-3 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">
+                <div className="w-10 h-10 bg-gradient-primary rounded-lg mr-3 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <span className="text-white text-sm font-bold">
                     {product.name.charAt(0)}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{product.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">
+                  <p className="font-medium group-hover:text-primary transition-colors truncate">{product.name}</p>
+                  <p className="text-sm text-muted-foreground truncate">
                     {product.description}
                   </p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    {product.is_free && (
+                      <Badge variant="secondary" className="text-xs">Free</Badge>
+                    )}
+                    {product.is_featured && (
+                      <Badge className="bg-gradient-accent text-white border-none text-xs">Featured</Badge>
+                    )}
+                  </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </Link>
             ))}
           </div>
         </div>
+
+        {/* View All Button */}
+        <div className="pt-4 border-t border-border/50">
+          <Link to={`/type/${typeId.replace('_', '-')}`}>
+            <Button className={`w-full bg-gradient-to-r ${gradient} hover:opacity-90 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300`}>
+              View All {title} ({count} total)
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       </div>
-    </div>
+    </DialogContent>
   );
 };
 
 const AdvancedProductTypeSection: React.FC = () => {
   const { data: productStats } = useProductStats();
-  const [expandedType, setExpandedType] = useState<string | null>(null);
 
   const productTypes = [
     {
@@ -102,7 +146,7 @@ const AdvancedProductTypeSection: React.FC = () => {
       href: '/type/ai-tools',
       count: productStats?.ai_tools || 0,
       trending: true,
-      features: ['Machine Learning', 'Natural Language', 'Computer Vision']
+      features: []
     },
     {
       id: 'software',
@@ -113,7 +157,7 @@ const AdvancedProductTypeSection: React.FC = () => {
       href: '/type/software',
       count: productStats?.software || 0,
       trending: false,
-      features: ['Enterprise Grade', 'Cloud Ready', 'Scalable']
+      features: []
     },
     {
       id: 'free_tools',
@@ -124,7 +168,7 @@ const AdvancedProductTypeSection: React.FC = () => {
       href: '/type/free-tools',
       count: productStats?.free_tools || 0,
       trending: true,
-      features: ['No Cost', 'Open Source', 'Community Driven']
+      features: []
     },
     {
       id: 'digital_products',
@@ -135,13 +179,10 @@ const AdvancedProductTypeSection: React.FC = () => {
       href: '/type/digital-products',
       count: productStats?.digital_products || 0,
       trending: false,
-      features: ['Instant Download', 'Commercial Use', 'Premium Quality']
+      features: []
     }
   ];
 
-  const handleTypeExpand = (typeId: string) => {
-    setExpandedType(expandedType === typeId ? null : typeId);
-  };
 
   return (
     <section className="py-16 bg-gradient-subtle">
@@ -162,14 +203,10 @@ const AdvancedProductTypeSection: React.FC = () => {
         
         {/* Advanced Product Type Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {productTypes.map((type, index) => {
-            const isExpanded = expandedType === type.id;
-            return (
+          {productTypes.map((type, index) => (
               <Card 
                 key={type.id} 
-                className={`group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 ${
-                  isExpanded ? 'lg:col-span-2' : ''
-                } animate-fade-in`}
+                className="group relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-500 animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${type.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-300`} />
@@ -197,18 +234,7 @@ const AdvancedProductTypeSection: React.FC = () => {
                           {type.description}
                         </p>
                         
-                        {/* Feature Tags */}
-                        <div className="flex flex-wrap gap-2">
-                          {type.features.map((feature) => (
-                            <Badge 
-                              key={feature} 
-                              variant="secondary" 
-                              className="text-xs bg-muted/50 text-muted-foreground"
-                            >
-                              {feature}
-                            </Badge>
-                          ))}
-                        </div>
+        {/* Remove hardcoded feature tags - these will be shown in expanded view */}
                       </div>
                     </div>
                     
@@ -225,28 +251,26 @@ const AdvancedProductTypeSection: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Expanded Content */}
-                  <ExpandedTypeContent
-                    typeId={type.id}
-                    productType={type.id}
-                    isExpanded={isExpanded}
-                    onToggle={() => handleTypeExpand(type.id)}
-                  />
-
                   {/* Action Buttons */}
                   <div className="flex items-center justify-between pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => handleTypeExpand(type.id)}
-                      className="flex items-center space-x-2 border-muted hover:border-primary hover:text-primary transition-colors"
-                    >
-                      <span>{isExpanded ? 'Show Less' : 'Explore Categories'}</span>
-                      {isExpanded ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" />
-                      )}
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="flex items-center space-x-2 border-muted hover:border-primary hover:text-primary transition-colors"
+                        >
+                          <Grid className="w-4 h-4" />
+                          <span>Explore Categories</span>
+                        </Button>
+                      </DialogTrigger>
+                      <CategoryModal
+                        typeId={type.id}
+                        productType={type.id}
+                        title={type.title}
+                        gradient={type.gradient}
+                        count={type.count}
+                      />
+                    </Dialog>
                     
                     <Link to={type.href}>
                       <Button className={`bg-gradient-to-r ${type.gradient} hover:opacity-90 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300`}>
@@ -257,30 +281,10 @@ const AdvancedProductTypeSection: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
+              ))}
         </div>
 
-        {/* Quick Stats */}
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 animate-fade-in">
-          {productTypes.map((type, index) => (
-            <div 
-              key={`stat-${type.id}`} 
-              className="text-center p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/20 transition-colors"
-              style={{ animationDelay: `${600 + index * 100}ms` }}
-            >
-              <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${type.gradient} flex items-center justify-center`}>
-                <type.icon className="h-6 w-6 text-white" />
-              </div>
-              <div className="text-2xl font-bold text-gradient-primary mb-1">
-                {type.count}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {type.title}
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Removed redundant count sections */}
       </div>
     </section>
   );

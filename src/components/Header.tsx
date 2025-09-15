@@ -65,7 +65,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
               <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground">
                 <Briefcase className="w-4 h-4 mr-2" />
                 Products
-                <ChevronDown className="w-3 h-3 ml-1 transition-transform group-data-[state=open]:rotate-180" />
               </NavigationMenuTrigger>
               <NavigationMenuContent className="min-w-[400px] p-4">
                 <div className="grid grid-cols-2 gap-3">
@@ -90,7 +89,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
               <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground">
                 <Tag className="w-4 h-4 mr-2" />
                 Categories
-                <ChevronDown className="w-3 h-3 ml-1 transition-transform group-data-[state=open]:rotate-180" />
               </NavigationMenuTrigger>
               <NavigationMenuContent className="min-w-[500px] p-4">
                 <div className="grid grid-cols-3 gap-3">
@@ -150,17 +148,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
               </Link>
             </NavigationMenuItem>
 
-            <NavigationMenuItem>
-              <Link
-                to="/browse"
-                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
-                  isActive('/browse') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
-                }`}
-              >
-                <Grid3X3 className="w-4 h-4 mr-2" />
-                Browse All
-              </Link>
-            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 

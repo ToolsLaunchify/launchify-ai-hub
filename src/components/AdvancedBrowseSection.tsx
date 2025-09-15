@@ -40,25 +40,6 @@ const AdvancedBrowseSection: React.FC = () => {
               Discover thousands of tools, software, and digital products with our advanced browsing experience
             </p>
             
-            {stats && (
-              <div className="flex flex-wrap justify-center gap-4 mb-8">
-                <Badge variant="secondary" className="text-sm px-4 py-2">
-                  {stats.total.toLocaleString()} Total Products
-                </Badge>
-                <Badge variant="secondary" className="text-sm px-4 py-2">
-                  {stats.ai_tools.toLocaleString()} AI Tools
-                </Badge>
-                <Badge variant="secondary" className="text-sm px-4 py-2">
-                  {stats.software.toLocaleString()} Software
-                </Badge>
-                <Badge variant="secondary" className="text-sm px-4 py-2">
-                  {stats.free_tools.toLocaleString()} Free Tools
-                </Badge>
-                <Badge variant="secondary" className="text-sm px-4 py-2">
-                  {stats.digital_products.toLocaleString()} Digital Products
-                </Badge>
-              </div>
-            )}
           </div>
 
           {/* CTA Section */}

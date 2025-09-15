@@ -22,12 +22,14 @@ import ProductsManagement from '@/components/admin/ProductsManagement';
 import CategoriesManagement from '@/components/admin/CategoriesManagement';
 import UsersManagement from '@/components/admin/UsersManagement';
 import { AdvancedAnalyticsDashboard } from '@/components/admin/AdvancedAnalyticsDashboard';
+import { useRealAdminStats } from '@/hooks/useRealAdminStats';
 
 const AdminDashboard: React.FC = () => {
   const { user, isAdmin, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const { data: adminStats, isLoading: statsLoading } = useRealAdminStats();
 
-  if (loading) {
+  if (loading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -39,44 +41,36 @@ const AdminDashboard: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Mock stats data - replace with real data from your queries
+  // Real stats data from database
   const stats = [
     { 
       title: 'Total Products', 
-      value: '124', 
-      change: '+12%', 
+      value: adminStats?.totalProducts.toLocaleString() || '0', 
+      change: 'Live data', 
       icon: Package,
       color: 'text-blue-600'
     },
     { 
       title: 'Total Users', 
-      value: '2,841', 
-      change: '+8%', 
+      value: adminStats?.totalUsers.toLocaleString() || '0', 
+      change: 'Live data', 
       icon: Users,
       color: 'text-green-600'
     },
     { 
-      title: 'Monthly Views', 
-      value: '45.2K', 
-      change: '+23%', 
+      title: 'Monthly Clicks', 
+      value: adminStats?.totalClicks.toLocaleString() || '0', 
+      change: 'Last 30 days', 
       icon: Eye,
       color: 'text-purple-600'
     },
     { 
       title: 'Conversion Rate', 
-      value: '3.24%', 
-      change: '+1.2%', 
+      value: `${adminStats?.conversionRate.toFixed(1) || '0'}%`, 
+      change: `${adminStats?.totalConversions || 0} conversions`, 
       icon: TrendingUp,
       color: 'text-orange-600'
     }
-  ];
-
-  const recentActivities = [
-    { action: 'New product added', detail: 'Leonardo AI Image Generator', time: '2 hours ago' },
-    { action: 'User registered', detail: 'john@example.com', time: '4 hours ago' },
-    { action: 'Product updated', detail: 'Notion AI Workspace', time: '6 hours ago' },
-    { action: 'Category created', detail: 'AI Video Tools', time: '1 day ago' },
-    { action: 'Product featured', detail: 'GitHub Copilot X', time: '2 days ago' }
   ];
 
   return (
@@ -92,24 +86,39 @@ const AdminDashboard: React.FC = () => {
 
         {/* Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-5 mb-8 bg-muted/50 p-1 rounded-lg">
+            <TabsTrigger 
+              value="overview" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
               <BarChart3 className="h-4 w-4" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="products" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="products" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
               <Package className="h-4 w-4" />
               Products
             </TabsTrigger>
-            <TabsTrigger value="categories" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="categories" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
               <Settings className="h-4 w-4" />
               Categories
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="users" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
               <Users className="h-4 w-4" />
               Users
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="analytics" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
               <BarChart3 className="h-4 w-4" />
               Analytics
             </TabsTrigger>
@@ -188,9 +197,14 @@ const AdminDashboard: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentActivities.map((activity, index) => (
-                      <div key={index} className="flex items-center space-x-4">
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    {adminStats?.recentActivity.length ? adminStats.recentActivity.map((activity) => (
+                      <div key={activity.id} className="flex items-center space-x-4">
+                        <div className={`w-2 h-2 rounded-full ${
+                          activity.type === 'product' ? 'bg-blue-500' :
+                          activity.type === 'user' ? 'bg-green-500' :
+                          activity.type === 'click' ? 'bg-purple-500' :
+                          'bg-primary'
+                        }`}></div>
                         <div className="flex-1 space-y-1">
                           <p className="text-sm font-medium leading-none">
                             {activity.action}
@@ -203,7 +217,9 @@ const AdminDashboard: React.FC = () => {
                           {activity.time}
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -111,20 +111,23 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
               </p>
             </div>
             <Calendar
-              mode="single"
-              selected={tempDate}
-              onSelect={setTempDate}
+              mode="range"
+              selected={{ from: dateRange.start, to: dateRange.end }}
+              onSelect={(range) => {
+                if (range?.from && range?.to) {
+                  setDateRange({ start: range.from, end: range.to });
+                } else if (range?.from) {
+                  setDateRange({ start: range.from, end: range.from });
+                }
+              }}
+              numberOfMonths={2}
               className="p-3 pointer-events-auto"
             />
             <div className="p-3 border-t flex gap-2">
               <Button
                 size="sm"
-                onClick={() => {
-                  if (tempDate) {
-                    setDateRange({ start: tempDate, end: new Date() });
-                    setCustomRangeOpen(false);
-                  }
-                }}
+                onClick={() => setCustomRangeOpen(false)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 Apply
               </Button>
@@ -242,10 +245,10 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
 
       {/* Detailed Analytics Tabs */}
       <Tabs defaultValue="sources" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="sources">Traffic Sources</TabsTrigger>
-          <TabsTrigger value="products">Product Performance</TabsTrigger>
-          <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="sources" className="bg-primary/10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Traffic Sources</TabsTrigger>
+          <TabsTrigger value="products" className="bg-primary/10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Product Performance</TabsTrigger>
+          <TabsTrigger value="activity" className="bg-primary/10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Recent Activity</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sources" className="space-y-4">

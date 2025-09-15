@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useLeads, useLeadsStats, Lead } from '@/hooks/useLeads';
 import { format } from 'date-fns';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SourceAnalyticsDashboard } from './SourceAnalyticsDashboard';
 import { 
   Table, 
   TableBody, 
@@ -107,8 +109,14 @@ export const LeadsManagement: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Stats Cards */}
+    <Tabs defaultValue="leads" className="space-y-6">
+      <TabsList>
+        <TabsTrigger value="leads">Collected Leads</TabsTrigger>
+        <TabsTrigger value="analytics">Source Analytics</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="leads" className="space-y-6">
+        {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -239,8 +247,10 @@ export const LeadsManagement: React.FC = () => {
                     <TableHead>Email</TableHead>
                     <TableHead>Phone</TableHead>
                     <TableHead>Product</TableHead>
-                    <TableHead>Source</TableHead>
-                    <TableHead>Date</TableHead>
+                <TableHead>Source</TableHead>
+                <TableHead>Purchase Status</TableHead>
+                <TableHead>Revenue</TableHead>
+                <TableHead>Date (IST)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -257,14 +267,32 @@ export const LeadsManagement: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        {lead.utm_source ? (
-                          <Badge variant="secondary">{lead.utm_source}</Badge>
+                        <Badge variant="secondary">
+                          {lead.source_display}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {lead.has_purchased ? (
+                          <Badge variant="default" className="bg-green-600 text-white">
+                            Purchased
+                          </Badge>
                         ) : (
-                          '-'
+                          <Badge variant="outline">
+                            Not Purchased
+                          </Badge>
                         )}
                       </TableCell>
                       <TableCell>
-                        {format(new Date(lead.created_at), 'MMM dd, yyyy')}
+                        {lead.has_purchased && lead.total_revenue ? (
+                          <span className="font-medium text-green-600">
+                            ${lead.total_revenue.toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">$0.00</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">{lead.formatted_created_at}</span>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -274,6 +302,11 @@ export const LeadsManagement: React.FC = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+      </TabsContent>
+
+      <TabsContent value="analytics">
+        <SourceAnalyticsDashboard />
+      </TabsContent>
+    </Tabs>
   );
 };

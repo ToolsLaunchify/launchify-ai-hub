@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { formatInTimeZone } from 'date-fns-tz';
 
 export interface Lead {
   id: string;
@@ -19,6 +20,17 @@ export interface Lead {
     name: string;
     slug: string;
   };
+  conversions?: Array<{
+    id: string;
+    conversion_type: string;
+    revenue_amount: number | null;
+    currency: string | null;
+    created_at: string;
+  }>;
+  formatted_created_at?: string;
+  source_display?: string;
+  has_purchased?: boolean;
+  total_revenue?: number;
 }
 
 export interface LeadsStats {
@@ -43,6 +55,13 @@ export const useLeads = () => {
           products (
             name,
             slug
+          ),
+          conversions (
+            id,
+            conversion_type,
+            revenue_amount,
+            currency,
+            created_at
           )
         `)
         .order('created_at', { ascending: false });
@@ -52,7 +71,46 @@ export const useLeads = () => {
         throw error;
       }
 
-      return data as Lead[];
+      // Process leads with enhanced data
+      const processedLeads = data?.map(lead => {
+        // Format date to IST
+        const istDate = formatInTimeZone(new Date(lead.created_at), 'Asia/Kolkata', 'MMM dd, yyyy hh:mm:ss a');
+        
+        // Enhanced source display
+        let sourceDisplay = 'Direct';
+        if (lead.utm_source) {
+          sourceDisplay = lead.utm_source.charAt(0).toUpperCase() + lead.utm_source.slice(1);
+          if (lead.utm_medium && lead.utm_medium !== 'none') {
+            sourceDisplay += ` (${lead.utm_medium})`;
+          }
+          if (lead.utm_campaign) {
+            sourceDisplay += ` - ${lead.utm_campaign}`;
+          }
+        } else if (lead.referrer) {
+          if (lead.referrer.includes('youtube.com')) sourceDisplay = 'YouTube (referral)';
+          else if (lead.referrer.includes('facebook.com')) sourceDisplay = 'Facebook (referral)';
+          else if (lead.referrer.includes('instagram.com')) sourceDisplay = 'Instagram (referral)';
+          else if (lead.referrer.includes('linkedin.com')) sourceDisplay = 'LinkedIn (referral)';
+          else if (lead.referrer.includes('google.com')) sourceDisplay = 'Google (search)';
+          else if (lead.referrer.includes('twitter.com')) sourceDisplay = 'Twitter (referral)';
+          else sourceDisplay = 'Website (referral)';
+        }
+
+        // Calculate purchase info
+        const conversions = lead.conversions || [];
+        const hasPurchased = conversions.length > 0;
+        const totalRevenue = conversions.reduce((sum, conv) => sum + (conv.revenue_amount || 0), 0);
+
+        return {
+          ...lead,
+          formatted_created_at: istDate,
+          source_display: sourceDisplay,
+          has_purchased: hasPurchased,
+          total_revenue: totalRevenue
+        };
+      }) || [];
+
+      return processedLeads as Lead[];
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
     refetchOnWindowFocus: false,

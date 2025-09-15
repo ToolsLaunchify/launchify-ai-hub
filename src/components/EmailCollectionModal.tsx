@@ -29,15 +29,62 @@ export const EmailCollectionModal: React.FC<EmailCollectionModalProps> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const getUtmParams = () => {
-    if (typeof window === 'undefined') return {};
-    
+  // Enhanced source detection
+  const getSourceInfo = () => {
     const urlParams = new URLSearchParams(window.location.search);
-    return {
-      utm_source: urlParams.get('utm_source') || undefined,
-      utm_medium: urlParams.get('utm_medium') || undefined,
-      utm_campaign: urlParams.get('utm_campaign') || undefined,
-    };
+    let source = urlParams.get('utm_source');
+    let medium = urlParams.get('utm_medium');
+    let campaign = urlParams.get('utm_campaign');
+
+    // Check session storage for persisted UTM parameters
+    if (!source) {
+      const storedSource = sessionStorage.getItem('utm_source');
+      const storedMedium = sessionStorage.getItem('utm_medium');
+      const storedCampaign = sessionStorage.getItem('utm_campaign');
+      
+      if (storedSource) {
+        source = storedSource;
+        medium = storedMedium;
+        campaign = storedCampaign;
+      } else {
+        // Detect source from referrer
+        const referrer = document.referrer;
+        if (referrer) {
+          if (referrer.includes('youtube.com') || referrer.includes('youtu.be')) {
+            source = 'youtube';
+            medium = 'referral';
+          } else if (referrer.includes('facebook.com') || referrer.includes('fb.com')) {
+            source = 'facebook';
+            medium = 'referral';
+          } else if (referrer.includes('instagram.com')) {
+            source = 'instagram';
+            medium = 'referral';
+          } else if (referrer.includes('linkedin.com')) {
+            source = 'linkedin';
+            medium = 'referral';
+          } else if (referrer.includes('google.com')) {
+            source = 'google';
+            medium = 'search';
+          } else if (referrer.includes('twitter.com') || referrer.includes('t.co')) {
+            source = 'twitter';
+            medium = 'referral';
+          } else {
+            source = 'referral';
+            medium = 'website';
+          }
+        } else {
+          source = 'direct';
+          medium = 'none';
+        }
+      }
+    }
+
+    // Store UTM parameters for future use
+    if (source) sessionStorage.setItem('utm_source', source);
+    if (medium) sessionStorage.setItem('utm_medium', medium);
+    if (campaign) sessionStorage.setItem('utm_campaign', campaign);
+
+    return { utm_source: source, utm_medium: medium, utm_campaign: campaign };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,17 +98,19 @@ export const EmailCollectionModal: React.FC<EmailCollectionModalProps> = ({
     setIsLoading(true);
 
     try {
-      const utmParams = getUtmParams();
+      const sourceInfo = getSourceInfo();
       
       const leadData = {
         product_id: productId,
         name: formData.name,
         email: formData.email,
         phone: formData.phone || null,
+        utm_source: sourceInfo.utm_source,
+        utm_medium: sourceInfo.utm_medium,
+        utm_campaign: sourceInfo.utm_campaign,
         ip_address: null, // Will be handled by backend if needed
         user_agent: navigator.userAgent,
         referrer: document.referrer || null,
-        ...utmParams,
       };
 
       const { data, error } = await supabase

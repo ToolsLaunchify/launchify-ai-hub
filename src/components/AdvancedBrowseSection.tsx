@@ -61,25 +61,6 @@ const AdvancedBrowseSection: React.FC = () => {
             )}
           </div>
 
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-10">
-            {features.map((feature, index) => (
-              <Card key={index} className="card-hover border border-border/50">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="w-8 h-8 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold card-title mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground card-text">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
           {/* CTA Section */}
           <div className="bg-gradient-card rounded-3xl border border-border/50 p-8 text-center shadow-lg">
             <h3 className="text-2xl font-bold text-foreground mb-4">
@@ -99,7 +80,7 @@ const AdvancedBrowseSection: React.FC = () => {
               </Link>
               
               <Link to="/search">
-                <Button variant="outline" size="lg" className="min-w-[200px]">
+                <Button variant="secondary" size="lg" className="min-w-[200px]">
                   <Search className="w-5 h-5 mr-2" />
                   Advanced Search
                 </Button>

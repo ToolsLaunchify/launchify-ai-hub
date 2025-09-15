@@ -14,7 +14,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch?.(searchQuery);
+    if (searchQuery.trim()) {
+      // Navigate to search page with query
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+    }
+    if (onSearch) {
+      onSearch(searchQuery);
+    }
   };
 
   const stats = [

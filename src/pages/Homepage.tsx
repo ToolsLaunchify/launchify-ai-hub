@@ -1,39 +1,65 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Grid, List, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import HeroSection from '@/components/HeroSection';
 import CombinedLaunchesSection from '@/components/CombinedLaunchesSection';
 import ProductsByCategorySection from '@/components/ProductsByCategorySection';
 import CategoriesSection from '@/components/CategoriesSection';
 import ProductTypeSections from '@/components/ProductTypeSections';
-import ProductCard from '@/components/ProductCard';
-import { useProducts, useFreeToolsByCategory } from '@/hooks/useProducts';
+import AdvancedBrowseSection from '@/components/AdvancedBrowseSection';
+import VersionToggle from '@/components/VersionToggle';
+import HomepageClassic from './HomepageClassic';
 
 const Homepage: React.FC = () => {
+  const [currentVersion, setCurrentVersion] = useState<'classic' | 'enhanced'>('enhanced');
+
+  useEffect(() => {
+    // Check for saved preference
+    const savedVersion = localStorage.getItem('homepage-version') as 'classic' | 'enhanced' | null;
+    if (savedVersion) {
+      setCurrentVersion(savedVersion);
+    }
+  }, []);
+
   const handleSearch = (query: string) => {
     console.log('Searching for:', query);
     // Implement search functionality
   };
 
+  // Render classic version if selected
+  if (currentVersion === 'classic') {
+    return (
+      <>
+        <HomepageClassic />
+        <VersionToggle onVersionChange={setCurrentVersion} />
+      </>
+    );
+  }
+
+  // Render enhanced version
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <HeroSection onSearch={handleSearch} />
+    <>
+      <div className="min-h-screen bg-background">
+        {/* Hero Section */}
+        <HeroSection onSearch={handleSearch} />
 
-      {/* Browse by Tool Type - Right after Hero */}
-      <ProductTypeSections />
+        {/* Advanced Browse Section - New Premium Experience */}
+        <AdvancedBrowseSection />
 
-      {/* Combined Latest Launches & Featured Products */}
-      <CombinedLaunchesSection />
+        {/* Browse by Tool Type - Right after Hero */}
+        <ProductTypeSections />
 
-      {/* Products by Category - Main Categories */}
-      <ProductsByCategorySection />
+        {/* Combined Latest Launches & Featured Products */}
+        <CombinedLaunchesSection />
 
-      {/* Categories Section */}
-      <CategoriesSection />
-    </div>
+        {/* Products by Category - Main Categories */}
+        <ProductsByCategorySection />
+
+        {/* Categories Section */}
+        <CategoriesSection />
+      </div>
+      
+      {/* Version Toggle */}
+      <VersionToggle onVersionChange={setCurrentVersion} />
+    </>
   );
 };
 

@@ -15,6 +15,8 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import ToolTypePage from "./pages/ToolTypePage";
 import NotFound from "./pages/NotFound";
 import SavedProductsPage from "./pages/SavedProductsPage";
+import SearchPage from "./pages/SearchPage";
+import ProductBrowserPage from "./pages/ProductBrowserPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +33,8 @@ const App = () => (
             <main className="flex-1">
               <Routes>
                 <Route path="/" element={<Homepage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/browse" element={<ProductBrowserPage />} />
                 <Route path="/auth" element={<LoginPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />

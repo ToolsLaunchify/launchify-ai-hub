@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { DollarSign, CreditCard, Gift, Shuffle } from 'lucide-react';
 
 interface RevenueTypeIndicatorProps {
-  revenueType: 'affiliate' | 'payment' | 'free' | 'mixed';
+  revenueType: 'affiliate' | 'payment' | 'free';
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -22,7 +22,7 @@ export const RevenueTypeIndicator: React.FC<RevenueTypeIndicatorProps> = ({
         };
       case 'payment':
         return {
-          label: 'Direct Payment',
+          label: 'Direct Payment Page',
           variant: 'default' as const,
           icon: CreditCard,
           className: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-100'
@@ -33,13 +33,6 @@ export const RevenueTypeIndicator: React.FC<RevenueTypeIndicatorProps> = ({
           variant: 'outline' as const,
           icon: Gift,
           className: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-100'
-        };
-      case 'mixed':
-        return {
-          label: 'Mixed',
-          variant: 'destructive' as const,
-          icon: Shuffle,
-          className: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900 dark:text-purple-100'
         };
       default:
         return {

@@ -652,9 +652,8 @@ const ProductsManagement: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="affiliate">Affiliate Commission</SelectItem>
-                    <SelectItem value="payment">Direct Payment (Razorpay)</SelectItem>
+                    <SelectItem value="payment">Direct Payment Page</SelectItem>
                     <SelectItem value="free">Free Product</SelectItem>
-                    <SelectItem value="mixed">Both Affiliate & Payment</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-sm text-muted-foreground mt-1">
@@ -1217,7 +1216,7 @@ const ProductsManagement: React.FC = () => {
                     <TableCell>{getCategoryName(product.category_id)}</TableCell>
                     <TableCell>
                       <RevenueTypeIndicator 
-                        revenueType={product.revenue_type || 'free'} 
+                        revenueType={(product.revenue_type as 'affiliate' | 'payment' | 'free') || 'free'} 
                         size="sm" 
                       />
                     </TableCell>

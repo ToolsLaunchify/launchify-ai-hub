@@ -21,7 +21,7 @@ import {
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CategoriesManagement from '@/components/admin/CategoriesManagement';
 import UsersManagement from '@/components/admin/UsersManagement';
-import Analytics from '@/components/admin/Analytics';
+import { AdvancedAnalyticsDashboard } from '@/components/admin/AdvancedAnalyticsDashboard';
 
 const AdminDashboard: React.FC = () => {
   const { user, isAdmin, loading } = useAuth();
@@ -227,7 +227,7 @@ const AdminDashboard: React.FC = () => {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics">
-            <Analytics />
+            <AdvancedAnalyticsDashboard />
           </TabsContent>
         </Tabs>
       </div>

@@ -108,6 +108,63 @@ export type Database = {
           },
         ]
       }
+      conversions: {
+        Row: {
+          click_tracking_id: string | null
+          conversion_type: string
+          created_at: string
+          currency: string | null
+          id: string
+          product_id: string | null
+          revenue_amount: number | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          click_tracking_id?: string | null
+          conversion_type: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          product_id?: string | null
+          revenue_amount?: number | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          click_tracking_id?: string | null
+          conversion_type?: string
+          created_at?: string
+          currency?: string | null
+          id?: string
+          product_id?: string | null
+          revenue_amount?: number | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversions_click_tracking_id_fkey"
+            columns: ["click_tracking_id"]
+            isOneToOne: false
+            referencedRelation: "click_tracking"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           affiliate_link: string | null
@@ -341,7 +398,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      revenue_type: "affiliate" | "payment" | "free" | "mixed"
+      revenue_type: "affiliate" | "payment" | "free"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -470,7 +527,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      revenue_type: ["affiliate", "payment", "free", "mixed"],
+      revenue_type: ["affiliate", "payment", "free"],
     },
   },
 } as const

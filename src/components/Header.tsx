@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, User, Rocket, LogOut, Bookmark } from 'lucide-react';
+import { Search, Menu, User, Heart, Settings, LogOut, Home, Briefcase, Tag, Grid3X3, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
 import { useAuth } from '@/hooks/useAuth';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useCategoryStats } from '@/hooks/useCategoryStats';
 import logo from '@/assets/tools-launchify-logo.png';
 
 interface HeaderProps {
@@ -21,218 +18,378 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user, signOut, isAdmin } = useAuth();
+  const { data: categories = [] } = useCategoryStats();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch?.(searchQuery);
+    if (onSearch && searchQuery.trim()) {
+      onSearch(searchQuery.trim());
+    }
   };
 
-  const isActivePath = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
-  const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'AI Tools', href: '/category/ai-tools' },
-    { label: 'Software', href: '/category/software' },
-    { label: 'Free Tools', href: '/free-tools' },
-    { label: 'Digital Products', href: '/category/digital-products' },
-  ];
-
-  const categories = [
-    { name: 'AI Writing Tools', href: '/category/ai-writing' },
-    { name: 'Design Tools', href: '/category/design' },
-    { name: 'Productivity', href: '/category/productivity' },
-    { name: 'Marketing', href: '/category/marketing' },
-    { name: 'Developer Tools', href: '/category/developer' },
-    { name: 'Analytics', href: '/category/analytics' },
+  const productTypes = [
+    { name: 'AI Tools', href: '/product-type/ai-tools', description: 'Artificial Intelligence powered tools' },
+    { name: 'Software', href: '/product-type/software', description: 'Desktop and web applications' },
+    { name: 'Free Tools', href: '/product-type/free-tools', description: 'Completely free resources' },
+    { name: 'Digital Products', href: '/product-type/digital-products', description: 'Courses, templates, and digital assets' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 hover-lift">
-            <img src={logo} alt="Tools Launchify" className="h-8 w-8" />
-            <span className="text-xl font-bold text-gradient-primary">Tools Launchify</span>
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto flex h-16 items-center px-4">
+        {/* Logo */}
+        <div className="flex items-center space-x-2 mr-8">
+          <Link to="/" className="flex items-center space-x-2 group">
+            <div className="relative">
+              <img src={logo} alt="Tools Launchify" className="h-8 w-8 transition-transform group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity blur-sm" />
+            </div>
+            <span className="hidden sm:block font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Tools Launchify
+            </span>
           </Link>
+        </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex lg:items-center lg:space-x-6">
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-foreground hover:text-primary">
-                    Categories
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                      {categories.map((category) => (
-                        <NavigationMenuLink key={category.name} asChild>
-                          <Link
-                            to={category.href}
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          >
-                            <div className="text-sm font-medium leading-none">{category.name}</div>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-
-            {navItems.slice(1).map((item) => (
+        {/* Desktop Navigation */}
+        <NavigationMenu className="hidden md:flex mr-6">
+          <NavigationMenuList className="space-x-2">
+            <NavigationMenuItem>
               <Link
-                key={item.href}
-                to={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActivePath(item.href) ? 'text-primary' : 'text-muted-foreground'
+                to="/"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
+                  isActive('/') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
                 }`}
               >
-                {item.label}
+                <Home className="w-4 h-4 mr-2" />
+                Home
               </Link>
-            ))}
-          </div>
+            </NavigationMenuItem>
+            
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground">
+                <Briefcase className="w-4 h-4 mr-2" />
+                Products
+                <ChevronDown className="w-3 h-3 ml-1 transition-transform group-data-[state=open]:rotate-180" />
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="min-w-[400px] p-4">
+                <div className="grid grid-cols-2 gap-3">
+                  {productTypes.map((type) => (
+                    <NavigationMenuLink asChild key={type.name}>
+                      <Link
+                        to={type.href}
+                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      >
+                        <div className="text-sm font-medium leading-none">{type.name}</div>
+                        <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
+                          {type.description}
+                        </p>
+                      </Link>
+                    </NavigationMenuLink>
+                  ))}
+                </div>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
 
-
-          {/* Auth Buttons */}
-          <div className="hidden md:flex md:items-center md:space-x-2">
-            {user ? (
-              <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/saved">
-                    <Bookmark className="h-4 w-4 mr-1" />
-                    Saved
-                  </Link>
-                </Button>
-                {isAdmin && (
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    asChild
-                  >
-                    <Link to="/admin">
-                      Admin
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground">
+                <Tag className="w-4 h-4 mr-2" />
+                Categories
+                <ChevronDown className="w-3 h-3 ml-1 transition-transform group-data-[state=open]:rotate-180" />
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="min-w-[500px] p-4">
+                <div className="grid grid-cols-3 gap-3">
+                  {categories.slice(0, 9).map((category) => (
+                    <NavigationMenuLink asChild key={category.id}>
+                      <Link
+                        to={`/category/${category.slug}`}
+                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{category.icon}</span>
+                          <div className="text-sm font-medium leading-none">{category.name}</div>
+                        </div>
+                        <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
+                          {category.product_count} tools
+                        </p>
+                      </Link>
+                    </NavigationMenuLink>
+                  ))}
+                </div>
+                <div className="mt-4 pt-3 border-t">
+                  <NavigationMenuLink asChild>
+                    <Link
+                      to="/categories"
+                      className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-center text-sm font-medium"
+                    >
+                      View All Categories
                     </Link>
-                  </Button>
-                )}
-                <Button variant="ghost" size="sm">
-                  <User className="h-4 w-4 mr-1" />
-                  {user.email?.split('@')[0]}
-                </Button>
-                <Button variant="ghost" size="sm" onClick={signOut}>
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/auth">
-                    <User className="h-4 w-4 mr-1" />
-                    Login
-                  </Link>
-                </Button>
-                <Button 
-                  size="sm"
-                  className="bg-gradient-primary hover:opacity-90"
-                  asChild
-                >
-                  <Link to="/auth">
-                    <Rocket className="h-4 w-4 mr-1" />
-                    Get Started
-                  </Link>
-                </Button>
-              </>
-            )}
-          </div>
+                  </NavigationMenuLink>
+                </div>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
 
-          {/* Mobile Menu Button */}
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <NavigationMenuItem>
+              <Link
+                to="/browse"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
+                  isActive('/browse') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                <Grid3X3 className="w-4 h-4 mr-2" />
+                Browse
+              </Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+
+        {/* Search */}
+        <div className="flex-1 max-w-lg">
+          <form onSubmit={handleSearch} className="relative group">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder="Search for AI tools, software, and more..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2 bg-muted/30 border border-border/50 rounded-xl focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary/50 transition-all placeholder:text-muted-foreground/70 hover:bg-muted/50"
+            />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
+          </form>
+        </div>
+
+        {/* User Menu */}
+        <div className="flex items-center space-x-4 ml-4">
+          {user ? (
+            <div className="hidden md:flex items-center space-x-2">
+              <Button variant="ghost" size="sm" asChild className="rounded-xl">
+                <Link to="/saved">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Saved
+                </Link>
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="rounded-xl">
+                    <Avatar className="h-6 w-6 mr-2">
+                      <AvatarFallback className="text-xs bg-gradient-to-r from-primary to-accent text-primary-foreground">
+                        {user.email?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="max-w-20 truncate">{user.email?.split('@')[0]}</span>
+                    <ChevronDown className="h-3 w-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="w-full">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/saved" className="w-full">
+                      <Heart className="mr-2 h-4 w-4" />
+                      Saved Products
+                    </Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="w-full">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center space-x-2">
+              <Button variant="ghost" size="sm" asChild className="rounded-xl">
+                <Link to="/auth">Login</Link>
+              </Button>
+              <Button size="sm" className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-xl" asChild>
+                <Link to="/auth">Get Started</Link>
+              </Button>
+            </div>
+          )}
+
+          {/* Mobile Menu */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
+              <Button variant="ghost" size="icon" className="md:hidden rounded-xl">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col space-y-4">
-                <div className="flex items-center space-x-2 pb-4 border-b">
-                  <img src={logo} alt="Tools Launchify" className="h-8 w-8" />
-                  <span className="text-xl font-bold text-gradient-primary">Tools Launchify</span>
-                </div>
-
+            <SheetContent side="right" className="w-80">
+              <SheetHeader>
+                <SheetTitle className="flex items-center space-x-2">
+                  <img src={logo} alt="Tools Launchify" className="h-6 w-6" />
+                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    Tools Launchify
+                  </span>
+                </SheetTitle>
+              </SheetHeader>
+              
+              <div className="mt-6 space-y-6">
                 {/* Mobile Search */}
-                <form onSubmit={handleSearch} className="w-full">
+                <form onSubmit={handleSearch}>
                   <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      type="search"
-                      placeholder="Search tools..."
+                      placeholder="Search..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-8"
+                      className="pl-10"
                     />
                   </div>
                 </form>
 
-                {/* Mobile Navigation Links */}
-                {navItems.map((item) => (
+                {/* Mobile Navigation */}
+                <nav className="space-y-2">
                   <Link
-                    key={item.href}
-                    to={item.href}
-                    className={`block px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
-                      isActivePath(item.href) ? 'text-primary' : 'text-muted-foreground'
+                    to="/"
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive('/') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                     }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {item.label}
+                    <Home className="h-4 w-4" />
+                    <span>Home</span>
                   </Link>
-                ))}
 
-                <div className="pt-4 border-t space-y-2">
+                  <div className="space-y-2">
+                    <div className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Product Types
+                    </div>
+                    {productTypes.map((type) => (
+                      <Link
+                        key={type.name}
+                        to={type.href}
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      >
+                        <Briefcase className="h-4 w-4" />
+                        <span>{type.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Categories
+                    </div>
+                    {categories.slice(0, 5).map((category) => (
+                      <Link
+                        key={category.id}
+                        to={`/category/${category.slug}`}
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      >
+                        <span className="text-base">{category.icon}</span>
+                        <span>{category.name}</span>
+                        <Badge variant="secondary" className="ml-auto">
+                          {category.product_count}
+                        </Badge>
+                      </Link>
+                    ))}
+                    <Link
+                      to="/categories"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-primary hover:text-primary/80"
+                    >
+                      <Tag className="h-4 w-4" />
+                      <span>View All Categories</span>
+                    </Link>
+                  </div>
+                </nav>
+
+                {/* Mobile User Menu */}
+                <div className="border-t pt-4">
                   {user ? (
-                    <>
-                      <Button variant="ghost" className="w-full justify-start" asChild>
-                        <Link to="/saved" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Bookmark className="h-4 w-4 mr-2" />
-                          Saved Products
-                        </Link>
-                      </Button>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-3 px-3 py-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
+                            {user.email?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 truncate">
+                          <p className="text-sm font-medium truncate">{user.email}</p>
+                        </div>
+                      </div>
+                      
+                      <Link
+                        to="/saved"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      >
+                        <Heart className="h-4 w-4" />
+                        <span>Saved Products</span>
+                      </Link>
+
                       {isAdmin && (
-                        <Button variant="ghost" className="w-full justify-start" asChild>
-                          <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
-                            <User className="h-4 w-4 mr-2" />
-                            Admin Dashboard
-                          </Link>
-                        </Button>
+                        <Link
+                          to="/admin"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        >
+                          <Settings className="h-4 w-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
                       )}
-                      <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
-                        <LogOut className="h-4 w-4 mr-2" />
+
+                      <Button
+                        onClick={() => {
+                          signOut();
+                          setIsOpen(false);
+                        }}
+                        variant="ghost"
+                        className="w-full justify-start"
+                      >
+                        <LogOut className="h-4 w-4 mr-3" />
                         Sign Out
                       </Button>
-                    </>
+                    </div>
                   ) : (
-                    <>
-                      <Button variant="ghost" className="w-full justify-start" asChild>
-                        <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                          <User className="h-4 w-4 mr-2" />
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => setIsOpen(false)}
+                        variant="ghost"
+                        className="w-full justify-start"
+                        asChild
+                      >
+                        <Link to="/auth">
+                          <User className="h-4 w-4 mr-3" />
                           Login
                         </Link>
                       </Button>
-                      <Button variant="hero" className="w-full" asChild>
-                        <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Rocket className="h-4 w-4 mr-2" />
-                          Get Started
-                        </Link>
+                      <Button
+                        onClick={() => setIsOpen(false)}
+                        className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground"
+                        asChild
+                      >
+                        <Link to="/auth">Get Started</Link>
                       </Button>
-                    </>
+                    </div>
                   )}
                 </div>
-              </nav>
+              </div>
             </SheetContent>
           </Sheet>
         </div>

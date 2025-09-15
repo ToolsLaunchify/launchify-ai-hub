@@ -56,23 +56,23 @@ const ProductBrowserPage: React.FC = () => {
   const SidebarContent = () => (
     <div className="h-full">
       {/* Search */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-border/50">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-background/50 border-border/50 focus:border-primary/50 focus:ring-primary/25"
           />
         </div>
       </div>
 
       {/* Filters */}
-      <div className="p-4 border-b border-border">
-        <h3 className="font-semibold mb-3">Filter by Type</h3>
+      <div className="p-4 border-b border-border/50">
+        <h3 className="font-bold text-lg mb-3 text-foreground">Filter by Type</h3>
         <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-background/50 border-border/50 focus:border-primary/50">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -87,14 +87,15 @@ const ProductBrowserPage: React.FC = () => {
 
       {/* Categories */}
       <div className="flex-1">
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-border/50">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold">Categories</h3>
+            <h3 className="font-bold text-lg text-foreground">Categories</h3>
             {selectedCategory && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setSelectedCategory(null)}
+                className="hover:bg-destructive/10 hover:text-destructive"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -102,7 +103,7 @@ const ProductBrowserPage: React.FC = () => {
           </div>
         </div>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 max-h-[calc(100vh-200px)]">
           <div className="p-2">
             {categoriesLoading ? (
               <div className="space-y-2">
@@ -116,22 +117,38 @@ const ProductBrowserPage: React.FC = () => {
                   <Button
                     key={category.id}
                     variant={selectedCategory === category.id ? 'default' : 'ghost'}
-                    className="w-full justify-between h-auto p-3"
+                    className={`w-full justify-between h-auto p-4 rounded-xl transition-all duration-200 hover:shadow-md ${
+                      selectedCategory === category.id 
+                        ? 'bg-gradient-primary text-primary-foreground shadow-lg transform scale-[1.02]' 
+                        : 'hover:bg-muted/50 hover:border-primary/20 border border-transparent'
+                    }`}
                     onClick={() => {
                       setSelectedCategory(category.id);
                       setIsMobileFilterOpen(false);
                     }}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{category.icon}</span>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        selectedCategory === category.id ? 'bg-white/20' : 'bg-gradient-primary'
+                      }`}>
+                        <span className={`text-lg ${
+                          selectedCategory === category.id ? 'text-white' : 'text-primary-foreground'
+                        }`}>
+                          {category.icon}
+                        </span>
+                      </div>
                       <div className="text-left">
-                        <div className="font-medium">{category.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {category.description}
-                        </div>
+                        <div className="font-bold text-base leading-tight">{category.name}</div>
                       </div>
                     </div>
-                    <Badge variant="secondary" className="ml-2">
+                    <Badge 
+                      variant={selectedCategory === category.id ? 'secondary' : 'outline'} 
+                      className={`ml-2 font-semibold ${
+                        selectedCategory === category.id 
+                          ? 'bg-white/20 text-white border-white/30' 
+                          : 'bg-gradient-subtle border-primary/30 text-primary'
+                      }`}
+                    >
                       {category.product_count}
                     </Badge>
                   </Button>
@@ -152,9 +169,9 @@ const ProductBrowserPage: React.FC = () => {
       </Helmet>
       
       <div className="min-h-screen bg-gradient-background">
-        <div className="flex">
+        <div className="flex min-h-screen">
           {/* Desktop Sidebar */}
-          <div className="hidden lg:block w-80 bg-card border-r border-border">
+          <div className="hidden lg:block w-80 bg-gradient-to-b from-card to-card/95 border-r border-border/50 shadow-lg">
             <SidebarContent />
           </div>
 
@@ -237,10 +254,10 @@ const ProductBrowserPage: React.FC = () => {
             </div>
 
             {/* Products Grid */}
-            <div className="p-6">
+            <div className="p-6 pb-24">
               {productsLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[...Array(6)].map((_, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {[...Array(8)].map((_, i) => (
                     <Card key={i} className="animate-pulse">
                       <CardContent className="p-6">
                         <div className="h-48 bg-muted rounded mb-4"></div>
@@ -274,7 +291,7 @@ const ProductBrowserPage: React.FC = () => {
               ) : (
                 <div className={
                   viewMode === 'grid'
-                    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
                     : 'space-y-4'
                 }>
                   {sortedProducts.map((product) => (

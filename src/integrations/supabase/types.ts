@@ -58,12 +58,63 @@ export type Database = {
           },
         ]
       }
+      click_tracking: {
+        Row: {
+          click_type: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          product_id: string | null
+          referrer: string | null
+          user_agent: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          click_type: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          product_id?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          click_type?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          product_id?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "click_tracking_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           affiliate_link: string | null
           alt_text: string | null
           canonical_url: string | null
           category_id: string | null
+          content_score: number | null
           created_at: string
           cta_button_text: string | null
           currency: string | null
@@ -71,7 +122,10 @@ export type Database = {
           custom_permalink: string | null
           description: string | null
           discounted_price: number | null
+          faq_data: Json | null
           file_attachments: Json | null
+          focus_keyword: string | null
+          howto_data: Json | null
           id: string
           image_url: string | null
           is_editors_choice: boolean | null
@@ -89,10 +143,17 @@ export type Database = {
           payment_link: string | null
           product_tags: string[] | null
           product_type: string | null
+          related_keywords: string[] | null
+          revenue_type: Database["public"]["Enums"]["revenue_type"] | null
           rich_description: string | null
           saves_count: number | null
           schema_markup: Json | null
+          seo_title: string | null
           slug: string
+          social_description: string | null
+          social_title: string | null
+          structured_data_type: string | null
+          twitter_image_url: string | null
           updated_at: string
           video_courses: Json | null
           views_count: number | null
@@ -102,6 +163,7 @@ export type Database = {
           alt_text?: string | null
           canonical_url?: string | null
           category_id?: string | null
+          content_score?: number | null
           created_at?: string
           cta_button_text?: string | null
           currency?: string | null
@@ -109,7 +171,10 @@ export type Database = {
           custom_permalink?: string | null
           description?: string | null
           discounted_price?: number | null
+          faq_data?: Json | null
           file_attachments?: Json | null
+          focus_keyword?: string | null
+          howto_data?: Json | null
           id?: string
           image_url?: string | null
           is_editors_choice?: boolean | null
@@ -127,10 +192,17 @@ export type Database = {
           payment_link?: string | null
           product_tags?: string[] | null
           product_type?: string | null
+          related_keywords?: string[] | null
+          revenue_type?: Database["public"]["Enums"]["revenue_type"] | null
           rich_description?: string | null
           saves_count?: number | null
           schema_markup?: Json | null
+          seo_title?: string | null
           slug: string
+          social_description?: string | null
+          social_title?: string | null
+          structured_data_type?: string | null
+          twitter_image_url?: string | null
           updated_at?: string
           video_courses?: Json | null
           views_count?: number | null
@@ -140,6 +212,7 @@ export type Database = {
           alt_text?: string | null
           canonical_url?: string | null
           category_id?: string | null
+          content_score?: number | null
           created_at?: string
           cta_button_text?: string | null
           currency?: string | null
@@ -147,7 +220,10 @@ export type Database = {
           custom_permalink?: string | null
           description?: string | null
           discounted_price?: number | null
+          faq_data?: Json | null
           file_attachments?: Json | null
+          focus_keyword?: string | null
+          howto_data?: Json | null
           id?: string
           image_url?: string | null
           is_editors_choice?: boolean | null
@@ -165,10 +241,17 @@ export type Database = {
           payment_link?: string | null
           product_tags?: string[] | null
           product_type?: string | null
+          related_keywords?: string[] | null
+          revenue_type?: Database["public"]["Enums"]["revenue_type"] | null
           rich_description?: string | null
           saves_count?: number | null
           schema_markup?: Json | null
+          seo_title?: string | null
           slug?: string
+          social_description?: string | null
+          social_title?: string | null
+          structured_data_type?: string | null
+          twitter_image_url?: string | null
           updated_at?: string
           video_courses?: Json | null
           views_count?: number | null
@@ -258,6 +341,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      revenue_type: "affiliate" | "payment" | "free" | "mixed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -386,6 +470,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      revenue_type: ["affiliate", "payment", "free", "mixed"],
     },
   },
 } as const

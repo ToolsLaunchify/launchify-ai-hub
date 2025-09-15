@@ -80,7 +80,7 @@ const AdvancedBrowseSection: React.FC = () => {
               </Link>
               
               <Link to="/search">
-                <Button variant="secondary" size="lg" className="min-w-[200px]">
+                <Button variant="accent" size="lg" className="min-w-[200px]">
                   <Search className="w-5 h-5 mr-2" />
                   Advanced Search
                 </Button>

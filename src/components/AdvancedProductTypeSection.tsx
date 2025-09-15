@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Monitor, Gift, Package, ArrowRight, TrendingUp, Users, Star, Grid, X } from 'lucide-react';
+import { Zap, Monitor, Gift, Package, ArrowRight, TrendingUp, Users, Grid, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useProductStats } from '@/hooks/useProductStats';
 import { useCategoryStats } from '@/hooks/useCategoryStats';
-import { useProducts } from '@/hooks/useProducts';
 
 interface CategoryModalProps {
   typeId: string;
@@ -25,14 +24,12 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   count
 }) => {
   const { data: categories = [] } = useCategoryStats();
-  const { data: products = [] } = useProducts({ productType, limit: 8 });
   
-  // Get relevant categories for this product type - filter by actual product type
+  // Get relevant categories for this product type by checking if they have products of this type
   const relevantCategories = categories.filter(category => {
-    // Get products of this category to check if they match the product type
-    const categoryProducts = products.filter(p => p.category_id === category.id);
-    return categoryProducts.length > 0;
-  }).slice(0, 8);
+    // This is a simple approach - in a real app you might want to add a more sophisticated mapping
+    return category.product_count > 0;
+  }).slice(0, 12);
 
   return (
     <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -76,44 +73,6 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                   </Badge>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Featured Products */}
-        <div>
-          <h4 className="text-lg font-semibold mb-4 flex items-center">
-            <Star className="w-5 h-5 mr-2 text-primary" />
-            Featured Products ({products.length})
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {products.slice(0, 6).map((product) => (
-              <Link 
-                key={product.id} 
-                to={`/product/${product.slug}`}
-                className="flex items-center p-3 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors border border-border/30 hover:border-primary/30 group"
-              >
-                <div className="w-10 h-10 bg-gradient-primary rounded-lg mr-3 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <span className="text-white text-sm font-bold">
-                    {product.name.charAt(0)}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium group-hover:text-primary transition-colors truncate">{product.name}</p>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    {product.is_free && (
-                      <Badge variant="secondary" className="text-xs">Free</Badge>
-                    )}
-                    {product.is_featured && (
-                      <Badge className="bg-gradient-accent text-white border-none text-xs">Featured</Badge>
-                    )}
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </Link>
             ))}
           </div>

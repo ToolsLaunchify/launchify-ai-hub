@@ -14,105 +14,86 @@ interface CategoryPreviewProps {
 }
 
 const CategoryPreview: React.FC<CategoryPreviewProps> = ({ category, products }) => {
-  const [showPreview, setShowPreview] = useState(false);
   const sampleProducts = products.slice(0, 3);
 
   return (
-    <Card 
-      className="group relative overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-500 cursor-pointer bg-gradient-card"
-      onMouseEnter={() => setShowPreview(true)}
-      onMouseLeave={() => setShowPreview(false)}
-    >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      
-      <CardHeader className="relative">
-        <div className="flex items-center space-x-4 mb-3">
-          <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-            <span className="text-white text-xl">{category.icon || '📁'}</span>
-          </div>
-          <div className="flex-1">
-            <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">
-              {category.name}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {category.description || 'Explore tools in this category'}
-            </p>
-          </div>
+    <Link to={`/category/${category.slug}`}>
+      <Card className="group relative h-[200px] overflow-hidden border-0 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer bg-gradient-card hover:scale-[1.02]">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <ArrowRight className="w-4 h-4 text-primary" />
         </div>
         
-        <div className="flex items-center justify-between">
-          <Badge className="bg-gradient-accent text-white border-none">
-            {category.product_count} Tools
-          </Badge>
-          {category.product_count > 10 && (
-            <Badge variant="secondary" className="text-xs">
-              <TrendingUp className="w-3 h-3 mr-1" />
-              Popular
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
+        <CardHeader className="relative pb-2">
+          <div className="flex items-start space-x-3">
+            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+              <span className="text-white text-lg">{category.icon || '📁'}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-base font-bold group-hover:text-primary transition-colors line-clamp-1">
+                {category.name}
+              </CardTitle>
+              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                {category.description || 'Explore tools in this category'}
+              </p>
+            </div>
+          </div>
+        </CardHeader>
 
-      <CardContent className="relative">
-        {/* Product Preview - Shows on Hover */}
-        <div className={`transition-all duration-300 ${showPreview ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-          <div className="border-t border-border/50 pt-4 mb-4">
-            <h4 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center">
-              <Star className="w-4 h-4 mr-2" />
+        <CardContent className="relative pt-0 pb-4 flex flex-col justify-between h-[calc(100%-80px)]">
+          {/* Featured Tools Preview - Fixed Layout */}
+          <div className="space-y-2 mb-4">
+            <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center">
+              <Star className="w-3 h-3 mr-1" />
               Featured Tools
             </h4>
-            <div className="space-y-2">
-              {sampleProducts.map((product) => (
-                <Link 
-                  key={product.id} 
-                  to={`/product/${product.slug}`}
-                  className="flex items-center p-2 rounded-lg bg-muted/20 hover:bg-muted/40 transition-colors group/product"
+            <div className="space-y-1">
+              {sampleProducts.slice(0, 2).map((product) => (
+                <div 
+                  key={product.id}
+                  className="flex items-center p-1.5 rounded-md bg-muted/20 group-hover:bg-muted/30 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="w-8 h-8 bg-gradient-primary rounded-md mr-3 flex items-center justify-center">
+                  <div className="w-5 h-5 bg-gradient-primary rounded-sm mr-2 flex items-center justify-center">
                     <span className="text-white text-xs font-bold">
                       {product.name.charAt(0)}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{product.name}</p>
-                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                      <span className="flex items-center">
-                        <Eye className="w-3 h-3 mr-1" />
-                        {product.views_count || 0}
-                      </span>
-                      {product.is_free && (
-                        <Badge variant="secondary" className="text-xs">Free</Badge>
-                      )}
-                    </div>
+                    <p className="text-xs font-medium truncate">{product.name}</p>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover/product:text-primary transition-colors" />
-                </Link>
+                  {product.is_free && (
+                    <Badge variant="secondary" className="text-xs px-1 py-0">Free</Badge>
+                  )}
+                </div>
               ))}
+              {sampleProducts.length === 0 && (
+                <div className="text-xs text-muted-foreground italic">
+                  No tools yet
+                </div>
+              )}
             </div>
           </div>
-        </div>
 
-        {/* Always Visible Content */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-            <span className="flex items-center">
-              <Users className="w-3 h-3 mr-1" />
-              Active
-            </span>
-            <span className="flex items-center">
-              <Calendar className="w-3 h-3 mr-1" />
-              Updated
-            </span>
+          {/* Bottom Info - Fixed Position */}
+          <div className="flex items-center justify-between border-t border-border/20 pt-2 mt-auto">
+            <div className="flex items-center space-x-3 text-xs text-muted-foreground">
+              <span className="flex items-center">
+                <Users className="w-3 h-3 mr-1" />
+                Active
+              </span>
+              <span className="flex items-center">
+                <Calendar className="w-3 h-3 mr-1" />
+                Updated
+              </span>
+            </div>
+            <Badge className="bg-gradient-accent text-white border-none text-xs">
+              {category.product_count} {category.product_count === 1 ? 'Tool' : 'Tools'}
+            </Badge>
           </div>
-          <Button 
-            size="sm" 
-            className="bg-gradient-primary hover:opacity-90 text-white border-none group-hover:scale-105 transition-transform"
-          >
-            Explore
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 

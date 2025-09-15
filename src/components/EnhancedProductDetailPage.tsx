@@ -12,6 +12,7 @@ import Breadcrumb from '@/components/Breadcrumb';
 import { toast } from '@/hooks/use-toast';
 import { useSavedProducts } from '@/hooks/useSavedProducts';
 import { useClickTracking } from '@/hooks/useClickTracking';
+import { EmailCollectionModal } from '@/components/EmailCollectionModal';
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -73,6 +74,7 @@ interface Product {
   saves_count: number | null;
   file_attachments: any;
   video_courses: any;
+  collect_email: boolean | null;
   created_at: string;
   // SEO fields
   meta_title?: string | null;
@@ -245,6 +247,7 @@ const EnhancedProductDetailPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const { isProductSaved, toggleSaveProduct, loading: saveLoading } = useSavedProducts();
 
   const { data: product, isLoading, error } = useQuery({
@@ -268,6 +271,19 @@ const EnhancedProductDetailPage: React.FC = () => {
   // Product save state is handled by useSavedProducts hook
 
   const handleCTAClick = async () => {
+    if (!product) return;
+    
+    // Check if email collection is required for this product
+    if (product.collect_email) {
+      setIsEmailModalOpen(true);
+      return;
+    }
+    
+    // If no email collection required, proceed directly
+    await proceedToProduct();
+  };
+
+  const proceedToProduct = async (leadId?: string) => {
     if (!product) return;
     
     const { trackClick } = useClickTracking();
@@ -783,6 +799,15 @@ const EnhancedProductDetailPage: React.FC = () => {
           onClose={() => setIsVideoModalOpen(false)} 
         />
       )}
+
+      {/* Email Collection Modal */}
+      <EmailCollectionModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        onSuccess={(leadId) => proceedToProduct(leadId)}
+        productId={product.id}
+        productName={product.name}
+      />
 
       {/* Related Products Section */}
       <RelatedProducts currentProduct={product} maxProducts={3} />

@@ -77,6 +77,7 @@ interface Product {
   custom_code: string;
   // Revenue tracking
   revenue_type?: 'affiliate' | 'payment' | 'free' | 'mixed';
+  collect_email?: boolean;
   // SEO fields
   meta_title?: string;
   meta_description?: string;
@@ -405,6 +406,7 @@ const ProductsManagement: React.FC = () => {
       category_id: formData.get('category_id') as string || null,
       product_type: formData.get('product_type') as string || 'software',
       revenue_type: formData.get('revenue_type') as 'affiliate' | 'payment' | 'free' | 'mixed' || 'free',
+      collect_email: formData.get('collect_email') === 'true',
       original_price: formData.get('original_price') ? Number(formData.get('original_price')) : null,
       discounted_price: formData.get('discounted_price') ? Number(formData.get('discounted_price')) : null,
       currency: formData.get('currency') as string || 'USD',
@@ -658,6 +660,23 @@ const ProductsManagement: React.FC = () => {
                 </Select>
                 <div className="text-sm text-muted-foreground mt-1">
                   This determines which link gets priority and helps track revenue sources
+                </div>
+              </div>
+
+              {/* Email Collection Setting */}
+              <div>
+                <Label htmlFor="collect_email">Email Collection</Label>
+                <Select name="collect_email" defaultValue={editingProduct?.collect_email ? 'true' : 'false'}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select email collection option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="false">No Need Email</SelectItem>
+                    <SelectItem value="true">Collect Email</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="text-sm text-muted-foreground mt-1">
+                  If enabled, users must provide name and email before accessing the product
                 </div>
               </div>
 

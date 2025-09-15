@@ -115,6 +115,7 @@ export type Database = {
           created_at: string
           currency: string | null
           id: string
+          lead_id: string | null
           product_id: string | null
           revenue_amount: number | null
           user_id: string | null
@@ -128,6 +129,7 @@ export type Database = {
           created_at?: string
           currency?: string | null
           id?: string
+          lead_id?: string | null
           product_id?: string | null
           revenue_amount?: number | null
           user_id?: string | null
@@ -141,6 +143,7 @@ export type Database = {
           created_at?: string
           currency?: string | null
           id?: string
+          lead_id?: string | null
           product_id?: string | null
           revenue_amount?: number | null
           user_id?: string | null
@@ -157,7 +160,70 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "conversions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "conversions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          name: string
+          phone: string | null
+          product_id: string | null
+          referrer: string | null
+          updated_at: string
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          name: string
+          phone?: string | null
+          product_id?: string | null
+          referrer?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          name?: string
+          phone?: string | null
+          product_id?: string | null
+          referrer?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
@@ -171,6 +237,7 @@ export type Database = {
           alt_text: string | null
           canonical_url: string | null
           category_id: string | null
+          collect_email: boolean | null
           content_score: number | null
           created_at: string
           cta_button_text: string | null
@@ -220,6 +287,7 @@ export type Database = {
           alt_text?: string | null
           canonical_url?: string | null
           category_id?: string | null
+          collect_email?: boolean | null
           content_score?: number | null
           created_at?: string
           cta_button_text?: string | null
@@ -269,6 +337,7 @@ export type Database = {
           alt_text?: string | null
           canonical_url?: string | null
           category_id?: string | null
+          collect_email?: boolean | null
           content_score?: number | null
           created_at?: string
           cta_button_text?: string | null

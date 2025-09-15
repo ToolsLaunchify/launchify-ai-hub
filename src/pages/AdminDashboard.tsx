@@ -16,12 +16,14 @@ import {
   Eye,
   TrendingUp,
   Star,
-  Bookmark
+  Bookmark,
+  Mail
 } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CategoriesManagement from '@/components/admin/CategoriesManagement';
 import UsersManagement from '@/components/admin/UsersManagement';
 import { AdvancedAnalyticsDashboard } from '@/components/admin/AdvancedAnalyticsDashboard';
+import { LeadsManagement } from '@/components/admin/LeadsManagement';
 import { useRealAdminStats } from '@/hooks/useRealAdminStats';
 
 const AdminDashboard: React.FC = () => {
@@ -86,7 +88,7 @@ const AdminDashboard: React.FC = () => {
 
         {/* Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8 bg-muted/50 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-6 mb-8 bg-muted/50 p-1 rounded-lg">
             <TabsTrigger 
               value="overview" 
               className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
@@ -114,6 +116,13 @@ const AdminDashboard: React.FC = () => {
             >
               <Users className="h-4 w-4" />
               Users
+            </TabsTrigger>
+            <TabsTrigger 
+              value="leads" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <Mail className="h-4 w-4" />
+              Leads
             </TabsTrigger>
             <TabsTrigger 
               value="analytics" 
@@ -239,6 +248,11 @@ const AdminDashboard: React.FC = () => {
           {/* Users Tab */}
           <TabsContent value="users">
             <UsersManagement />
+          </TabsContent>
+
+          {/* Leads Tab */}
+          <TabsContent value="leads">
+            <LeadsManagement />
           </TabsContent>
 
           {/* Analytics Tab */}

@@ -126,13 +126,49 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
             <NavigationMenuItem>
               <Link
-                to="/browse"
-                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
-                  isActive('/browse') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                to="/type/free-tools"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 hover-scale ${
+                  isActive('/type/free-tools') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
                 }`}
               >
-                <Grid3X3 className="w-4 h-4 mr-2" />
-                Browse
+                <span className="text-green-500 mr-2">🆓</span>
+                Free Tools
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/browse?filter=featured"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 hover-scale ${
+                  location.pathname === '/browse' && location.search.includes('featured') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                <span className="text-yellow-500 mr-2">⭐</span>
+                Featured
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/browse?filter=trending"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 hover-scale ${
+                  location.pathname === '/browse' && location.search.includes('trending') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                <span className="text-red-500 mr-2">🔥</span>
+                Trending
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/browse?filter=latest"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 hover-scale ${
+                  location.pathname === '/browse' && location.search.includes('latest') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                <span className="text-blue-500 mr-2">🚀</span>
+                Latest
               </Link>
             </NavigationMenuItem>
           </NavigationMenuList>

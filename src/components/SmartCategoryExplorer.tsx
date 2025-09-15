@@ -24,73 +24,28 @@ const CategoryPreview: React.FC<CategoryPreviewProps> = ({ category, products })
         </div>
         
         <CardHeader className="relative pb-3">
-          <div className="flex items-start space-x-3">
-            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 border border-white/20">
-              <span className="text-white text-lg">{category.icon || '📁'}</span>
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 border border-white/20">
+              <span className="text-white text-xl">{category.icon || '📁'}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-base font-bold group-hover:text-primary transition-colors line-clamp-1">
+              <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors line-clamp-1">
                 {category.name}
               </CardTitle>
-              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                {category.description || 'Explore tools in this category'}
-              </p>
             </div>
-            <Badge className="bg-gradient-accent text-white border-none text-xs px-2 py-1 flex-shrink-0">
+            <Badge className="bg-gradient-accent text-white border-none text-sm px-3 py-1 flex-shrink-0">
               {category.product_count}
             </Badge>
           </div>
         </CardHeader>
 
-        <CardContent className="relative pt-0 pb-4 flex flex-col justify-between h-[calc(100%-95px)]">
-          {/* Featured Tools Preview */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold text-muted-foreground mb-2 flex items-center">
-              <Star className="w-3 h-3 mr-1" />
-              Featured Tools
-            </h4>
-            <div className="space-y-1">
-              {sampleProducts.slice(0, 2).map((product) => (
-                <div 
-                  key={product.id}
-                  className="flex items-center p-1.5 rounded-md bg-muted/20 group-hover:bg-muted/40 transition-colors"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="w-5 h-5 bg-gradient-primary rounded-sm mr-2 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">
-                      {product.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">{product.name}</p>
-                  </div>
-                  {product.is_free && (
-                    <Badge variant="secondary" className="text-xs px-1 py-0">Free</Badge>
-                  )}
-                </div>
-              ))}
-              {sampleProducts.length === 0 && (
-                <div className="text-xs text-muted-foreground italic">
-                  No tools yet
-                </div>
-              )}
+        <CardContent className="relative pt-0 pb-4 flex flex-col justify-center h-[calc(100%-95px)]">
+          <div className="text-center space-y-4">
+            <div className="text-3xl font-bold text-primary">
+              {category.product_count}
             </div>
-          </div>
-
-          {/* Bottom Info */}
-          <div className="flex items-center justify-between border-t border-border/20 pt-2 mt-auto">
-            <div className="flex items-center space-x-3 text-xs text-muted-foreground">
-              <span className="flex items-center">
-                <Users className="w-3 h-3 mr-1" />
-                Active
-              </span>
-              <span className="flex items-center">
-                <Calendar className="w-3 h-3 mr-1" />
-                Updated
-              </span>
-            </div>
-            <div className="text-xs font-medium text-primary">
-              {category.product_count === 1 ? '1 Tool' : `${category.product_count} Tools`}
+            <div className="text-sm font-medium text-muted-foreground">
+              {category.product_count === 1 ? 'Tool Available' : 'Tools Available'}
             </div>
           </div>
         </CardContent>

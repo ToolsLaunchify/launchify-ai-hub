@@ -245,8 +245,7 @@ const AdvancedProductTypeSection: React.FC = () => {
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button
-                          variant="outline"
-                          className="flex items-center space-x-2 border-muted hover:border-primary hover:text-primary transition-colors"
+                          className="flex items-center space-x-2 bg-gradient-primary text-white hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
                         >
                           <Grid className="w-4 h-4" />
                           <span>Explore Categories</span>

@@ -106,7 +106,47 @@ const InteractiveCategoryMatrix: React.FC = () => {
   }, [products, filters.sortBy]);
 
   const currentType = productTypes.find(type => type.id === activeTab);
-  const relevantCategories = categories.slice(0, 6);
+  
+  // Get relevant categories based on active tab
+  const getRelevantCategories = (toolType: string) => {
+    // Filter categories based on tool type or show different sets
+    switch (toolType) {
+      case 'ai_tools':
+        return categories.filter(cat => 
+          cat.name.toLowerCase().includes('ai') || 
+          cat.name.toLowerCase().includes('automation') ||
+          cat.name.toLowerCase().includes('machine learning') ||
+          cat.name.toLowerCase().includes('analytics')
+        ).slice(0, 6);
+      case 'software':
+        return categories.filter(cat => 
+          cat.name.toLowerCase().includes('development') ||
+          cat.name.toLowerCase().includes('business') ||
+          cat.name.toLowerCase().includes('productivity') ||
+          cat.name.toLowerCase().includes('design')
+        ).slice(0, 6);
+      case 'free_tools':
+        return categories.filter(cat => 
+          cat.name.toLowerCase().includes('utility') ||
+          cat.name.toLowerCase().includes('free') ||
+          cat.name.toLowerCase().includes('open source') ||
+          cat.name.toLowerCase().includes('education')
+        ).slice(0, 6);
+      case 'digital_products':
+        return categories.filter(cat => 
+          cat.name.toLowerCase().includes('template') ||
+          cat.name.toLowerCase().includes('course') ||
+          cat.name.toLowerCase().includes('ebook') ||
+          cat.name.toLowerCase().includes('digital')
+        ).slice(0, 6);
+      default:
+        return categories.slice(0, 6);
+    }
+  };
+  
+  const relevantCategories = getRelevantCategories(activeTab).length > 0 
+    ? getRelevantCategories(activeTab) 
+    : categories.slice(0, 6);
 
   return (
     <section className="py-16 bg-background">

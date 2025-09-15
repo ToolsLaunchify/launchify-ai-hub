@@ -14,36 +14,34 @@ export const useCategoryStats = () => {
   return useQuery({
     queryKey: ['category-stats'],
     queryFn: async (): Promise<CategoryWithCount[]> => {
-      // Get categories
+      // Optimized single query to get categories with product counts
       const { data: categories, error: categoriesError } = await supabase
         .from('categories')
-        .select('*')
+        .select(`
+          id,
+          name,
+          slug,
+          description,
+          icon,
+          sort_order,
+          products!category_id(count)
+        `)
         .is('parent_id', null)
         .order('sort_order', { ascending: true })
         .order('name');
 
       if (categoriesError) throw categoriesError;
 
-      // Get product counts for each category
-      const categoriesWithCounts = await Promise.all(
-        categories.map(async (category) => {
-          const { count, error: countError } = await supabase
-            .from('products')
-            .select('*', { count: 'exact', head: true })
-            .eq('category_id', category.id);
-
-          if (countError) throw countError;
-
-          return {
-            ...category,
-            product_count: count || 0,
-          };
-        })
-      );
-
-      return categoriesWithCounts;
+      return (categories || []).map((category: any) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        icon: category.icon,
+        product_count: category.products?.[0]?.count || 0,
+      }));
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes for better caching
     refetchOnWindowFocus: false,
   });
 };

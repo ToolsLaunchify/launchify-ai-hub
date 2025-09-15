@@ -103,8 +103,8 @@ const SmartCategoryExplorer: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'all' | 'trending' | 'popular'>('all');
   
-  const { data: categories = [] } = useCategoryStats();
-  const { data: allProducts = [] } = useProducts({ limit: 50 });
+  const { data: categories = [], isLoading: categoriesLoading } = useCategoryStats();
+  const { data: allProducts = [], isLoading: productsLoading } = useProducts({ limit: 30 });
 
   // Group products by category
   const productsByCategory = useMemo(() => {
@@ -141,6 +141,8 @@ const SmartCategoryExplorer: React.FC = () => {
   const topCategories = categories
     .sort((a, b) => b.product_count - a.product_count)
     .slice(0, 3);
+
+  const isLoading = categoriesLoading || productsLoading;
 
   return (
     <section className="py-16 bg-gradient-subtle">
@@ -213,7 +215,27 @@ const SmartCategoryExplorer: React.FC = () => {
             </Link>
           </div>
 
-          {filteredCategories.length > 0 ? (
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <Card key={index} className="h-[200px] animate-pulse">
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <div className="w-10 h-10 bg-muted rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-muted rounded" />
+                        <div className="h-3 bg-muted/70 rounded w-3/4" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-muted/50 rounded" />
+                      <div className="h-3 bg-muted/50 rounded w-5/6" />
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : filteredCategories.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredCategories.map((category) => (
                 <CategoryPreview 

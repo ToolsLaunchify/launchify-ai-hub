@@ -11,12 +11,28 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Save, BookOpen, Eye, EyeOff, Star } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, BookOpen, Eye, EyeOff, Star, Tag } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAllBlogPosts, useCreateBlogPost, useUpdateBlogPost, useDeleteBlogPost, type BlogPost } from '@/hooks/useBlog';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const BlogManagement: React.FC = () => {
   const { data: blogPosts = [], isLoading } = useAllBlogPosts();
+  
+  // Fetch categories for selection
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
+      if (error) throw error;
+      return data;
+    }
+  });
   const createBlogPost = useCreateBlogPost();
   const updateBlogPost = useUpdateBlogPost();
   const deleteBlogPost = useDeleteBlogPost();
@@ -32,6 +48,7 @@ const BlogManagement: React.FC = () => {
     content: '',
     excerpt: '',
     featured_image_url: '',
+    category_id: '',
     tags: [] as string[],
     is_published: false,
     is_featured: false,
@@ -50,6 +67,7 @@ const BlogManagement: React.FC = () => {
       content: '',
       excerpt: '',
       featured_image_url: '',
+      category_id: '',
       tags: [],
       is_published: false,
       is_featured: false,
@@ -72,6 +90,7 @@ const BlogManagement: React.FC = () => {
         content: post.content || '',
         excerpt: post.excerpt || '',
         featured_image_url: post.featured_image_url || '',
+        category_id: post.category_id || '',
         tags: post.tags || [],
         is_published: post.is_published,
         is_featured: post.is_featured,
@@ -292,6 +311,26 @@ const BlogManagement: React.FC = () => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category_id}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No Category</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="excerpt">Excerpt</Label>
               <Textarea
                 id="excerpt"
@@ -322,25 +361,14 @@ const BlogManagement: React.FC = () => {
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="author">Author Name</Label>
-                  <Input
-                    id="author"
-                    placeholder="Author Name"
-                    value={formData.author_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, author_name: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="tags">Tags (comma-separated)</Label>
-                  <Input
-                    id="tags"
-                    placeholder="tech, programming, tutorial"
-                    value={formData.tags.join(', ')}
-                    onChange={(e) => handleTagsChange(e.target.value)}
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="tags">Tags (comma-separated)</Label>
+                <Input
+                  id="tags"
+                  placeholder="tech, programming, tutorial"
+                  value={formData.tags.join(', ')}
+                  onChange={(e) => handleTagsChange(e.target.value)}
+                />
               </div>
             </div>
 

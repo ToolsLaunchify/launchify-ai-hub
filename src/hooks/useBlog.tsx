@@ -54,7 +54,10 @@ export const useAllBlogPosts = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select(`
+          *,
+          categories(id, name, slug)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -70,7 +73,10 @@ export const usePublishedBlogPosts = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select(`
+          *,
+          categories(id, name, slug)
+        `)
         .eq('is_published', true)
         .order('published_at', { ascending: false });
 
@@ -87,7 +93,10 @@ export const useBlogPostBySlug = (slug: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select(`
+          *,
+          categories(id, name, slug)
+        `)
         .eq('slug', slug)
         .eq('is_published', true)
         .single();

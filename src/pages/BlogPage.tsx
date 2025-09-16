@@ -6,9 +6,30 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SEOHead } from '@/components/SEOHead';
 import { usePublishedBlogPosts } from '@/hooks/useBlog';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const BlogPage: React.FC = () => {
   const { data: blogPosts = [], isLoading } = usePublishedBlogPosts();
+  
+  // Fetch categories to display category names
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Helper function to get category name
+  const getCategoryName = (categoryId: string | null) => {
+    if (!categoryId) return null;
+    const category = categories.find(cat => cat.id === categoryId);
+    return category?.name || null;
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -54,7 +75,7 @@ const BlogPage: React.FC = () => {
       />
       
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 pt-24 pb-12">
           {/* Header */}
           <div className="text-center space-y-4 mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -91,10 +112,12 @@ const BlogPage: React.FC = () => {
                           <Calendar className="h-4 w-4" />
                           {formatDate(featuredPost.published_at || featuredPost.created_at)}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <User className="h-4 w-4" />
-                          {featuredPost.author_name || 'Admin'}
-                        </div>
+                        {getCategoryName(featuredPost.category_id) && (
+                          <div className="flex items-center gap-1">
+                            <Tag className="h-4 w-4" />
+                            {getCategoryName(featuredPost.category_id)}
+                          </div>
+                        )}
                         <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
                           {calculateReadingTime(featuredPost.content || '')} min read
@@ -108,13 +131,11 @@ const BlogPage: React.FC = () => {
                       </CardDescription>
                     </CardHeader>
                     
-                    {featuredPost.tags && featuredPost.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {featuredPost.tags.slice(0, 3).map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
+                    {getCategoryName(featuredPost.category_id) && (
+                      <div className="mb-4">
+                        <Badge variant="outline" className="text-primary border-primary">
+                          {getCategoryName(featuredPost.category_id)}
+                        </Badge>
                       </div>
                     )}
                     
@@ -136,61 +157,61 @@ const BlogPage: React.FC = () => {
               <h2 className="text-2xl font-bold mb-6">Latest Articles</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {regularPosts.map((post) => (
-                  <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group bg-card/50 backdrop-blur-sm border-border/50">
-                    {post.featured_image_url && (
-                      <div className="aspect-video overflow-hidden">
-                        <img 
-                          src={post.featured_image_url} 
-                          alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      </div>
-                    )}
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDate(post.published_at || post.created_at)}
+                  <Link key={post.id} to={`/blog/${post.slug}`} className="block group">
+                    <Card className="overflow-hidden h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-card/50 backdrop-blur-sm border-2 border-transparent hover:border-primary/20 hover:bg-gradient-to-br hover:from-primary/5 hover:to-accent/5">
+                      {post.featured_image_url && (
+                        <div className="aspect-video overflow-hidden">
+                          <img 
+                            src={post.featured_image_url} 
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          />
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {calculateReadingTime(post.content || '')} min
+                      )}
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {formatDate(post.published_at || post.created_at)}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {calculateReadingTime(post.content || '')} min
+                          </div>
+                          {getCategoryName(post.category_id) && (
+                            <div className="flex items-center gap-1">
+                              <Tag className="h-3 w-3" />
+                              {getCategoryName(post.category_id)}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                      <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
-                        {post.title}
-                      </CardTitle>
-                      <CardDescription className="line-clamp-3 text-sm">
-                        {post.excerpt}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="space-y-4">
-                        {post.tags && post.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {post.tags.slice(0, 2).map((tag, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {tag}
+                        <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
+                          {post.title}
+                        </CardTitle>
+                        <CardDescription className="line-clamp-3 text-sm">
+                          {post.excerpt}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-0 flex flex-col flex-1">
+                        <div className="space-y-4 flex-1">
+                          {getCategoryName(post.category_id) && (
+                            <div className="flex">
+                              <Badge variant="outline" className="text-primary border-primary text-xs">
+                                {getCategoryName(post.category_id)}
                               </Badge>
-                            ))}
-                          </div>
-                        )}
+                            </div>
+                          )}
+                        </div>
                         
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <User className="h-3 w-3" />
-                            {post.author_name || 'Admin'}
-                          </div>
-                          <Button variant="ghost" size="sm" asChild className="group/btn">
-                            <Link to={`/blog/${post.slug}`}>
-                              Read More
-                              <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-                            </Link>
+                        <div className="flex justify-center pt-4 mt-auto">
+                          <Button className="w-full bg-gradient-primary text-primary-foreground hover:shadow-glow hover:scale-105">
+                            Read Article
+                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                           </Button>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </div>

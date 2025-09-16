@@ -32,6 +32,7 @@ interface FooterSettings {
     facebook: string;
     linkedin: string;
     instagram: string;
+    youtube: string;
   };
   sections: FooterSection[];
   showNewsletter: boolean;
@@ -52,7 +53,8 @@ const FooterManagement: React.FC = () => {
       twitter: '',
       facebook: '',
       linkedin: '',
-      instagram: ''
+      instagram: '',
+      youtube: ''
     },
     sections: [
       {
@@ -250,12 +252,12 @@ const FooterManagement: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle>Social Links</CardTitle>
-          <CardDescription>Social media profiles</CardDescription>
+          <CardDescription>Social media profiles for your brand</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="twitter">Twitter</Label>
+              <Label htmlFor="twitter">Twitter/X</Label>
               <Input
                 id="twitter"
                 placeholder="https://twitter.com/yourcompany"
@@ -302,6 +304,18 @@ const FooterManagement: React.FC = () => {
                 }))}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="youtube">YouTube</Label>
+              <Input
+                id="youtube"
+                placeholder="https://youtube.com/@yourcompany"
+                value={formData.socialLinks.youtube}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  socialLinks: { ...prev.socialLinks, youtube: e.target.value }
+                }))}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -316,66 +330,103 @@ const FooterManagement: React.FC = () => {
               Add Section
             </Button>
           </CardTitle>
-          <CardDescription>Organize footer links into sections</CardDescription>
+          <CardDescription>
+            Organize footer links into sections. Add links to internal pages (use slugs like "/about") or external websites (use full URLs).
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {formData.sections.map((section, sectionIndex) => (
-            <div key={sectionIndex} className="border rounded-lg p-4 space-y-4">
+            <div key={sectionIndex} className="border rounded-lg p-4 space-y-4 bg-muted/20">
               <div className="flex items-center justify-between">
-                <Input
-                  placeholder="Section Title"
-                  value={section.title}
-                  onChange={(e) => updateSection(sectionIndex, 'title', e.target.value)}
-                  className="max-w-sm"
-                />
+                <div className="flex-1 mr-4">
+                  <Label htmlFor={`section-${sectionIndex}`} className="text-sm font-medium">Section Title</Label>
+                  <Input
+                    id={`section-${sectionIndex}`}
+                    placeholder="e.g., Company, Products, Resources"
+                    value={section.title}
+                    onChange={(e) => updateSection(sectionIndex, 'title', e.target.value)}
+                  />
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => removeSection(sectionIndex)}
+                  className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-muted-foreground">Links in this section:</div>
                 {section.links.map((link, linkIndex) => (
-                  <div key={linkIndex} className="flex items-center gap-2">
-                    <Input
-                      placeholder="Link Text"
-                      value={link.text}
-                      onChange={(e) => updateLink(sectionIndex, linkIndex, 'text', e.target.value)}
-                      className="flex-1"
-                    />
-                    <Input
-                      placeholder="URL"
-                      value={link.url}
-                      onChange={(e) => updateLink(sectionIndex, linkIndex, 'url', e.target.value)}
-                      className="flex-1"
-                    />
-                    <Switch
-                      checked={link.external}
-                      onCheckedChange={(checked) => updateLink(sectionIndex, linkIndex, 'external', checked)}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeLink(sectionIndex, linkIndex)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <div key={linkIndex} className="grid grid-cols-12 gap-2 items-center p-2 border rounded bg-background">
+                    <div className="col-span-3">
+                      <Input
+                        placeholder="Link Text"
+                        value={link.text}
+                        onChange={(e) => updateLink(sectionIndex, linkIndex, 'text', e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div className="col-span-6">
+                      <Input
+                        placeholder={link.external ? "https://example.com" : "/page-slug"}
+                        value={link.url}
+                        onChange={(e) => updateLink(sectionIndex, linkIndex, 'url', e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div className="col-span-2 flex items-center justify-center">
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          checked={link.external}
+                          onCheckedChange={(checked) => updateLink(sectionIndex, linkIndex, 'external', checked)}
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {link.external ? 'External' : 'Internal'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="col-span-1 flex justify-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeLink(sectionIndex, linkIndex)}
+                        className="text-destructive hover:text-destructive h-8 w-8 p-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
+                <div className="flex gap-2 text-xs text-muted-foreground bg-info/10 p-2 rounded border border-info/20">
+                  <div className="font-medium">💡 Tip:</div>
+                  <div>
+                    Use <code className="px-1 bg-muted rounded">/about</code> for internal pages or 
+                    <code className="px-1 bg-muted rounded ml-1">https://example.com</code> for external links. 
+                    Toggle the "External" switch accordingly.
+                  </div>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => addLink(sectionIndex)}
+                  className="w-full"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Link
+                  Add Link to {section.title || 'Section'}
                 </Button>
               </div>
             </div>
           ))}
+          
+          {formData.sections.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              <p className="mb-4">No footer sections yet. Click "Add Section" to get started.</p>
+              <p className="text-sm">Common sections include: Company, Products, Resources, Legal, Support</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

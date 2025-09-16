@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import RichTextEditor from '@/components/ui/rich-text-editor';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -36,6 +38,9 @@ const BlogManagement: React.FC = () => {
     meta_title: '',
     meta_description: '',
     canonical_url: '',
+    author_name: '',
+    og_image_url: '',
+    twitter_image_url: '',
   });
 
   const resetForm = () => {
@@ -51,6 +56,9 @@ const BlogManagement: React.FC = () => {
       meta_title: '',
       meta_description: '',
       canonical_url: '',
+      author_name: '',
+      og_image_url: '',
+      twitter_image_url: '',
     });
     setEditingPost(null);
   };
@@ -70,6 +78,9 @@ const BlogManagement: React.FC = () => {
         meta_title: post.meta_title || '',
         meta_description: post.meta_description || '',
         canonical_url: post.canonical_url || '',
+        author_name: post.author_name || '',
+        og_image_url: post.og_image_url || '',
+        twitter_image_url: post.twitter_image_url || '',
       });
     } else {
       resetForm();
@@ -293,48 +304,60 @@ const BlogManagement: React.FC = () => {
 
             <div className="space-y-2">
               <Label htmlFor="content">Content</Label>
-              <Textarea
-                id="content"
-                placeholder="Write your blog post content here..."
+              <RichTextEditor
                 value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                rows={12}
-                className="font-mono text-sm"
+                onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+                placeholder="Write your blog post content here..."
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="featured-image">Featured Image URL</Label>
-                <Input
-                  id="featured-image"
-                  placeholder="https://example.com/image.jpg"
+                <Label>Featured Image</Label>
+                <ImageUpload
                   value={formData.featured_image_url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, featured_image_url: e.target.value }))}
+                  onChange={(url) => setFormData(prev => ({ ...prev, featured_image_url: url }))}
+                  bucket="blog-images"
+                  folder="featured"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="tags">Tags (comma-separated)</Label>
-                <Input
-                  id="tags"
-                  placeholder="tech, programming, tutorial"
-                  value={formData.tags.join(', ')}
-                  onChange={(e) => handleTagsChange(e.target.value)}
-                />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="author">Author Name</Label>
+                  <Input
+                    id="author"
+                    placeholder="Author Name"
+                    value={formData.author_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, author_name: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Input
+                    id="tags"
+                    placeholder="tech, programming, tutorial"
+                    value={formData.tags.join(', ')}
+                    onChange={(e) => handleTagsChange(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <h4 className="font-medium">SEO Settings</h4>
+              <h4 className="font-medium">SEO & Social Media Settings</h4>
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="meta-title">Meta Title</Label>
                   <Input
                     id="meta-title"
-                    placeholder="SEO title for search engines"
+                    placeholder="SEO title for search engines (60 characters)"
                     value={formData.meta_title}
                     onChange={(e) => setFormData(prev => ({ ...prev, meta_title: e.target.value }))}
                   />
+                  <div className="text-xs text-muted-foreground">
+                    {formData.meta_title.length}/60 characters
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="meta-description">Meta Description</Label>
@@ -345,6 +368,9 @@ const BlogManagement: React.FC = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, meta_description: e.target.value }))}
                     rows={3}
                   />
+                  <div className="text-xs text-muted-foreground">
+                    {formData.meta_description.length}/160 characters
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="canonical-url">Canonical URL</Label>
@@ -354,6 +380,33 @@ const BlogManagement: React.FC = () => {
                     value={formData.canonical_url}
                     onChange={(e) => setFormData(prev => ({ ...prev, canonical_url: e.target.value }))}
                   />
+                  <div className="text-xs text-muted-foreground">
+                    Helps prevent duplicate content issues
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="og-image">Open Graph Image URL</Label>
+                  <Input
+                    id="og-image"
+                    placeholder="https://yoursite.com/og-image.jpg"
+                    value={formData.og_image_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, og_image_url: e.target.value }))}
+                  />
+                  <div className="text-xs text-muted-foreground">
+                    Image for social media sharing (Facebook, LinkedIn)
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="twitter-image">Twitter Image URL</Label>
+                  <Input
+                    id="twitter-image"
+                    placeholder="https://yoursite.com/twitter-image.jpg"
+                    value={formData.twitter_image_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, twitter_image_url: e.target.value }))}
+                  />
+                  <div className="text-xs text-muted-foreground">
+                    Image optimized for Twitter sharing
+                  </div>
                 </div>
               </div>
             </div>

@@ -10,6 +10,7 @@ export interface BlogPost {
   excerpt: string | null;
   featured_image_url: string | null;
   author_id: string | null;
+  author_name?: string | null;
   category_id: string | null;
   tags: string[];
   is_published: boolean;
@@ -18,6 +19,10 @@ export interface BlogPost {
   meta_title: string | null;
   meta_description: string | null;
   canonical_url: string | null;
+  og_image_url?: string | null;
+  twitter_image_url?: string | null;
+  reading_time?: number | null;
+  structured_data?: any;
   created_at: string;
   updated_at: string;
 }

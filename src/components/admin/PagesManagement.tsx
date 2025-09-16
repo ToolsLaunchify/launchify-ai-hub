@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import RichTextEditor from '@/components/ui/rich-text-editor';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -247,17 +248,14 @@ const PagesManagement: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="content">Content (HTML)</Label>
-              <Textarea
-                id="content"
-                placeholder="Enter HTML content for the page..."
+              <Label htmlFor="content">Content</Label>
+              <RichTextEditor
                 value={formData.content}
-                onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                rows={8}
-                className="font-mono text-sm"
+                onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+                placeholder="Enter content for the page..."
               />
               <p className="text-xs text-muted-foreground">
-                You can use HTML tags for formatting. Example: &lt;h1&gt;Title&lt;/h1&gt; &lt;p&gt;Paragraph&lt;/p&gt;
+                Use the rich text editor to format your content with headings, lists, links, and more.
               </p>
             </div>
 

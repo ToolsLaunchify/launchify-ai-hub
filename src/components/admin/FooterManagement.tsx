@@ -42,7 +42,7 @@ const FooterManagement: React.FC = () => {
   const { data: settings, isLoading } = useSiteSettings();
   const { toast } = useToast();
 
-  const footerSettings = settings?.find(s => s.setting_key === 'footer_settings')?.setting_value as FooterSettings || {
+  const footerSettings = settings?.footer_settings as FooterSettings || {
     companyName: 'Tools Launchify',
     description: 'Discover and launch amazing tools for your business',
     email: 'hello@toolslaunchify.com',

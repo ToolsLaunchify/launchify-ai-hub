@@ -1,19 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Save, Settings2, Plus, Trash2 } from 'lucide-react';
-import { useSiteSettings } from '@/hooks/useSiteSettings';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Save, Settings2, Plus, GripVertical, Sparkles, Layout } from 'lucide-react';
+import { useSiteSettings, useUpdateSiteSettings } from '@/hooks/useSiteSettings';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { DraggableFooterSection } from './DraggableFooterSection';
+import { PageBrowser } from './PageBrowser';
 
 interface FooterLink {
   text: string;
   url: string;
-  external: boolean;
 }
 
 interface FooterSection {
@@ -39,9 +58,98 @@ interface FooterSettings {
   copyrightText: string;
 }
 
+interface SortableSectionProps {
+  section: FooterSection;
+  index: number;
+  onUpdateSection: (index: number, field: keyof FooterSection, value: any) => void;
+  onRemoveSection: (index: number) => void;
+  onAddLink: (sectionIndex: number) => void;
+  onUpdateLink: (sectionIndex: number, linkIndex: number, field: keyof FooterLink, value: string) => void;
+  onRemoveLink: (sectionIndex: number, linkIndex: number) => void;
+  onReorderLinks: (sectionIndex: number, oldIndex: number, newIndex: number) => void;
+}
+
+function SortableSection({ 
+  section, 
+  index, 
+  onUpdateSection, 
+  onRemoveSection, 
+  onAddLink, 
+  onUpdateLink, 
+  onRemoveLink, 
+  onReorderLinks 
+}: SortableSectionProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: `section-${index}` });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <div className="relative">
+        <div 
+          {...listeners} 
+          className="absolute -left-8 top-4 cursor-grab hover:cursor-grabbing p-2 rounded-md hover:bg-muted/50 transition-colors"
+        >
+          <GripVertical className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <DraggableFooterSection
+          section={section}
+          sectionIndex={index}
+          onUpdateSection={onUpdateSection}
+          onRemoveSection={onRemoveSection}
+          onAddLink={onAddLink}
+          onUpdateLink={onUpdateLink}
+          onRemoveLink={onRemoveLink}
+          onReorderLinks={onReorderLinks}
+        />
+      </div>
+    </div>
+  );
+}
+
+const SECTION_TEMPLATES = [
+  {
+    title: 'Company',
+    links: [
+      { text: 'About Us', url: '/about' },
+      { text: 'Contact', url: '/contact' },
+      { text: 'Careers', url: '/careers' }
+    ]
+  },
+  {
+    title: 'Legal',
+    links: [
+      { text: 'Privacy Policy', url: '/privacy' },
+      { text: 'Terms of Service', url: '/terms' },
+      { text: 'Cookie Policy', url: '/cookies' }
+    ]
+  },
+  {
+    title: 'Support',
+    links: [
+      { text: 'Help Center', url: '/help' },
+      { text: 'FAQ', url: '/faq' },
+      { text: 'Contact Support', url: '/support' }
+    ]
+  }
+];
+
 const FooterManagement: React.FC = () => {
   const { data: settings, isLoading } = useSiteSettings();
+  const updateSiteSettings = useUpdateSiteSettings();
   const { toast } = useToast();
+  const [showExternalLinkDialog, setShowExternalLinkDialog] = useState(false);
+  const [newExternalLink, setNewExternalLink] = useState({ text: '', url: '' });
+  const [currentSectionForLink, setCurrentSectionForLink] = useState<number>(0);
 
   const footerSettings = settings?.footer_settings as FooterSettings || {
     companyName: 'Tools Launchify',
@@ -56,60 +164,49 @@ const FooterManagement: React.FC = () => {
       instagram: '',
       youtube: ''
     },
-    sections: [
-      {
-        title: 'Product',
-        links: [
-          { text: 'Features', url: '/features', external: false },
-          { text: 'Pricing', url: '/pricing', external: false },
-          { text: 'API', url: '/api', external: false }
-        ]
-      },
-      {
-        title: 'Company',
-        links: [
-          { text: 'About', url: '/about', external: false },
-          { text: 'Blog', url: '/blog', external: false },
-          { text: 'Careers', url: '/careers', external: false }
-        ]
-      }
-    ],
+    sections: [],
     showNewsletter: true,
     copyrightText: 'All rights reserved.'
   };
 
   const [formData, setFormData] = useState<FooterSettings>(footerSettings);
-  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setFormData(footerSettings);
+  }, [settings]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleSave = async () => {
-    setIsSaving(true);
     try {
-      // Save to site_settings table using Supabase
-      const { error } = await supabase
-        .from('site_settings')
-        .upsert({
-          setting_key: 'footer_settings',
-          setting_value: formData as any
-        });
-
-      if (error) throw error;
-
-      toast({ title: 'Footer settings saved successfully!' });
-    } catch (error) {
+      await updateSiteSettings.mutateAsync({
+        key: 'footer_settings',
+        value: formData
+      });
+      
+      toast({ 
+        title: 'Footer settings saved successfully!',
+        description: 'Your changes have been applied to the website.'
+      });
+    } catch (error: any) {
       toast({
         title: 'Failed to save footer settings',
-        description: 'Please try again.',
+        description: error.message || 'Please try again.',
         variant: 'destructive'
       });
-    } finally {
-      setIsSaving(false);
     }
   };
 
-  const addSection = () => {
+  const addSection = (template?: FooterSection) => {
+    const newSection = template || { title: '', links: [] };
     setFormData(prev => ({
       ...prev,
-      sections: [...prev.sections, { title: '', links: [] }]
+      sections: [...prev.sections, newSection]
     }));
   };
 
@@ -129,8 +226,8 @@ const FooterManagement: React.FC = () => {
     }));
   };
 
-  const addLink = (sectionIndex: number) => {
-    const newLink: FooterLink = { text: '', url: '', external: false };
+  const addLink = (sectionIndex: number, link?: FooterLink) => {
+    const newLink: FooterLink = link || { text: '', url: '' };
     setFormData(prev => ({
       ...prev,
       sections: prev.sections.map((section, i) => 
@@ -152,7 +249,7 @@ const FooterManagement: React.FC = () => {
     }));
   };
 
-  const updateLink = (sectionIndex: number, linkIndex: number, field: keyof FooterLink, value: any) => {
+  const updateLink = (sectionIndex: number, linkIndex: number, field: keyof FooterLink, value: string) => {
     setFormData(prev => ({
       ...prev,
       sections: prev.sections.map((section, i) => 
@@ -168,6 +265,60 @@ const FooterManagement: React.FC = () => {
     }));
   };
 
+  const reorderSections = (oldIndex: number, newIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      sections: arrayMove(prev.sections, oldIndex, newIndex)
+    }));
+  };
+
+  const reorderLinks = (sectionIndex: number, oldIndex: number, newIndex: number) => {
+    setFormData(prev => ({
+      ...prev,
+      sections: prev.sections.map((section, i) => 
+        i === sectionIndex 
+          ? { ...section, links: arrayMove(section.links, oldIndex, newIndex) }
+          : section
+      )
+    }));
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      const activeIndex = parseInt(active.id.split('-')[1]);
+      const overIndex = parseInt(over.id.split('-')[1]);
+      
+      reorderSections(activeIndex, overIndex);
+    }
+  };
+
+  const handlePageSelect = (page: { title: string; url: string }, sectionIndex: number) => {
+    addLink(sectionIndex, { text: page.title, url: page.url });
+    toast({
+      title: 'Page added!',
+      description: `"${page.title}" has been added to the footer section.`
+    });
+  };
+
+  const handleExternalLinkAdd = (sectionIndex: number) => {
+    setCurrentSectionForLink(sectionIndex);
+    setShowExternalLinkDialog(true);
+  };
+
+  const addExternalLink = () => {
+    if (newExternalLink.text && newExternalLink.url) {
+      addLink(currentSectionForLink, newExternalLink);
+      setNewExternalLink({ text: '', url: '' });
+      setShowExternalLinkDialog(false);
+      toast({
+        title: 'External link added!',
+        description: `"${newExternalLink.text}" has been added to the footer section.`
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -181,282 +332,357 @@ const FooterManagement: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Settings2 className="h-5 w-5" />
+          <Layout className="h-5 w-5 text-primary" />
           <h2 className="text-2xl font-bold">Footer Management</h2>
+          <div className="ml-2 px-2 py-1 bg-gradient-primary text-primary-foreground text-xs rounded-full font-medium">
+            Enhanced
+          </div>
         </div>
-        <Button onClick={handleSave} disabled={isSaving}>
+        <Button 
+          onClick={handleSave} 
+          disabled={updateSiteSettings.isPending}
+          className="shadow-glow"
+        >
           <Save className="h-4 w-4 mr-2" />
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {updateSiteSettings.isPending ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
 
-      {/* Company Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Company Information</CardTitle>
-          <CardDescription>Basic company details displayed in the footer</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="company-name">Company Name</Label>
-              <Input
-                id="company-name"
-                value={formData.companyName}
-                onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              rows={3}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Social Links */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Social Links</CardTitle>
-          <CardDescription>Social media profiles for your brand</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="twitter">Twitter/X</Label>
-              <Input
-                id="twitter"
-                placeholder="https://twitter.com/yourcompany"
-                value={formData.socialLinks.twitter}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  socialLinks: { ...prev.socialLinks, twitter: e.target.value }
-                }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="facebook">Facebook</Label>
-              <Input
-                id="facebook"
-                placeholder="https://facebook.com/yourcompany"
-                value={formData.socialLinks.facebook}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  socialLinks: { ...prev.socialLinks, facebook: e.target.value }
-                }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="linkedin">LinkedIn</Label>
-              <Input
-                id="linkedin"
-                placeholder="https://linkedin.com/company/yourcompany"
-                value={formData.socialLinks.linkedin}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  socialLinks: { ...prev.socialLinks, linkedin: e.target.value }
-                }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="instagram">Instagram</Label>
-              <Input
-                id="instagram"
-                placeholder="https://instagram.com/yourcompany"
-                value={formData.socialLinks.instagram}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  socialLinks: { ...prev.socialLinks, instagram: e.target.value }
-                }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="youtube">YouTube</Label>
-              <Input
-                id="youtube"
-                placeholder="https://youtube.com/@yourcompany"
-                value={formData.socialLinks.youtube}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  socialLinks: { ...prev.socialLinks, youtube: e.target.value }
-                }))}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Footer Sections */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+      <Tabs defaultValue="sections" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="sections" className="flex items-center gap-2">
+            <Layout className="h-4 w-4" />
             Footer Sections
-            <Button onClick={addSection} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Section
-            </Button>
-          </CardTitle>
-          <CardDescription>
-            Organize footer links into sections. Add links to internal pages (use slugs like "/about") or external websites (use full URLs).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {formData.sections.map((section, sectionIndex) => (
-            <div key={sectionIndex} className="border rounded-lg p-4 space-y-4 bg-muted/20">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 mr-4">
-                  <Label htmlFor={`section-${sectionIndex}`} className="text-sm font-medium">Section Title</Label>
+          </TabsTrigger>
+          <TabsTrigger value="company">Company Info</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="sections" className="space-y-6">
+          <Card className="bg-gradient-hero border-2">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Footer Sections
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => addSection()}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Custom Section
+                  </Button>
+                </div>
+              </CardTitle>
+              <CardDescription>
+                Organize your footer with drag-and-drop sections. Add pages directly or create external links.
+              </CardDescription>
+            </CardHeader>
+
+            {SECTION_TEMPLATES.length > 0 && (
+              <CardContent className="pt-0">
+                <div className="mb-6 p-4 bg-muted/30 rounded-lg border-2 border-dashed border-primary/20">
+                  <h4 className="font-medium text-sm mb-3 text-muted-foreground">Quick Start Templates:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {SECTION_TEMPLATES.map((template, index) => (
+                      <Button
+                        key={index}
+                        onClick={() => addSection(template)}
+                        size="sm"
+                        variant="secondary"
+                        className="h-8"
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        {template.title}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+
+          <div className="relative pl-8">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext 
+                items={formData.sections.map((_, i) => `section-${i}`)} 
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-6">
+                  {formData.sections.map((section, index) => (
+                    <div key={`section-${index}`} className="space-y-4">
+                      <SortableSection
+                        section={section}
+                        index={index}
+                        onUpdateSection={updateSection}
+                        onRemoveSection={removeSection}
+                        onAddLink={addLink}
+                        onUpdateLink={updateLink}
+                        onRemoveLink={removeLink}
+                        onReorderLinks={reorderLinks}
+                      />
+                      
+                      <Card className="bg-muted/20 border-dashed">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm text-muted-foreground">
+                            Add Links to "{section.title || 'Section'}"
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <PageBrowser 
+                            onPageSelect={(page) => handlePageSelect(page, index)}
+                            onExternalLinkAdd={() => handleExternalLinkAdd(index)}
+                          />
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </div>
+
+          {formData.sections.length === 0 && (
+            <Card className="border-2 border-dashed border-primary/20 bg-gradient-hero">
+              <CardContent className="text-center py-12">
+                <Layout className="h-12 w-12 text-primary/50 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No footer sections yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  Get started by adding a section template or creating a custom section.
+                </p>
+                <div className="flex justify-center gap-2">
+                  {SECTION_TEMPLATES.slice(0, 2).map((template, index) => (
+                    <Button
+                      key={index}
+                      onClick={() => addSection(template)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      {template.title}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="company" className="space-y-6">
+          {/* Company Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Company Information</CardTitle>
+              <CardDescription>Basic company details displayed in the footer</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="company-name">Company Name</Label>
                   <Input
-                    id={`section-${sectionIndex}`}
-                    placeholder="e.g., Company, Products, Resources"
-                    value={section.title}
-                    onChange={(e) => updateSection(sectionIndex, 'title', e.target.value)}
+                    id="company-name"
+                    value={formData.companyName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
                   />
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeSection(sectionIndex)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="text-sm font-medium text-muted-foreground">Links in this section:</div>
-                {section.links.map((link, linkIndex) => (
-                  <div key={linkIndex} className="grid grid-cols-12 gap-2 items-center p-2 border rounded bg-background">
-                    <div className="col-span-3">
-                      <Input
-                        placeholder="Link Text"
-                        value={link.text}
-                        onChange={(e) => updateLink(sectionIndex, linkIndex, 'text', e.target.value)}
-                        className="text-sm"
-                      />
-                    </div>
-                    <div className="col-span-6">
-                      <Input
-                        placeholder={link.external ? "https://example.com" : "/page-slug"}
-                        value={link.url}
-                        onChange={(e) => updateLink(sectionIndex, linkIndex, 'url', e.target.value)}
-                        className="text-sm"
-                      />
-                    </div>
-                    <div className="col-span-2 flex items-center justify-center">
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          checked={link.external}
-                          onCheckedChange={(checked) => updateLink(sectionIndex, linkIndex, 'external', checked)}
-                        />
-                        <span className="text-xs text-muted-foreground">
-                          {link.external ? 'External' : 'Internal'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="col-span-1 flex justify-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeLink(sectionIndex, linkIndex)}
-                        className="text-destructive hover:text-destructive h-8 w-8 p-0"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex gap-2 text-xs text-muted-foreground bg-info/10 p-2 rounded border border-info/20">
-                  <div className="font-medium">💡 Tip:</div>
-                  <div>
-                    Use <code className="px-1 bg-muted rounded">/about</code> for internal pages or 
-                    <code className="px-1 bg-muted rounded ml-1">https://example.com</code> for external links. 
-                    Toggle the "External" switch accordingly.
-                  </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Social Links */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Social Links</CardTitle>
+              <CardDescription>Social media profiles for your brand</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="twitter">Twitter/X</Label>
+                  <Input
+                    id="twitter"
+                    placeholder="https://twitter.com/yourcompany"
+                    value={formData.socialLinks.twitter}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      socialLinks: { ...prev.socialLinks, twitter: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="facebook">Facebook</Label>
+                  <Input
+                    id="facebook"
+                    placeholder="https://facebook.com/yourcompany"
+                    value={formData.socialLinks.facebook}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      socialLinks: { ...prev.socialLinks, facebook: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="linkedin">LinkedIn</Label>
+                  <Input
+                    id="linkedin"
+                    placeholder="https://linkedin.com/company/yourcompany"
+                    value={formData.socialLinks.linkedin}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      socialLinks: { ...prev.socialLinks, linkedin: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="instagram">Instagram</Label>
+                  <Input
+                    id="instagram"
+                    placeholder="https://instagram.com/yourcompany"
+                    value={formData.socialLinks.instagram}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      socialLinks: { ...prev.socialLinks, instagram: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="youtube">YouTube</Label>
+                  <Input
+                    id="youtube"
+                    placeholder="https://youtube.com/@yourcompany"
+                    value={formData.socialLinks.youtube}
+                    onChange={(e) => setFormData(prev => ({ 
+                      ...prev, 
+                      socialLinks: { ...prev.socialLinks, youtube: e.target.value }
+                    }))}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          {/* Footer Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Footer Settings</CardTitle>
+              <CardDescription>Additional footer configuration</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="newsletter"
+                  checked={formData.showNewsletter}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, showNewsletter: checked }))}
+                />
+                <Label htmlFor="newsletter">Show newsletter signup</Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="copyright">Copyright Text</Label>
+                <Input
+                  id="copyright"
+                  placeholder="All rights reserved."
+                  value={formData.copyrightText}
+                  onChange={(e) => setFormData(prev => ({ ...prev, copyrightText: e.target.value }))}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* External Link Dialog */}
+      {showExternalLinkDialog && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader>
+              <CardTitle>Add External Link</CardTitle>
+              <CardDescription>Add a link to an external website</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="link-text">Link Text</Label>
+                <Input
+                  id="link-text"
+                  placeholder="Enter link text"
+                  value={newExternalLink.text}
+                  onChange={(e) => setNewExternalLink(prev => ({ ...prev, text: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="link-url">URL</Label>
+                <Input
+                  id="link-url"
+                  placeholder="https://example.com"
+                  value={newExternalLink.url}
+                  onChange={(e) => setNewExternalLink(prev => ({ ...prev, url: e.target.value }))}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
                 <Button
                   variant="outline"
-                  size="sm"
-                  onClick={() => addLink(sectionIndex)}
-                  className="w-full"
+                  onClick={() => {
+                    setShowExternalLinkDialog(false);
+                    setNewExternalLink({ text: '', url: '' });
+                  }}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Link to {section.title || 'Section'}
+                  Cancel
+                </Button>
+                <Button onClick={addExternalLink}>
+                  Add Link
                 </Button>
               </div>
-            </div>
-          ))}
-          
-          {formData.sections.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              <p className="mb-4">No footer sections yet. Click "Add Section" to get started.</p>
-              <p className="text-sm">Common sections include: Company, Products, Resources, Legal, Support</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Footer Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Footer Settings</CardTitle>
-          <CardDescription>Additional footer configuration</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="newsletter"
-              checked={formData.showNewsletter}
-              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, showNewsletter: checked }))}
-            />
-            <Label htmlFor="newsletter">Show newsletter signup</Label>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="copyright">Copyright Text</Label>
-            <Input
-              id="copyright"
-              placeholder="All rights reserved."
-              value={formData.copyrightText}
-              onChange={(e) => setFormData(prev => ({ ...prev, copyrightText: e.target.value }))}
-            />
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

@@ -359,51 +359,74 @@ const FooterManagement: React.FC = () => {
         </TabsList>
 
         <TabsContent value="sections" className="space-y-6">
-          <Card className="bg-gradient-hero border-2">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  Footer Sections
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => addSection()}
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Custom Section
-                  </Button>
-                </div>
-              </CardTitle>
-              <CardDescription>
-                Organize your footer with drag-and-drop sections. Add pages directly or create external links.
-              </CardDescription>
-            </CardHeader>
+          {/* Enhanced Header with Prominent Add Section Area */}
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/20 rounded-lg p-6">
+            <div className="text-center mb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Layout className="h-6 w-6 text-primary" />
+                <h3 className="text-xl font-bold">Footer Sections Manager</h3>
+              </div>
+              <p className="text-muted-foreground text-sm max-w-2xl mx-auto">
+                Create organized footer sections with drag-and-drop functionality. Start with templates or build custom sections.
+              </p>
+            </div>
 
-            {SECTION_TEMPLATES.length > 0 && (
-              <CardContent className="pt-0">
-                <div className="mb-6 p-4 bg-muted/30 rounded-lg border-2 border-dashed border-primary/20">
-                  <h4 className="font-medium text-sm mb-3 text-muted-foreground">Quick Start Templates:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {SECTION_TEMPLATES.map((template, index) => (
-                      <Button
-                        key={index}
-                        onClick={() => addSection(template)}
-                        size="sm"
-                        variant="secondary"
-                        className="h-8"
-                      >
-                        <Plus className="h-3 w-3 mr-1" />
-                        {template.title}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            )}
-          </Card>
+            {/* Prominent Add Section Buttons */}
+            <div className="bg-background/80 backdrop-blur border-2 border-dashed border-primary/30 rounded-lg p-6">
+              <div className="text-center mb-4">
+                <h4 className="font-semibold text-lg mb-2 flex items-center justify-center gap-2">
+                  <Plus className="h-5 w-5 text-primary" />
+                  Add New Footer Section
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Choose a pre-built template or create a custom section from scratch
+                </p>
+              </div>
+
+              {/* Template Buttons - More Prominent */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+                {SECTION_TEMPLATES.map((template, index) => (
+                  <Button
+                    key={index}
+                    onClick={() => addSection(template)}
+                    variant="outline"
+                    className="h-16 flex-col gap-2 border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-200"
+                  >
+                    <Plus className="h-5 w-5 text-primary" />
+                    <span className="font-medium">{template.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {template.links.length} links included
+                    </span>
+                  </Button>
+                ))}
+                
+                {/* Custom Section Button */}
+                <Button
+                  onClick={() => addSection()}
+                  variant="default"
+                  className="h-16 flex-col gap-2 bg-gradient-primary hover:shadow-glow transition-all duration-200"
+                >
+                  <Sparkles className="h-5 w-5" />
+                  <span className="font-medium">Custom Section</span>
+                  <span className="text-xs opacity-90">
+                    Start from scratch
+                  </span>
+                </Button>
+              </div>
+
+              {/* Quick Tips */}
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <h5 className="font-medium text-sm text-blue-800 dark:text-blue-200 mb-2">
+                  💡 Quick Tips:
+                </h5>
+                <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                  <li>• Use templates for common sections like Company, Legal, or Support</li>
+                  <li>• Drag sections to reorder them in your footer</li>
+                  <li>• Add pages from your site or external links to any section</li>
+                </ul>
+              </div>
+            </div>
+          </div>
 
           <div className="relative pl-8">
             <DndContext
@@ -455,28 +478,18 @@ const FooterManagement: React.FC = () => {
           </div>
 
           {formData.sections.length === 0 && (
-            <Card className="border-2 border-dashed border-primary/20 bg-gradient-hero">
-              <CardContent className="text-center py-12">
-                <Layout className="h-12 w-12 text-primary/50 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No footer sections yet</h3>
-                <p className="text-muted-foreground mb-6">
-                  Get started by adding a section template or creating a custom section.
-                </p>
-                <div className="flex justify-center gap-2">
-                  {SECTION_TEMPLATES.slice(0, 2).map((template, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => addSection(template)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      {template.title}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="text-center py-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                <Layout className="h-8 w-8 text-primary animate-pulse" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Ready to organize your footer!</h3>
+              <p className="text-muted-foreground mb-4 max-w-md mx-auto">
+                Your footer sections will appear here once you add them using the buttons above.
+              </p>
+              <p className="text-sm text-primary font-medium">
+                ↑ Click any "Add Section" button above to get started
+              </p>
+            </div>
           )}
         </TabsContent>
 

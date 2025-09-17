@@ -154,15 +154,24 @@ const Footer: React.FC = () => {
                   
                   return (
                     <li key={linkIndex}>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2"
-                      >
-                        {link.text}
-                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
+                      {isExternal ? (
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2"
+                        >
+                          {link.text}
+                          <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
+                      ) : (
+                        <Link
+                          to={link.url}
+                          className="text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          {link.text}
+                        </Link>
+                      )}
                     </li>
                   );
                 })}
@@ -176,23 +185,20 @@ const Footer: React.FC = () => {
               <h4 className="font-semibold text-lg">Browse</h4>
               <ul className="space-y-3">
                 <li>
-                  <a href="/browse" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2">
+                  <Link to="/browse" className="text-muted-foreground hover:text-primary transition-colors">
                     All Tools
-                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/blog" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2">
+                  <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">
                     Blog
-                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </a>
+                  </Link>
                 </li>
                 {companyPages.slice(0, 2).map((page) => (
                   <li key={page.id}>
-                    <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2">
+                    <Link to={`/${page.slug}`} className="text-muted-foreground hover:text-primary transition-colors">
                       {page.title}
-                      <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

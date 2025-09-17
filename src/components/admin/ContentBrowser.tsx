@@ -10,6 +10,7 @@ import { usePages } from '@/hooks/usePages';
 import { useCategoryStats } from '@/hooks/useCategoryStats';
 import { useProducts } from '@/hooks/useProducts';
 import { usePublishedBlogPosts } from '@/hooks/useBlog';
+import { useProductStats } from '@/hooks/useProductStats';
 
 interface ContentBrowserProps {
   onContentSelect: (content: { title: string; url: string }) => void;
@@ -27,6 +28,7 @@ export const ContentBrowser: React.FC<ContentBrowserProps> = ({
   const { data: categories = [], isLoading: categoriesLoading } = useCategoryStats();
   const { data: products = [], isLoading: productsLoading } = useProducts({ limit: 20, isFeatured: true });
   const { data: blogPosts = [], isLoading: blogLoading } = usePublishedBlogPosts();
+  const { data: productStats, isLoading: productStatsLoading } = useProductStats();
 
   const copyToClipboard = (url: string, title: string) => {
     navigator.clipboard.writeText(url);
@@ -38,15 +40,23 @@ export const ContentBrowser: React.FC<ContentBrowserProps> = ({
     toast.success(`Added "${title}" to footer`);
   };
 
-  // Product types from your existing products
-  const productTypes = [
-    { name: 'AI Writing Tools', slug: 'ai-writing', count: 25 },
-    { name: 'Design Tools', slug: 'design', count: 18 },
-    { name: 'Marketing Tools', slug: 'marketing', count: 22 },
-    { name: 'Developer Tools', slug: 'developer', count: 15 },
-    { name: 'Analytics Tools', slug: 'analytics', count: 12 },
-    { name: 'Productivity Tools', slug: 'productivity', count: 20 }
-  ];
+  // Get actual product types from your database
+  const productTypes = React.useMemo(() => {
+    if (!productStats) return [];
+    
+    const typeMapping = {
+      ai_tools: 'AI Tools',
+      software: 'Software', 
+      free_tools: 'Free Tools',
+      digital_products: 'Digital Product'
+    };
+    
+    return Object.entries(typeMapping).map(([key, name]) => ({
+      name,
+      slug: key.replace('_', '-'),
+      count: productStats[key as keyof typeof productStats] || 0
+    })).filter(type => type.count > 0); // Only show types that have products
+  }, [productStats]);
 
   const filterItems = (items: any[], searchFields: string[]) => {
     if (!searchTerm) return items;
@@ -208,38 +218,46 @@ export const ContentBrowser: React.FC<ContentBrowserProps> = ({
                 Browse tool types to add to your footer navigation
               </div>
               
-              <div className="space-y-2 max-h-80 overflow-y-auto">
-                {filteredProductTypes.map((type) => (
-                  <div key={type.slug} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{type.name}</span>
-                        <Badge variant="secondary">{type.count} tools</Badge>
+              {productStatsLoading ? (
+                <div className="text-center py-4">Loading tool types...</div>
+              ) : filteredProductTypes.length === 0 ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  {searchTerm ? 'No tool types found matching your search.' : 'No tool types available.'}
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-80 overflow-y-auto">
+                  {filteredProductTypes.map((type) => (
+                    <div key={type.slug} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{type.name}</span>
+                          <Badge variant="secondary">{type.count} tools</Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          /type/{type.slug}
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        /type/{type.slug}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(`/type/${type.slug}`, type.name)}
+                        >
+                          <Copy className="h-4 w-4 mr-1" />
+                          Copy Link
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleContentSelect(type.name, `/type/${type.slug}`)}
+                        >
+                          Add to Footer
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(`/type/${type.slug}`, type.name)}
-                      >
-                        <Copy className="h-4 w-4 mr-1" />
-                        Copy Link
-                      </Button>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handleContentSelect(type.name, `/type/${type.slug}`)}
-                      >
-                        Add to Footer
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="blog" className="space-y-3">

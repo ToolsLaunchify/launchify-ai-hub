@@ -359,72 +359,60 @@ const FooterManagement: React.FC = () => {
         </TabsList>
 
         <TabsContent value="sections" className="space-y-6">
-          {/* Enhanced Header with Prominent Add Section Area */}
-          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/20 rounded-lg p-6">
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Layout className="h-6 w-6 text-primary" />
-                <h3 className="text-xl font-bold">Footer Sections Manager</h3>
-              </div>
-              <p className="text-muted-foreground text-sm max-w-2xl mx-auto">
-                Create organized footer sections with drag-and-drop functionality. Start with templates or build custom sections.
+          {/* Simple and Prominent Add Section Area */}
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-2 border-primary/20 rounded-lg p-8">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
+                <Plus className="h-8 w-8 text-primary bg-primary/10 rounded-full p-1" />
+                Add Footer Section
+              </h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                Click any button below to add a new section to your footer
               </p>
             </div>
 
-            {/* Prominent Add Section Buttons */}
-            <div className="bg-background/80 backdrop-blur border-2 border-dashed border-primary/30 rounded-lg p-6">
-              <div className="text-center mb-4">
-                <h4 className="font-semibold text-lg mb-2 flex items-center justify-center gap-2">
-                  <Plus className="h-5 w-5 text-primary" />
-                  Add New Footer Section
-                </h4>
-                <p className="text-sm text-muted-foreground">
-                  Choose a pre-built template or create a custom section from scratch
-                </p>
-              </div>
-
-              {/* Template Buttons - More Prominent */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-                {SECTION_TEMPLATES.map((template, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => addSection(template)}
-                    variant="outline"
-                    className="h-16 flex-col gap-2 border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-200"
-                  >
-                    <Plus className="h-5 w-5 text-primary" />
-                    <span className="font-medium">{template.title}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {template.links.length} links included
-                    </span>
-                  </Button>
-                ))}
-                
-                {/* Custom Section Button */}
+            {/* Large, Simple Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              {/* Template Buttons */}
+              {SECTION_TEMPLATES.map((template, index) => (
                 <Button
-                  onClick={() => addSection()}
-                  variant="default"
-                  className="h-16 flex-col gap-2 bg-gradient-primary hover:shadow-glow transition-all duration-200"
+                  key={index}
+                  onClick={() => addSection(template)}
+                  size="lg"
+                  variant="outline"
+                  className="h-20 flex-col gap-2 border-2 border-primary/30 hover:border-primary hover:bg-primary/10 text-lg font-semibold transition-all duration-200"
                 >
-                  <Sparkles className="h-5 w-5" />
-                  <span className="font-medium">Custom Section</span>
-                  <span className="text-xs opacity-90">
-                    Start from scratch
+                  <div className="flex items-center gap-2">
+                    <Plus className="h-6 w-6 text-primary" />
+                    <span>{template.title}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground font-normal">
+                    {template.links.length} links included
                   </span>
                 </Button>
-              </div>
+              ))}
+              
+              {/* Custom Section Button - Make it stand out */}
+              <Button
+                onClick={() => addSection()}
+                size="lg"
+                className="h-20 flex-col gap-2 bg-primary hover:bg-primary/90 text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-6 w-6" />
+                  <span>Custom</span>
+                </div>
+                <span className="text-sm opacity-90 font-normal">
+                  Build your own
+                </span>
+              </Button>
+            </div>
 
-              {/* Quick Tips */}
-              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <h5 className="font-medium text-sm text-blue-800 dark:text-blue-200 mb-2">
-                  💡 Quick Tips:
-                </h5>
-                <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-                  <li>• Use templates for common sections like Company, Legal, or Support</li>
-                  <li>• Drag sections to reorder them in your footer</li>
-                  <li>• Add pages from your site or external links to any section</li>
-                </ul>
-              </div>
+            {/* Simple instruction */}
+            <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-700">
+              <p className="text-blue-800 dark:text-blue-200 font-medium">
+                💡 Choose a template to get started quickly, or create a custom section from scratch
+              </p>
             </div>
           </div>
 

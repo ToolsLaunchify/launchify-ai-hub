@@ -150,12 +150,15 @@ const Footer: React.FC = () => {
                         <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </a>
                     ) : (
-                      <Link
-                        to={link.url}
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2"
                       >
                         {link.text}
-                      </Link>
+                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
                     )}
                   </li>
                 ))}
@@ -169,20 +172,23 @@ const Footer: React.FC = () => {
               <h4 className="font-semibold text-lg">Browse</h4>
               <ul className="space-y-3">
                 <li>
-                  <Link to="/browse" className="text-muted-foreground hover:text-primary transition-colors">
+                  <a href="/browse" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2">
                     All Tools
-                  </Link>
+                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
                 </li>
                 <li>
-                  <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">
+                  <a href="/blog" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2">
                     Blog
-                  </Link>
+                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
                 </li>
                 {companyPages.slice(0, 2).map((page) => (
                   <li key={page.id}>
-                    <Link to={`/page/${page.slug}`} className="text-muted-foreground hover:text-primary transition-colors">
+                    <a href={`/page/${page.slug}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2">
                       {page.title}
-                    </Link>
+                      <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </a>
                   </li>
                 ))}
               </ul>

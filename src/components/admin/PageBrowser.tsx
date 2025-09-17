@@ -103,19 +103,20 @@ export const PageBrowser: React.FC<PageBrowserProps> = ({
                       /{page.slug}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1 ml-2">
+                  <div className="flex items-center gap-2 ml-2">
                     <Button
                       size="sm"
-                      variant="ghost"
+                      variant="outline"
                       onClick={() => copyPageUrl(page.slug)}
-                      className="h-8 w-8 p-0"
+                      className="h-8 px-3 bg-accent/10 hover:bg-accent/20 text-accent hover:text-accent border-accent/30"
                     >
-                      <Copy className="h-3 w-3" />
+                      <Copy className="h-3 w-3 mr-1" />
+                      Copy Link
                     </Button>
                     <Button
                       size="sm"
                       onClick={() => handlePageSelect(page)}
-                      className="h-8"
+                      className="h-8 px-3"
                     >
                       <Plus className="h-3 w-3 mr-1" />
                       Add

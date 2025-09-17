@@ -57,6 +57,7 @@ function SortableLink({ link, index, sectionIndex, onUpdate, onRemove }: Sortabl
 
   const isExternal = link.url.startsWith('http') || link.url.startsWith('https');
   const isInternal = link.url.startsWith('/');
+  const isEmpty = !link.url.trim();
 
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
@@ -68,12 +69,14 @@ function SortableLink({ link, index, sectionIndex, onUpdate, onRemove }: Sortabl
             </div>
             
             <div className="flex-shrink-0">
-              {isExternal ? (
+              {isEmpty ? (
+                <div className="h-4 w-4 rounded bg-muted" />
+              ) : isExternal ? (
                 <ExternalLink className="h-4 w-4 text-accent" />
               ) : isInternal ? (
                 <FileText className="h-4 w-4 text-primary" />
               ) : (
-                <div className="h-4 w-4" />
+                <div className="h-4 w-4 rounded bg-orange-400" />
               )}
             </div>
 
@@ -89,11 +92,13 @@ function SortableLink({ link, index, sectionIndex, onUpdate, onRemove }: Sortabl
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">
-                  URL {isExternal && <span className="text-accent">(External)</span>}
-                  {isInternal && <span className="text-primary">(Internal)</span>}
+                  URL {isEmpty ? <span className="text-muted-foreground">(Enter URL)</span> : 
+                      isExternal ? <span className="text-accent">(External - Opens in New Tab)</span> :
+                      isInternal ? <span className="text-primary">(Internal Page - Opens in New Tab)</span> :
+                      <span className="text-orange-500">(Invalid URL)</span>}
                 </Label>
                 <Input
-                  placeholder={isExternal ? "https://example.com" : "/page-slug"}
+                  placeholder="Paste URL here (e.g., /about or https://example.com)"
                   value={link.url}
                   onChange={(e) => onUpdate(sectionIndex, index, 'url', e.target.value)}
                   className="h-8 text-sm"

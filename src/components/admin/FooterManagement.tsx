@@ -436,6 +436,11 @@ const FooterManagement: React.FC = () => {
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
+                          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <p className="text-sm text-blue-800 dark:text-blue-200">
+                              <strong>How to add links:</strong> Click "Copy Link" on any page below to copy its URL, then paste it in the footer link URL field. All footer links will open in new tabs.
+                            </p>
+                          </div>
                           <PageBrowser 
                             onPageSelect={(page) => handlePageSelect(page, index)}
                             onExternalLinkAdd={() => handleExternalLinkAdd(index)}

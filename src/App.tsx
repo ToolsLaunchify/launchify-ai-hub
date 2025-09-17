@@ -20,6 +20,7 @@ import ProductBrowserPage from "./pages/ProductBrowserPage";
 import BlogPage from "./pages/BlogPage";
 import BlogPostPage from "./pages/BlogPostPage";
 import PageContent from "./components/PageContent";
+import SmartSlugRouter from "./components/SmartSlugRouter";
 
 const queryClient = new QueryClient();
 
@@ -61,7 +62,7 @@ const App = () => (
                 <Route path="/page/:slug" element={<PageContent />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="/:slug" element={<ProductDetailPage />} />
+                <Route path="/:slug" element={<SmartSlugRouter />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

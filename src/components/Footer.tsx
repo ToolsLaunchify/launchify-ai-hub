@@ -21,37 +21,41 @@ const Footer: React.FC = () => {
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
-      subscribeNewsletter.mutate(email);
-      setEmail('');
+      try {
+        await subscribeNewsletter.mutateAsync(email);
+        setEmail('');
+      } catch (error) {
+        console.error('Newsletter subscription failed:', error);
+      }
     }
   };
 
-  // Get footer settings from site_settings
-  const footerSettings = siteSettings?.footer_settings || {
-    companyName: 'Tools Launchify',
-    description: 'Discover the latest AI tools, software launches, and digital products.',
-    email: 'hello@toolslaunchify.com',
-    socialLinks: {
-      twitter: '',
-      facebook: '',
-      linkedin: '',
-      instagram: '',
-      youtube: ''
-    },
-    sections: [],
-    showNewsletter: true,
-    copyrightText: 'All rights reserved.'
+  // Footer settings with defaults
+  const footerSettings = {
+    companyName: siteSettings.companyName || 'Tools Launchify',
+    description: siteSettings.description || 'Your ultimate directory for discovering the best AI tools and software solutions.',
+    email: siteSettings.email || 'contact@toolslaunchify.com',
+    phone: siteSettings.phone || '',
+    address: siteSettings.address || '',
+    showNewsletter: siteSettings.showNewsletter ?? true,
+    socialLinks: siteSettings.socialLinks || {},
+    sections: siteSettings.sections || [],
+    ...siteSettings
   };
 
-  const socialLinks = [
-    { icon: Twitter, href: footerSettings.socialLinks?.twitter, label: 'Twitter', show: !!footerSettings.socialLinks?.twitter },
-    { icon: Linkedin, href: footerSettings.socialLinks?.linkedin, label: 'LinkedIn', show: !!footerSettings.socialLinks?.linkedin },
-    { icon: Youtube, href: footerSettings.socialLinks?.youtube, label: 'YouTube', show: !!footerSettings.socialLinks?.youtube },
-    { icon: Mail, href: `mailto:${footerSettings.email}`, label: 'Email', show: !!footerSettings.email },
-  ].filter(link => link.show);
+  // Debug logs
+  console.log('Footer - footerSettings:', footerSettings);
+  console.log('Footer - pages available:', pages?.length || 0);
+  console.log('Footer - sections:', footerSettings.sections?.length || 0);
 
+  // Create social links array
+  const socialLinks = Object.entries(footerSettings.socialLinks || {})
+    .filter(([_, url]) => url && typeof url === 'string' && url.trim() !== '')
+    .map(([platform, url]) => ({ platform, url: url as string }));
+
+  // Filter pages for company info (common pages)
   const companyPages = pages.filter(page => 
-    ['about', 'contact', 'privacy', 'terms'].includes(page.slug)
+    ['about', 'contact', 'privacy', 'terms', 'careers', 'help', 'faq'].includes(page.slug)
   );
 
   const topCategories = categories.slice(0, 6);
@@ -68,11 +72,8 @@ const Footer: React.FC = () => {
           {/* Brand Section */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="relative">
-                <img src={logo} alt="Tools Launchify" className="h-10 w-10" />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 rounded-full blur-md opacity-50" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <img src={logo} alt="Tools Launchify" className="h-10 w-10" />
+              <span className="font-bold text-2xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 {footerSettings.companyName}
               </span>
             </div>
@@ -85,61 +86,74 @@ const Footer: React.FC = () => {
             {footerSettings.showNewsletter && (
               <div className="space-y-4">
                 <h4 className="font-semibold text-lg">Stay Updated</h4>
-                <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3">
-                  <div className="relative flex-1">
-                    <Input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="bg-background/80 backdrop-blur-sm border-border/50 rounded-xl focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary/50 transition-all"
-                      disabled={subscribeNewsletter.isPending}
-                    />
-                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 focus-within:opacity-100 transition-opacity pointer-events-none" />
-                  </div>
+                <form onSubmit={handleNewsletterSubmit} className="flex gap-3">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="flex-1"
+                    required
+                  />
                   <Button 
                     type="submit" 
-                    className="shrink-0 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-xl px-6 py-2 transition-all hover:shadow-lg hover:shadow-primary/25"
                     disabled={subscribeNewsletter.isPending}
+                    className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
                   >
                     <Rocket className="h-4 w-4 mr-2" />
-                    {subscribeNewsletter.isPending ? 'Subscribing...' : 'Subscribe'}
+                    Subscribe
                   </Button>
                 </form>
               </div>
             )}
             
             {/* Social Links */}
-            <div className="flex space-x-3">
-              {socialLinks.map((social) => (
-                <Button
-                  key={social.label}
-                  variant="ghost"
-                  size="icon"
-                  asChild
-                  className="h-10 w-10 rounded-xl bg-muted/30 hover:bg-muted/60 hover:text-primary transition-all hover:scale-105"
-                >
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
+            {socialLinks.length > 0 && (
+              <div className="flex space-x-4">
+                {socialLinks.map(({ platform, url }) => (
+                  <Button
+                    key={platform}
+                    variant="outline"
+                    size="icon"
+                    asChild
+                    className="hover:bg-primary/10 hover:border-primary/30 transition-colors"
                   >
-                    <social.icon className="h-4 w-4" />
-                  </a>
-                </Button>
-              ))}
-            </div>
+                    <a href={url} target="_blank" rel="noopener noreferrer">
+                      {platform === 'twitter' && <Twitter className="h-4 w-4" />}
+                      {platform === 'github' && <Github className="h-4 w-4" />}
+                      {platform === 'linkedin' && <Linkedin className="h-4 w-4" />}
+                      {platform === 'youtube' && <Youtube className="h-4 w-4" />}
+                      {platform === 'email' && <Mail className="h-4 w-4" />}
+                    </a>
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
+          
+          {/* Show message if no sections configured */}
+          {(!footerSettings.sections || footerSettings.sections.length === 0) && (
+            <div className="lg:col-span-3 space-y-6">
+              <div className="text-center p-8 border-2 border-dashed border-primary/20 rounded-lg">
+                <p className="text-muted-foreground">
+                  <strong>No footer sections configured.</strong><br />
+                  Go to Admin Dashboard → Footer Management to add links to pages, categories, tool types, blog posts, and products.
+                </p>
+              </div>
+            </div>
+          )}
           
           {/* Dynamic Footer Sections */}
           {footerSettings.sections?.map((section, index) => (
             <div key={index} className="space-y-6">
               <h4 className="font-semibold text-lg">{section.title}</h4>
               <ul className="space-y-3">
-                {section.links?.map((link, linkIndex) => (
-                  <li key={linkIndex}>
-                    {link.external ? (
+                {section.links?.map((link, linkIndex) => {
+                  // Determine if link is external based on URL pattern
+                  const isExternal = (link.url as string).startsWith('http') || (link.url as string).startsWith('https') || (link.url as string).startsWith('mailto');
+                  
+                  return (
+                    <li key={linkIndex}>
                       <a
                         href={link.url}
                         target="_blank"
@@ -149,19 +163,9 @@ const Footer: React.FC = () => {
                         {link.text}
                         <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </a>
-                    ) : (
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2"
-                      >
-                        {link.text}
-                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
-                    )}
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -198,13 +202,13 @@ const Footer: React.FC = () => {
         
         {/* Bottom Section */}
         <div className="border-t border-border/40 mt-16 pt-8">
-          <div className="flex flex-col items-center text-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-muted-foreground text-sm">
-              © {currentYear} {footerSettings.companyName}. {footerSettings.copyrightText}
+              © {currentYear} {footerSettings.companyName}. All rights reserved.
             </p>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <span>Made with ❤️ for the tech community</span>
-            </div>
+            <p className="text-muted-foreground text-sm">
+              Made with ❤️ for the AI community
+            </p>
           </div>
         </div>
       </div>

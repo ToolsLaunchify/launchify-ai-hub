@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const PageContent: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  console.log('PageContent - Loading page with slug:', slug);
   const { data: page, isLoading, error } = usePageBySlug(slug || '');
 
   if (isLoading) {

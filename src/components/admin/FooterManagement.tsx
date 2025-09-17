@@ -28,7 +28,7 @@ import { Save, Settings2, Plus, GripVertical, Sparkles, Layout } from 'lucide-re
 import { useSiteSettings, useUpdateSiteSettings } from '@/hooks/useSiteSettings';
 import { useToast } from '@/hooks/use-toast';
 import { DraggableFooterSection } from './DraggableFooterSection';
-import { PageBrowser } from './PageBrowser';
+import { ContentBrowser } from './ContentBrowser';
 
 interface FooterLink {
   text: string;
@@ -441,8 +441,8 @@ const FooterManagement: React.FC = () => {
                               <strong>How to add links:</strong> Click "Copy Link" on any page below to copy its URL, then paste it in the footer link URL field. All footer links will open in new tabs.
                             </p>
                           </div>
-                          <PageBrowser 
-                            onPageSelect={(page) => handlePageSelect(page, index)}
+                          <ContentBrowser 
+                            onContentSelect={(content) => handlePageSelect(content, index)}
                             onExternalLinkAdd={() => handleExternalLinkAdd(index)}
                           />
                         </CardContent>

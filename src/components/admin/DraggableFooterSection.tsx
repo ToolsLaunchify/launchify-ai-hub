@@ -203,6 +203,10 @@ export const DraggableFooterSection: React.FC<DraggableFooterSectionProps> = ({
                 />
               ))}
             </div>
+            
+            <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted/50 rounded">
+              💡 Tip: Click "Browse Content" to find pages, categories, tool types, blog posts, and products. Copy any link and paste it here!
+            </div>
           </SortableContext>
         </DndContext>
 

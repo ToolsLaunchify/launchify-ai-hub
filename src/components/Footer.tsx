@@ -185,7 +185,7 @@ const Footer: React.FC = () => {
                 </li>
                 {companyPages.slice(0, 2).map((page) => (
                   <li key={page.id}>
-                    <a href={`/page/${page.slug}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2">
+                    <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors group flex items-center gap-2">
                       {page.title}
                       <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </a>

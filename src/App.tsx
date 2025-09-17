@@ -19,6 +19,7 @@ import SearchPage from "./pages/SearchPage";
 import ProductBrowserPage from "./pages/ProductBrowserPage";
 import BlogPage from "./pages/BlogPage";
 import BlogPostPage from "./pages/BlogPostPage";
+import PageContent from "./components/PageContent";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,19 @@ const App = () => (
                 <Route path="/saved" element={<SavedProductsPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
+                
+                {/* Common pages - add more as needed */}
+                <Route path="/about" element={<PageContent />} />
+                <Route path="/contact" element={<PageContent />} />
+                <Route path="/privacy" element={<PageContent />} />
+                <Route path="/terms" element={<PageContent />} />
+                <Route path="/careers" element={<PageContent />} />
+                <Route path="/help" element={<PageContent />} />
+                <Route path="/faq" element={<PageContent />} />
+                
+                {/* Dynamic page route for any other pages */}
+                <Route path="/page/:slug" element={<PageContent />} />
+                
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="/:slug" element={<ProductDetailPage />} />
                 <Route path="*" element={<NotFound />} />

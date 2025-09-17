@@ -30,16 +30,16 @@ const Footer: React.FC = () => {
     }
   };
 
-  // Footer settings with defaults
+  // Footer settings with defaults - handle nested footer_settings structure
   const footerSettings = {
-    companyName: siteSettings.companyName || 'Tools Launchify',
-    description: siteSettings.description || 'Your ultimate directory for discovering the best AI tools and software solutions.',
-    email: siteSettings.email || 'contact@toolslaunchify.com',
-    phone: siteSettings.phone || '',
-    address: siteSettings.address || '',
-    showNewsletter: siteSettings.showNewsletter ?? true,
-    socialLinks: siteSettings.socialLinks || {},
-    sections: siteSettings.sections || [],
+    companyName: siteSettings.companyName || siteSettings.footer_settings?.companyName || 'Tools Launchify',
+    description: siteSettings.description || siteSettings.footer_settings?.description || 'Your ultimate directory for discovering the best AI tools and software solutions.',
+    email: siteSettings.email || siteSettings.footer_settings?.email || 'contact@toolslaunchify.com',
+    phone: siteSettings.phone || siteSettings.footer_settings?.phone || '',
+    address: siteSettings.address || siteSettings.footer_settings?.address || '',
+    showNewsletter: siteSettings.showNewsletter ?? siteSettings.footer_settings?.showNewsletter ?? true,
+    socialLinks: siteSettings.socialLinks || siteSettings.footer_settings?.socialLinks || siteSettings.social_media || {},
+    sections: siteSettings.sections || siteSettings.footer_settings?.sections || [],
     ...siteSettings
   };
 
@@ -170,8 +170,8 @@ const Footer: React.FC = () => {
             </div>
           ))}
           
-          {/* Browse/Resources - Always show as fallback */}
-          {(!footerSettings.sections || footerSettings.sections.length < 2) && (
+          {/* Browse/Resources - Show only if no sections or very few sections */}
+          {(!footerSettings.sections || footerSettings.sections.length === 0) && (
             <div className="space-y-6">
               <h4 className="font-semibold text-lg">Browse</h4>
               <ul className="space-y-3">

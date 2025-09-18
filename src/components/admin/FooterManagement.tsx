@@ -122,23 +122,26 @@ const SECTION_TEMPLATES = [
     links: [
       { text: 'About Us', url: '/about' },
       { text: 'Contact', url: '/contact' },
-      { text: 'Careers', url: '/careers' }
+      { text: 'Privacy Policy', url: '/privacy' },
+      { text: 'Terms & Conditions', url: '/terms' }
     ]
   },
   {
     title: 'Tool Types',
     links: [
-      { text: 'All Tools', url: '/browse' },
-      { text: 'Free Tools', url: '/type/free' },
-      { text: 'Premium Tools', url: '/type/premium' }
+      { text: 'AI Tools', url: '/type/ai-tools' },
+      { text: 'Software', url: '/type/software' },
+      { text: 'Free Tools', url: '/type/free-tools' },
+      { text: 'Digital Products', url: '/type/digital-products' }
     ]
   },
   {
     title: 'Categories',
     links: [
-      { text: 'Browse Categories', url: '/browse' },
-      { text: 'Popular Categories', url: '/browse' },
-      { text: 'New Categories', url: '/browse' }
+      { text: 'Vibe Coding Tools', url: '/category/vibe-coding-tools' },
+      { text: 'Developer Tools', url: '/category/developer-tools' },
+      { text: 'Productivity Apps', url: '/category/productivity-apps' },
+      { text: 'Marketing Tools', url: '/category/marketing-tools' }
     ]
   }
 ];

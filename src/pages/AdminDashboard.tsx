@@ -310,9 +310,21 @@ const AdminDashboard: React.FC = () => {
           </TabsContent>
 
           {/* Analytics Tab */}
-          <TabsContent value="analytics">
-            <AdvancedAnalyticsDashboard />
-          </TabsContent>
+        <TabsContent value="tools">
+          <ToolsManagement />
+        </TabsContent>
+        
+        <TabsContent value="sub-categories">
+          <SubCategoryManagement />
+        </TabsContent>
+        
+        <TabsContent value="orders">
+          <OrdersManagement />
+        </TabsContent>
+        
+        <TabsContent value="analytics">
+          <AdvancedAnalyticsDashboard />
+        </TabsContent>
         </Tabs>
       </div>
     </div>

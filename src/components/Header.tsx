@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
   const productTypes = [
     { name: 'AI Tools', href: '/type/ai-tools', description: 'Artificial Intelligence powered tools' },
     { name: 'Software', href: '/type/software', description: 'Desktop and web applications' },
-    { name: 'Free Tools', href: '/type/free-tools', description: 'Completely free resources' },
+    { name: 'Free Tools', href: '/tools', description: 'Free online calculators and utilities' },
     { name: 'Digital Products', href: '/type/digital-products', description: 'Courses, templates, and digital assets' },
   ];
 
@@ -143,6 +143,17 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                 }`}
               >
                 Software
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/tools"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
+                  isActive('/tools') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                Tools
               </Link>
             </NavigationMenuItem>
 

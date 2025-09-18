@@ -21,6 +21,9 @@ import BlogPage from "./pages/BlogPage";
 import BlogPostPage from "./pages/BlogPostPage";
 import PageContent from "./components/PageContent";
 import SmartSlugRouter from "./components/SmartSlugRouter";
+import ToolsPage from "./pages/ToolsPage";
+import PercentageCalculator from "./components/tools/PercentageCalculator";
+import BMICalculator from "./components/tools/BMICalculator";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +51,11 @@ const App = () => (
                 <Route path="/saved" element={<SavedProductsPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
+                
+                {/* Tools Routes */}
+                <Route path="/tools" element={<ToolsPage />} />
+                <Route path="/tools/percentage-calculator" element={<PercentageCalculator />} />
+                <Route path="/tools/bmi-calculator" element={<BMICalculator />} />
                 
                 {/* Dynamic page route for any other pages */}
                 <Route path="/page/:slug" element={<PageContent />} />

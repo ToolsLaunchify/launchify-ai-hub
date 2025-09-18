@@ -341,6 +341,56 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          id: string
+          payment_status: string | null
+          product_id: string | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_status?: string | null
+          product_id?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_status?: string | null
+          product_id?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pages: {
         Row: {
           content: string | null
@@ -379,6 +429,7 @@ export type Database = {
       }
       products: {
         Row: {
+          adsense_config: Json | null
           affiliate_link: string | null
           alt_text: string | null
           canonical_url: string | null
@@ -399,6 +450,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_editors_choice: boolean | null
+          is_embedded_tool: boolean | null
           is_featured: boolean | null
           is_free: boolean | null
           is_newly_launched: boolean | null
@@ -413,6 +465,8 @@ export type Database = {
           payment_link: string | null
           product_tags: string[] | null
           product_type: string | null
+          purchase_price: number | null
+          razorpay_plan_id: string | null
           related_keywords: string[] | null
           revenue_type: Database["public"]["Enums"]["revenue_type"] | null
           rich_description: string | null
@@ -423,12 +477,17 @@ export type Database = {
           social_description: string | null
           social_title: string | null
           structured_data_type: string | null
+          sub_category_id: string | null
+          tool_config: Json | null
+          tool_type: string | null
+          tool_url: string | null
           twitter_image_url: string | null
           updated_at: string
           video_courses: Json | null
           views_count: number | null
         }
         Insert: {
+          adsense_config?: Json | null
           affiliate_link?: string | null
           alt_text?: string | null
           canonical_url?: string | null
@@ -449,6 +508,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_editors_choice?: boolean | null
+          is_embedded_tool?: boolean | null
           is_featured?: boolean | null
           is_free?: boolean | null
           is_newly_launched?: boolean | null
@@ -463,6 +523,8 @@ export type Database = {
           payment_link?: string | null
           product_tags?: string[] | null
           product_type?: string | null
+          purchase_price?: number | null
+          razorpay_plan_id?: string | null
           related_keywords?: string[] | null
           revenue_type?: Database["public"]["Enums"]["revenue_type"] | null
           rich_description?: string | null
@@ -473,12 +535,17 @@ export type Database = {
           social_description?: string | null
           social_title?: string | null
           structured_data_type?: string | null
+          sub_category_id?: string | null
+          tool_config?: Json | null
+          tool_type?: string | null
+          tool_url?: string | null
           twitter_image_url?: string | null
           updated_at?: string
           video_courses?: Json | null
           views_count?: number | null
         }
         Update: {
+          adsense_config?: Json | null
           affiliate_link?: string | null
           alt_text?: string | null
           canonical_url?: string | null
@@ -499,6 +566,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_editors_choice?: boolean | null
+          is_embedded_tool?: boolean | null
           is_featured?: boolean | null
           is_free?: boolean | null
           is_newly_launched?: boolean | null
@@ -513,6 +581,8 @@ export type Database = {
           payment_link?: string | null
           product_tags?: string[] | null
           product_type?: string | null
+          purchase_price?: number | null
+          razorpay_plan_id?: string | null
           related_keywords?: string[] | null
           revenue_type?: Database["public"]["Enums"]["revenue_type"] | null
           rich_description?: string | null
@@ -523,6 +593,10 @@ export type Database = {
           social_description?: string | null
           social_title?: string | null
           structured_data_type?: string | null
+          sub_category_id?: string | null
+          tool_config?: Json | null
+          tool_type?: string | null
+          tool_url?: string | null
           twitter_image_url?: string | null
           updated_at?: string
           video_courses?: Json | null
@@ -534,6 +608,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_sub_category_id_fkey"
+            columns: ["sub_category_id"]
+            isOneToOne: false
+            referencedRelation: "sub_categories"
             referencedColumns: ["id"]
           },
         ]
@@ -564,6 +645,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      sub_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          parent_category_id: string | null
+          slug: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          parent_category_id?: string | null
+          slug: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          parent_category_id?: string | null
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sub_categories_parent_category_id_fkey"
+            columns: ["parent_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -640,7 +765,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
-      revenue_type: "affiliate" | "payment" | "free"
+      revenue_type: "affiliate" | "payment" | "free" | "paid"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -769,7 +894,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      revenue_type: ["affiliate", "payment", "free"],
+      revenue_type: ["affiliate", "payment", "free", "paid"],
     },
   },
 } as const

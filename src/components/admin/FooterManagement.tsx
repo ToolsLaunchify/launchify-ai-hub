@@ -126,19 +126,19 @@ const SECTION_TEMPLATES = [
     ]
   },
   {
-    title: 'Legal',
+    title: 'Tool Types',
     links: [
-      { text: 'Privacy Policy', url: '/privacy' },
-      { text: 'Terms of Service', url: '/terms' },
-      { text: 'Cookie Policy', url: '/cookies' }
+      { text: 'All Tools', url: '/browse' },
+      { text: 'Free Tools', url: '/type/free' },
+      { text: 'Premium Tools', url: '/type/premium' }
     ]
   },
   {
-    title: 'Support',
+    title: 'Categories',
     links: [
-      { text: 'Help Center', url: '/help' },
-      { text: 'FAQ', url: '/faq' },
-      { text: 'Contact Support', url: '/support' }
+      { text: 'Browse Categories', url: '/browse' },
+      { text: 'Popular Categories', url: '/browse' },
+      { text: 'New Categories', url: '/browse' }
     ]
   }
 ];

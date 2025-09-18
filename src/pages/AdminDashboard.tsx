@@ -19,7 +19,10 @@ import {
   Bookmark,
   Mail,
   BookOpen,
-  Settings2
+  Settings2,
+  Wrench,
+  Layers,
+  ShoppingCart
 } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CategoriesManagement from '@/components/admin/CategoriesManagement';
@@ -97,7 +100,7 @@ const AdminDashboard: React.FC = () => {
 
         {/* Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-10 mb-8 bg-muted/50 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-13 mb-8 bg-muted/50 p-1 rounded-lg">
             <TabsTrigger 
               value="overview" 
               className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
@@ -167,6 +170,27 @@ const AdminDashboard: React.FC = () => {
             >
               <BarChart3 className="h-4 w-4" />
               Analytics
+            </TabsTrigger>
+            <TabsTrigger 
+              value="tools" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <Wrench className="h-4 w-4" />
+              Tools
+            </TabsTrigger>
+            <TabsTrigger 
+              value="sub-categories" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <Layers className="h-4 w-4" />
+              Sub-Categories
+            </TabsTrigger>
+            <TabsTrigger 
+              value="orders" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              Orders
             </TabsTrigger>
           </TabsList>
 
@@ -312,22 +336,25 @@ const AdminDashboard: React.FC = () => {
             <NewsletterManagement />
           </TabsContent>
 
+          {/* Tools Tab */}
+          <TabsContent value="tools">
+            <ToolsManagement />
+          </TabsContent>
+          
+          {/* Sub-Categories Tab */}
+          <TabsContent value="sub-categories">
+            <SubCategoryManagement />
+          </TabsContent>
+          
+          {/* Orders Tab */}
+          <TabsContent value="orders">
+            <OrdersManagement />
+          </TabsContent>
+          
           {/* Analytics Tab */}
-        <TabsContent value="tools">
-          <ToolsManagement />
-        </TabsContent>
-        
-        <TabsContent value="sub-categories">
-          <SubCategoryManagement />
-        </TabsContent>
-        
-        <TabsContent value="orders">
-          <OrdersManagement />
-        </TabsContent>
-        
-        <TabsContent value="analytics">
-          <AdvancedAnalyticsDashboard />
-        </TabsContent>
+          <TabsContent value="analytics">
+            <AdvancedAnalyticsDashboard />
+          </TabsContent>
         </Tabs>
       </div>
     </div>

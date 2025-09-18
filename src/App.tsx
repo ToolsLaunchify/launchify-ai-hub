@@ -49,15 +49,6 @@ const App = () => (
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
                 
-                {/* Common pages - add more as needed */}
-                <Route path="/about" element={<PageContent />} />
-                <Route path="/contact" element={<PageContent />} />
-                <Route path="/privacy" element={<PageContent />} />
-                <Route path="/terms-conditions" element={<PageContent />} />
-                <Route path="/careers" element={<PageContent />} />
-                <Route path="/help" element={<PageContent />} />
-                <Route path="/faq" element={<PageContent />} />
-                
                 {/* Dynamic page route for any other pages */}
                 <Route path="/page/:slug" element={<PageContent />} />
                 

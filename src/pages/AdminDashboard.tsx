@@ -29,6 +29,7 @@ import BlogManagement from '@/components/admin/BlogManagement';
 import FooterManagement from '@/components/admin/FooterManagement';
 import { AdvancedAnalyticsDashboard } from '@/components/admin/AdvancedAnalyticsDashboard';
 import { LeadsManagement } from '@/components/admin/LeadsManagement';
+import NewsletterManagement from '@/components/admin/NewsletterManagement';
 import { useRealAdminStats } from '@/hooks/useRealAdminStats';
 
 const AdminDashboard: React.FC = () => {
@@ -93,7 +94,7 @@ const AdminDashboard: React.FC = () => {
 
         {/* Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-9 mb-8 bg-muted/50 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-10 mb-8 bg-muted/50 p-1 rounded-lg">
             <TabsTrigger 
               value="overview" 
               className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
@@ -149,6 +150,13 @@ const AdminDashboard: React.FC = () => {
             >
               <Mail className="h-4 w-4" />
               Leads
+            </TabsTrigger>
+            <TabsTrigger 
+              value="newsletter" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <Mail className="h-4 w-4" />
+              Newsletter
             </TabsTrigger>
             <TabsTrigger 
               value="analytics" 
@@ -294,6 +302,11 @@ const AdminDashboard: React.FC = () => {
           {/* Leads Tab */}
           <TabsContent value="leads">
             <LeadsManagement />
+          </TabsContent>
+
+          {/* Newsletter Tab */}
+          <TabsContent value="newsletter">
+            <NewsletterManagement />
           </TabsContent>
 
           {/* Analytics Tab */}

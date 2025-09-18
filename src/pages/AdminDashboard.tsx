@@ -30,6 +30,9 @@ import FooterManagement from '@/components/admin/FooterManagement';
 import { AdvancedAnalyticsDashboard } from '@/components/admin/AdvancedAnalyticsDashboard';
 import { LeadsManagement } from '@/components/admin/LeadsManagement';
 import NewsletterManagement from '@/components/admin/NewsletterManagement';
+import ToolsManagement from '@/components/admin/ToolsManagement';
+import SubCategoryManagement from '@/components/admin/SubCategoryManagement';
+import OrdersManagement from '@/components/admin/OrdersManagement';
 import { useRealAdminStats } from '@/hooks/useRealAdminStats';
 
 const AdminDashboard: React.FC = () => {

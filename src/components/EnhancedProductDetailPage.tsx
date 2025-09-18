@@ -57,7 +57,7 @@ interface Product {
   image_url: string | null;
   category_id: string | null;
   product_type: string | null;
-  revenue_type?: 'affiliate' | 'payment' | 'free' | 'mixed' | null;
+  revenue_type?: 'affiliate' | 'payment' | 'free' | 'paid' | null;
   is_free: boolean | null;
   is_featured: boolean | null;
   is_newly_launched: boolean | null;
@@ -298,8 +298,8 @@ const EnhancedProductDetailPage: React.FC = () => {
     } else if (product.revenue_type === 'payment' && product.payment_link) {
       targetUrl = product.payment_link;
       clickType = 'payment';
-    } else if (product.revenue_type === 'mixed') {
-      // For mixed type, prioritize affiliate link if available, then payment link
+    } else if (product.revenue_type === 'paid') {
+      // For paid type, prioritize affiliate link if available, then payment link
       if (product.affiliate_link) {
         targetUrl = product.affiliate_link;
         clickType = 'affiliate';

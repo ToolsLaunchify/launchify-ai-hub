@@ -13,9 +13,11 @@ import {
   Users,
   TrendingUp,
   Target,
-  Filter
+  Filter,
+  Trash2
 } from 'lucide-react';
-import { useLeads, useLeadsStats, Lead } from '@/hooks/useLeads';
+import { useLeads, useLeadsStats, useDeleteLead, Lead } from '@/hooks/useLeads';
+import { useNewsletterSubscribers, NewsletterSubscriber } from '@/hooks/useNewsletter';
 import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SourceAnalyticsDashboard } from './SourceAnalyticsDashboard';
@@ -27,11 +29,24 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
 export const LeadsManagement: React.FC = () => {
   const { data: leads, isLoading: leadsLoading } = useLeads();
   const { data: stats, isLoading: statsLoading } = useLeadsStats();
+  const { data: newsletterSubscribers, isLoading: newsletterLoading } = useNewsletterSubscribers();
+  const deleteLead = useDeleteLead();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterProduct, setFilterProduct] = useState('');
 
@@ -112,6 +127,7 @@ export const LeadsManagement: React.FC = () => {
     <Tabs defaultValue="leads" className="space-y-6">
       <TabsList>
         <TabsTrigger value="leads">Collected Leads</TabsTrigger>
+        <TabsTrigger value="newsletter">Newsletter Subscribers</TabsTrigger>
         <TabsTrigger value="analytics">Source Analytics</TabsTrigger>
       </TabsList>
 
@@ -251,6 +267,7 @@ export const LeadsManagement: React.FC = () => {
                 <TableHead>Purchase Status</TableHead>
                 <TableHead>Revenue</TableHead>
                 <TableHead>Date (IST)</TableHead>
+                <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -294,6 +311,32 @@ export const LeadsManagement: React.FC = () => {
                       <TableCell>
                         <span className="text-sm">{lead.formatted_created_at}</span>
                       </TableCell>
+                      <TableCell>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Lead</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete this lead? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteLead.mutate(lead.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -302,6 +345,67 @@ export const LeadsManagement: React.FC = () => {
           )}
         </CardContent>
       </Card>
+      </TabsContent>
+
+      <TabsContent value="newsletter" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Newsletter Subscribers</CardTitle>
+            <CardDescription>
+              Manage email subscribers from footer newsletter signup
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {newsletterLoading ? (
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} className="h-12 w-full" />
+                ))}
+              </div>
+            ) : !newsletterSubscribers || newsletterSubscribers.length === 0 ? (
+              <div className="text-center py-8">
+                <Mail className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-2 text-sm font-semibold">No newsletter subscribers</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Newsletter subscriptions will appear here
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Subscribed Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {newsletterSubscribers.map((subscriber) => (
+                      <TableRow key={subscriber.id}>
+                        <TableCell className="font-medium">{subscriber.email}</TableCell>
+                        <TableCell>
+                          <Badge variant={subscriber.status === 'active' ? 'default' : 'secondary'}>
+                            {subscriber.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{subscriber.source}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm">
+                            {format(new Date(subscriber.subscribed_at), 'MMM dd, yyyy hh:mm:ss a')}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </TabsContent>
 
       <TabsContent value="analytics">

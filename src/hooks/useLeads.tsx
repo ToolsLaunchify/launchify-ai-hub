@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatInTimeZone } from 'date-fns-tz';
+import { useToast } from '@/hooks/use-toast';
 
 export interface Lead {
   id: string;
@@ -188,5 +189,36 @@ export const useLeadsStats = () => {
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
     refetchOnWindowFocus: false,
+  });
+};
+
+export const useDeleteLead = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('leads')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+      queryClient.invalidateQueries({ queryKey: ['leads-stats'] });
+      toast({
+        title: 'Lead deleted',
+        description: 'The lead has been successfully deleted.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Delete failed',
+        description: error.message || 'Failed to delete lead. Please try again.',
+        variant: 'destructive',
+      });
+    },
   });
 };

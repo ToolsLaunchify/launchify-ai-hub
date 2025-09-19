@@ -89,10 +89,10 @@ const ModernHomepage: React.FC = () => {
     }
   ] : [];
 
-  // For free tools, only show static tools. For other types, combine with database products
+  // Handle different product types
   const products = activeToolType === 'free_tools' 
     ? staticFreeTools 
-    : [...staticFreeTools, ...databaseProducts];
+    : databaseProducts;
 
   // Reset category when tool type changes
   useEffect(() => {
@@ -177,14 +177,16 @@ const ModernHomepage: React.FC = () => {
         isLoading={statsLoading}
       />
 
-      {/* Category Sub-tabs */}
-      <CategorySubTabs
-        categories={categories}
-        activeCategory={activeCategory}
-        onCategorySelect={handleCategorySelect}
-        isLoading={categoriesLoading}
-        toolType={getToolTypeDisplayName(activeToolType)}
-      />
+      {/* Category Sub-tabs - Only show if there are categories for this tool type */}
+      {categories.length > 0 && (
+        <CategorySubTabs
+          categories={categories}
+          activeCategory={activeCategory}
+          onCategorySelect={handleCategorySelect}
+          isLoading={categoriesLoading}
+          toolType={getToolTypeDisplayName(activeToolType)}
+        />
+      )}
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">

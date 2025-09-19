@@ -13,45 +13,52 @@ export const useProductStats = () => {
   return useQuery({
     queryKey: ['product-stats'],
     queryFn: async (): Promise<ProductStats> => {
-      // Get all products to count by type accurately
+      // Get all products with their types and pricing info
       const { data: productData, error: productError } = await supabase
         .from('products')
-        .select('product_type');
+        .select('product_type, original_price, discounted_price, purchase_price');
 
       if (productError) throw productError;
 
-      // Count products by type, but handle free_tools specially
-      const dbStats = (productData || []).reduce((acc, product) => {
-        const type = product.product_type || 'software';
-        if (type !== 'free_tools') {
-          acc[type as keyof Omit<ProductStats, 'total' | 'free_tools'>] = (acc[type as keyof Omit<ProductStats, 'total' | 'free_tools'>] || 0) + 1;
-          acc.total += 1;
-        }
-        return acc;
-      }, {
+      // Initialize stats
+      const stats = {
         ai_tools: 0,
         software: 0,
-        free_tools: 0,
+        free_tools: 2, // Only the 2 static tools (BMI and Percentage calculators)
         paid_tools: 0,
-        total: 0
-      } as ProductStats);
+        total: 2 // Start with 2 for the static free tools
+      } as ProductStats;
 
-      // For free_tools, count only the 2 static tools (BMI Calculator and Percentage Calculator)
-      // as these are the only ones shown in ModernHomepage for free_tools type
-      dbStats.free_tools = 2;
-      dbStats.total += 2;
+      // Count database products
+      (productData || []).forEach(product => {
+        const type = product.product_type || 'software';
+        
+        // Skip free_tools from database as we only show static tools for this type
+        if (type === 'free_tools') return;
+        
+        // Count by product type
+        if (type === 'ai_tools') {
+          stats.ai_tools += 1;
+        } else if (type === 'software') {
+          stats.software += 1;
+        } else if (type === 'digital_products') {
+          // Digital products count as software in the UI
+          stats.software += 1;
+        }
+        
+        // Count paid tools (products with any price > 0)
+        const hasPricing = (product.original_price && product.original_price > 0) ||
+                          (product.discounted_price && product.discounted_price > 0) ||
+                          (product.purchase_price && product.purchase_price > 0);
+        
+        if (hasPricing) {
+          stats.paid_tools += 1;
+        }
+        
+        stats.total += 1;
+      });
 
-      // Handle paid_tools by counting products with prices
-      const { data: paidProducts, error: paidError } = await supabase
-        .from('products')
-        .select('original_price, discounted_price, purchase_price')
-        .or('original_price.gt.0,discounted_price.gt.0,purchase_price.gt.0');
-
-      if (!paidError && paidProducts) {
-        dbStats.paid_tools = paidProducts.length;
-      }
-
-      return dbStats;
+      return stats;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,

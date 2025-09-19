@@ -39,44 +39,8 @@ export const useCategoriesByProductType = (productType: string) => {
         return [];
       }
 
-      // Handle paid_tools by finding categories with products that have prices
-      if (productType === 'paid_tools') {
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('categories')
-          .select(`
-            id,
-            name,
-            slug,
-            description,
-            icon,
-            sort_order,
-            parent_id
-          `)
-          .is('parent_id', null)
-          .order('sort_order', { ascending: true });
-
-        if (categoriesError) throw categoriesError;
-
-        const categoriesWithCounts = await Promise.all(
-          (categoriesData || []).map(async (category) => {
-            const { count } = await supabase
-              .from('products')
-              .select('*', { count: 'exact', head: true })
-              .eq('category_id', category.id)
-              .or('original_price.gt.0,discounted_price.gt.0,purchase_price.gt.0');
-
-            return {
-              ...category,
-              product_count: count || 0
-            };
-          })
-        );
-
-        return categoriesWithCounts.filter(cat => cat.product_count > 0);
-      }
-
-      // For ai_tools and software, get categories that have products of the specified type
-      const { data, error } = await supabase
+      // Get all top-level categories
+      const { data: categoriesData, error: categoriesError } = await supabase
         .from('categories')
         .select(`
           id,
@@ -90,25 +54,47 @@ export const useCategoriesByProductType = (productType: string) => {
         .is('parent_id', null)
         .order('sort_order', { ascending: true });
 
-      if (error) throw error;
+      if (categoriesError) throw categoriesError;
 
-      // Get product counts for each category with this product type
+      // For each category, count products based on the product type
       const categoriesWithCounts = await Promise.all(
-        (data || []).map(async (category) => {
-          const { count } = await supabase
-            .from('products')
-            .select('*', { count: 'exact', head: true })
-            .eq('category_id', category.id)
-            .eq('product_type', productType);
+        (categoriesData || []).map(async (category) => {
+          let count = 0;
+
+          if (productType === 'paid_tools') {
+            // For paid tools, count products with any pricing from any product type
+            const { count: paidCount } = await supabase
+              .from('products')
+              .select('*', { count: 'exact', head: true })
+              .eq('category_id', category.id)
+              .or('original_price.gt.0,discounted_price.gt.0,purchase_price.gt.0');
+            count = paidCount || 0;
+          } else if (productType === 'software') {
+            // Software includes both 'software' and 'digital_products' types
+            const { count: softwareCount } = await supabase
+              .from('products')
+              .select('*', { count: 'exact', head: true })
+              .eq('category_id', category.id)
+              .in('product_type', ['software', 'digital_products']);
+            count = softwareCount || 0;
+          } else if (productType === 'ai_tools') {
+            // AI tools only includes 'ai_tools' type
+            const { count: aiCount } = await supabase
+              .from('products')
+              .select('*', { count: 'exact', head: true })
+              .eq('category_id', category.id)
+              .eq('product_type', 'ai_tools');
+            count = aiCount || 0;
+          }
 
           return {
             ...category,
-            product_count: count || 0
+            product_count: count
           };
         })
       );
 
-      // Filter out categories with no products and return
+      // Only return categories that have products for this type
       return categoriesWithCounts.filter(cat => cat.product_count > 0);
     },
     enabled: !!productType,

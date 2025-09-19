@@ -39,56 +39,64 @@ const CategorySubTabs: React.FC<CategorySubTabsProps> = ({
   }
 
   return (
-    <div className="bg-muted/30 border-b border-border shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center space-x-2 py-3 overflow-x-auto scrollbar-hide">
-          {/* All Categories Button */}
+    <div className="bg-card/50 border-y border-border/60 shadow-elegant backdrop-blur-sm">
+      <div className="container mx-auto px-4 py-4">
+        {/* All Categories Button - Always First */}
+        <div className="mb-3">
           <Button
             variant={activeCategory === null ? "default" : "outline"}
             size="sm"
             onClick={() => onCategorySelect(null)}
-            className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all border ${
+            className={`rounded-full px-6 py-2.5 text-sm font-medium transition-all border-2 ${
               activeCategory === null
-                ? 'bg-gradient-primary text-white shadow-glow border-primary/20'
-                : 'bg-background text-foreground hover:bg-card hover:border-primary/20 border-border'
+                ? 'bg-gradient-primary text-white shadow-glow border-primary/30 hover:shadow-accent-glow'
+                : 'bg-card/80 text-foreground hover:bg-primary/5 hover:border-primary/40 border-border/60 hover:text-primary'
             }`}
           >
             All Categories
             <Badge 
               variant="secondary" 
-              className={`ml-2 text-xs ${
-                activeCategory === null ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
+              className={`ml-2 text-xs font-medium ${
+                activeCategory === null 
+                  ? 'bg-white/25 text-white border-white/20' 
+                  : 'bg-primary/10 text-primary border-primary/20'
               }`}
             >
               {categories.reduce((total, cat) => total + (cat.product_count || 0), 0)}
             </Badge>
           </Button>
+        </div>
 
-          {/* Category Buttons */}
+        {/* Category Grid - Multi-row Layout */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-2.5">
           {categories.map((category) => (
             <Button
               key={category.id}
               variant={activeCategory === category.id ? "default" : "outline"}
               size="sm"
               onClick={() => onCategorySelect(category.id)}
-              className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all border ${
+              className={`rounded-full px-4 py-2.5 text-sm font-medium transition-all border-2 min-w-0 ${
                 activeCategory === category.id
-                  ? 'bg-gradient-primary text-white shadow-glow border-primary/20'
-                  : 'bg-background text-foreground hover:bg-card hover:border-primary/20 border-border'
+                  ? 'bg-gradient-primary text-white shadow-glow border-primary/30 hover:shadow-accent-glow'
+                  : 'bg-card/80 text-foreground hover:bg-primary/5 hover:border-primary/40 border-border/60 hover:text-primary'
               }`}
             >
-              <span className="mr-2 text-base">{category.icon || '📂'}</span>
-              {category.name}
-              {category.product_count !== undefined && (
-                <Badge 
-                  variant="secondary" 
-                  className={`ml-2 text-xs ${
-                    activeCategory === category.id ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {category.product_count}
-                </Badge>
-              )}
+              <div className="flex items-center justify-center min-w-0 w-full">
+                <span className="mr-1.5 text-base flex-shrink-0">{category.icon || '📂'}</span>
+                <span className="truncate flex-1">{category.name}</span>
+                {category.product_count !== undefined && (
+                  <Badge 
+                    variant="secondary" 
+                    className={`ml-1.5 text-xs font-medium flex-shrink-0 ${
+                      activeCategory === category.id 
+                        ? 'bg-white/25 text-white border-white/20' 
+                        : 'bg-primary/10 text-primary border-primary/20'
+                    }`}
+                  >
+                    {category.product_count}
+                  </Badge>
+                )}
+              </div>
             </Button>
           ))}
         </div>

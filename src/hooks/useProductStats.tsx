@@ -5,7 +5,7 @@ export interface ProductStats {
   ai_tools: number;
   software: number;
   free_tools: number;
-  digital_products: number;
+  paid_tools: number;
   total: number;
 }
 
@@ -30,7 +30,7 @@ export const useProductStats = () => {
         ai_tools: 0,
         software: 0,
         free_tools: 0,
-        digital_products: 0,
+        paid_tools: 0,
         total: 0
       } as ProductStats);
 

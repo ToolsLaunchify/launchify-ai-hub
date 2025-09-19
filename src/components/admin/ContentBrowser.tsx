@@ -48,7 +48,7 @@ export const ContentBrowser: React.FC<ContentBrowserProps> = ({
       ai_tools: 'AI Tools',
       software: 'Software', 
       free_tools: 'Free Tools',
-      digital_products: 'Digital Product'
+      paid_tools: 'Paid Tool'
     };
     
     return Object.entries(typeMapping).map(([key, name]) => ({

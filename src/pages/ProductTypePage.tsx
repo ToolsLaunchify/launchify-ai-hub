@@ -43,7 +43,7 @@ const ProductTypePage: React.FC = () => {
       const typeMapping: Record<string, string> = {
         'ai-tools': 'ai_tools',
         'free-tools': 'free_tools',
-        'digital-products': 'digital_products',
+        'paid-tools': 'paid_tools',
         'software': 'software'
       };
 
@@ -70,7 +70,7 @@ const ProductTypePage: React.FC = () => {
     const titleMap: Record<string, string> = {
       'ai-tools': 'AI Tools',
       'free-tools': 'Free Tools',
-      'digital-products': 'Digital Products',
+      'paid-tools': 'Paid Tools',
       'software': 'Software'
     };
     return titleMap[type || ''] || 'Products';

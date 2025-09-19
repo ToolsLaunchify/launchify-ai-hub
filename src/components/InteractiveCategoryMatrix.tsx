@@ -35,8 +35,8 @@ const InteractiveCategoryMatrix: React.FC = () => {
         return 'software';
       case 'free_tools':
         return 'free_tools';
-      case 'digital_products':
-        return 'digital_products';
+      case 'paid_tools':
+        return 'paid_tools';
       default:
         return toolType;
     }
@@ -71,8 +71,8 @@ const InteractiveCategoryMatrix: React.FC = () => {
       count: products.length
     },
     {
-      id: 'digital_products',
-      title: 'Digital Products',
+      id: 'paid_tools',
+      title: 'Paid Tools',
       icon: ShoppingBag,
       gradient: 'from-pink-500 to-purple-600',
       count: products.length

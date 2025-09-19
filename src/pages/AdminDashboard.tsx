@@ -20,8 +20,6 @@ import {
   Mail,
   BookOpen,
   Settings2,
-  Wrench,
-  Layers,
   ShoppingCart
 } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
@@ -33,8 +31,6 @@ import FooterManagement from '@/components/admin/FooterManagement';
 import { AdvancedAnalyticsDashboard } from '@/components/admin/AdvancedAnalyticsDashboard';
 import { LeadsManagement } from '@/components/admin/LeadsManagement';
 import NewsletterManagement from '@/components/admin/NewsletterManagement';
-import ToolsManagement from '@/components/admin/ToolsManagement';
-import SubCategoryManagement from '@/components/admin/SubCategoryManagement';
 import OrdersManagement from '@/components/admin/OrdersManagement';
 import { useRealAdminStats } from '@/hooks/useRealAdminStats';
 
@@ -100,7 +96,7 @@ const AdminDashboard: React.FC = () => {
 
         {/* Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-13 mb-8 bg-muted/50 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-11 mb-8 bg-muted/50 p-1 rounded-lg">
             <TabsTrigger 
               value="overview" 
               className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
@@ -170,20 +166,6 @@ const AdminDashboard: React.FC = () => {
             >
               <BarChart3 className="h-4 w-4" />
               Analytics
-            </TabsTrigger>
-            <TabsTrigger 
-              value="tools" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
-            >
-              <Wrench className="h-4 w-4" />
-              Tools
-            </TabsTrigger>
-            <TabsTrigger 
-              value="sub-categories" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
-            >
-              <Layers className="h-4 w-4" />
-              Sub-Categories
             </TabsTrigger>
             <TabsTrigger 
               value="orders" 
@@ -336,15 +318,6 @@ const AdminDashboard: React.FC = () => {
             <NewsletterManagement />
           </TabsContent>
 
-          {/* Tools Tab */}
-          <TabsContent value="tools">
-            <ToolsManagement />
-          </TabsContent>
-          
-          {/* Sub-Categories Tab */}
-          <TabsContent value="sub-categories">
-            <SubCategoryManagement />
-          </TabsContent>
           
           {/* Orders Tab */}
           <TabsContent value="orders">

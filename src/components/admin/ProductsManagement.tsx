@@ -640,7 +640,7 @@ const ProductsManagement: React.FC = () => {
                     <SelectItem value="ai_tools">AI Tools</SelectItem>
                     <SelectItem value="software">Software</SelectItem>
                     <SelectItem value="free_tools">Free Tools</SelectItem>
-                    <SelectItem value="digital_products">Digital Products</SelectItem>
+                    <SelectItem value="paid_tools">Paid Tools</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

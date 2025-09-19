@@ -40,8 +40,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
       icon: Gift 
     },
     { 
-      label: 'Digital Products', 
-      value: productStats?.digital_products ? `${productStats.digital_products}+` : '0', 
+      label: 'Paid Tools', 
+      value: productStats?.paid_tools ? `${productStats.paid_tools}+` : '0', 
       icon: Rocket 
     },
   ];
@@ -73,7 +73,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           
           {/* Subheading */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Find cutting-edge AI Tools, Software, Free Tools and Digital Products that boost your productivity and creativity
+            Find cutting-edge AI Tools, Software, Free Tools and Paid Tools that boost your productivity and creativity
           </p>
           
           {/* Search Bar */}
@@ -83,7 +83,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search for AI tools, software, digital products..."
+                  placeholder="Search for AI tools, software, paid tools..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-12 pr-4 py-4 text-lg bg-background/80 backdrop-blur border-muted focus:border-primary shadow-lg h-14"

@@ -67,7 +67,7 @@ const SearchPage: React.FC = () => {
     <>
       <Helmet>
         <title>Search Results - Tools Launchify</title>
-        <meta name="description" content="Search and discover amazing tools, software, and digital products on Tools Launchify." />
+        <meta name="description" content="Search and discover amazing tools, software, and paid tools on Tools Launchify." />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-background">
@@ -87,7 +87,7 @@ const SearchPage: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <Input
                     type="text"
-                    placeholder="Search for tools, software, or digital products..."
+                    placeholder="Search for tools, software, or paid tools..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 h-12 text-lg"
@@ -120,7 +120,7 @@ const SearchPage: React.FC = () => {
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="ai_tools">AI Tools</SelectItem>
                   <SelectItem value="software">Software</SelectItem>
-                  <SelectItem value="digital_products">Digital Products</SelectItem>
+                  <SelectItem value="paid_tools">Paid Tools</SelectItem>
                   <SelectItem value="free_tools">Free Tools</SelectItem>
                 </SelectContent>
               </Select>

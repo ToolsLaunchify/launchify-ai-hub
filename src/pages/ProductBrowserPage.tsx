@@ -79,7 +79,7 @@ const ProductBrowserPage: React.FC = () => {
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="ai_tools">AI Tools</SelectItem>
             <SelectItem value="software">Software</SelectItem>
-            <SelectItem value="digital_products">Digital Products</SelectItem>
+            <SelectItem value="paid_tools">Paid Tools</SelectItem>
             <SelectItem value="free_tools">Free Tools</SelectItem>
           </SelectContent>
         </Select>
@@ -165,7 +165,7 @@ const ProductBrowserPage: React.FC = () => {
     <>
       <Helmet>
         <title>Browse Products - Tools Launchify</title>
-        <meta name="description" content="Browse our complete catalog of tools, software, and digital products by category." />
+        <meta name="description" content="Browse our complete catalog of tools, software, and paid tools by category." />
       </Helmet>
       
       <div className="min-h-screen bg-gradient-background">
@@ -187,7 +187,7 @@ const ProductBrowserPage: React.FC = () => {
                   <p className="text-muted-foreground">
                     {selectedCategoryData 
                       ? selectedCategoryData.description 
-                      : 'Discover amazing tools, software, and digital products'
+                      : 'Discover amazing tools, software, and paid tools'
                     }
                   </p>
                   {filteredProducts.length > 0 && (

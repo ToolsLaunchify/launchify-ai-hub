@@ -24,7 +24,7 @@ const ToolTypePage: React.FC = () => {
     'ai-tools': 'ai_tools',
     'software': 'software',
     'free-tools': 'free_tools',
-    'digital-products': 'digital_products'
+    'paid-tools': 'paid_tools'
   };
 
   const productType = productTypeMapping[type || ''];
@@ -79,8 +79,8 @@ const ToolTypePage: React.FC = () => {
         return 'Software';
       case 'free-tools':
         return 'Free Tools';
-      case 'digital-products':
-        return 'Digital Products';
+      case 'paid-tools':
+        return 'Paid Tools';
       default:
         return 'Tools';
     }
@@ -94,7 +94,7 @@ const ToolTypePage: React.FC = () => {
         return 'Professional software solutions for various business needs';
       case 'free-tools':
         return 'Useful tools at no cost for individuals and businesses';
-      case 'digital-products':
+      case 'paid-tools':
         return 'Templates, assets, and digital downloads for your projects';
       default:
         return 'Browse tools by category';

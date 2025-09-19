@@ -132,7 +132,7 @@ const SECTION_TEMPLATES = [
       { text: 'AI Tools', url: '/type/ai-tools' },
       { text: 'Software', url: '/type/software' },
       { text: 'Free Tools', url: '/type/free-tools' },
-      { text: 'Digital Products', url: '/type/digital-products' }
+      { text: 'Paid Tools', url: '/type/paid-tools' }
     ]
   },
   {

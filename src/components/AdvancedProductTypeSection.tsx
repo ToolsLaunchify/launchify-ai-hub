@@ -207,13 +207,13 @@ const AdvancedProductTypeSection: React.FC = () => {
       features: []
     },
     {
-      id: 'digital_products',
-      title: 'Digital Products',
+      id: 'paid_tools',
+      title: 'Paid Tools',
       description: 'Templates, assets, and downloadable resources',
       icon: Package,
       gradient: 'from-pink-500 via-purple-500 to-violet-600',
-      href: '/type/digital-products',
-      count: productStats?.digital_products || 0,
+      href: '/type/paid-tools',
+      count: productStats?.paid_tools || 0,
       trending: false,
       features: []
     }

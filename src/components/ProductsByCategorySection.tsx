@@ -123,12 +123,12 @@ const ProductsByCategorySection: React.FC = () => {
       slug: "free-tools"
     },
     {
-      title: "Digital Products",
+      title: "Paid Tools",
       description: "Digital downloads and resources",
       icon: <ShoppingBag className="h-6 w-6 text-white" />,
-      productType: "digital_products",
+      productType: "paid_tools",
       bgClass: "bg-gradient-to-br from-muted/30 to-background",
-      slug: "digital-products"
+      slug: "paid-tools"
     }
   ];
 

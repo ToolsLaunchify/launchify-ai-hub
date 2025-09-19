@@ -37,7 +37,7 @@ const AdvancedBrowseSection: React.FC = () => {
               Explore Our Complete Product Catalog
             </h2>
             <p className="text-xl text-muted-foreground mb-6">
-              Discover thousands of tools, software, and digital products with our advanced browsing experience
+              Discover thousands of tools, software, and paid tools with our advanced browsing experience
             </p>
             
           </div>

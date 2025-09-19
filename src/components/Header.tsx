@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
     { name: 'AI Tools', href: '/type/ai-tools', description: 'Artificial Intelligence powered tools' },
     { name: 'Software', href: '/type/software', description: 'Desktop and web applications' },
     { name: 'Free Tools', href: '/tools', description: 'Free online calculators and utilities' },
-    { name: 'Digital Products', href: '/type/digital-products', description: 'Courses, templates, and digital assets' },
+    { name: 'Paid Tools', href: '/type/paid-tools', description: 'Courses, templates, and digital assets' },
   ];
 
   return (

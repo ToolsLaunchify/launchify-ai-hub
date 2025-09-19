@@ -38,27 +38,57 @@ const CategorySubTabs: React.FC<CategorySubTabsProps> = ({
     );
   }
 
-  // Mock categories for testing design with many items
-  const mockCategories = categories.length < 10 ? [
+  // Tool-type specific mock categories for testing design
+  const getToolTypeSpecificMockCategories = (toolType: string) => {
+    const mockCategoriesByType = {
+      'ai_tools': [
+        { id: 'ai-1', name: 'Machine Learning', icon: '🤖', product_count: 25 },
+        { id: 'ai-2', name: 'Natural Language Processing', icon: '💬', product_count: 18 },
+        { id: 'ai-3', name: 'Computer Vision', icon: '👁️', product_count: 15 },
+        { id: 'ai-4', name: 'AI Assistants', icon: '🤵', product_count: 12 },
+        { id: 'ai-5', name: 'Deep Learning', icon: '🧠', product_count: 22 },
+        { id: 'ai-6', name: 'AI Analytics', icon: '📊', product_count: 14 },
+        { id: 'ai-7', name: 'Speech Recognition', icon: '🎙️', product_count: 8 },
+        { id: 'ai-8', name: 'Recommendation Systems', icon: '🎯', product_count: 11 }
+      ],
+      'software': [
+        { id: 'sw-1', name: 'Productivity', icon: '⚡', product_count: 32 },
+        { id: 'sw-2', name: 'Development Tools', icon: '💻', product_count: 28 },
+        { id: 'sw-3', name: 'Design Software', icon: '🎨', product_count: 24 },
+        { id: 'sw-4', name: 'Business Apps', icon: '💼', product_count: 19 },
+        { id: 'sw-5', name: 'Communication', icon: '📞', product_count: 16 },
+        { id: 'sw-6', name: 'Project Management', icon: '📋', product_count: 21 },
+        { id: 'sw-7', name: 'Security Software', icon: '🔒', product_count: 13 },
+        { id: 'sw-8', name: 'Media & Entertainment', icon: '🎮', product_count: 17 }
+      ],
+      'free_tools': [
+        { id: 'free-1', name: 'Calculators', icon: '🧮', product_count: 15 },
+        { id: 'free-2', name: 'Converters', icon: '🔄', product_count: 12 },
+        { id: 'free-3', name: 'Utilities', icon: '🛠️', product_count: 18 },
+        { id: 'free-4', name: 'Educational Tools', icon: '📚', product_count: 22 },
+        { id: 'free-5', name: 'Text Tools', icon: '📝', product_count: 14 },
+        { id: 'free-6', name: 'Image Tools', icon: '🖼️', product_count: 10 },
+        { id: 'free-7', name: 'File Tools', icon: '📁', product_count: 8 },
+        { id: 'free-8', name: 'Web Tools', icon: '🌐', product_count: 16 }
+      ],
+      'paid_tools': [
+        { id: 'paid-1', name: 'Premium Software', icon: '💎', product_count: 24 },
+        { id: 'paid-2', name: 'Professional Services', icon: '🏢', product_count: 18 },
+        { id: 'paid-3', name: 'Enterprise Solutions', icon: '🏗️', product_count: 15 },
+        { id: 'paid-4', name: 'Advanced Analytics', icon: '📈', product_count: 12 },
+        { id: 'paid-5', name: 'Cloud Platforms', icon: '☁️', product_count: 20 },
+        { id: 'paid-6', name: 'Security Solutions', icon: '🛡️', product_count: 14 },
+        { id: 'paid-7', name: 'Marketing Tools', icon: '📢', product_count: 16 },
+        { id: 'paid-8', name: 'Finance Tools', icon: '💰', product_count: 11 }
+      ]
+    };
+
+    return mockCategoriesByType[toolType as keyof typeof mockCategoriesByType] || [];
+  };
+
+  const mockCategories = categories.length < 5 ? [
     ...categories,
-    { id: 'mock-1', name: 'Web Development', icon: '💻', product_count: 15 },
-    { id: 'mock-2', name: 'Mobile Apps', icon: '📱', product_count: 8 },
-    { id: 'mock-3', name: 'Data Analytics', icon: '📊', product_count: 12 },
-    { id: 'mock-4', name: 'Machine Learning', icon: '🤖', product_count: 22 },
-    { id: 'mock-5', name: 'Cloud Services', icon: '☁️', product_count: 18 },
-    { id: 'mock-6', name: 'Security Tools', icon: '🔒', product_count: 9 },
-    { id: 'mock-7', name: 'Design Tools', icon: '🎨', product_count: 14 },
-    { id: 'mock-8', name: 'DevOps', icon: '⚙️', product_count: 11 },
-    { id: 'mock-9', name: 'E-commerce', icon: '🛒', product_count: 7 },
-    { id: 'mock-10', name: 'Marketing', icon: '📈', product_count: 16 },
-    { id: 'mock-11', name: 'Communication', icon: '💬', product_count: 6 },
-    { id: 'mock-12', name: 'Project Management', icon: '📋', product_count: 13 },
-    { id: 'mock-13', name: 'Finance', icon: '💰', product_count: 10 },
-    { id: 'mock-14', name: 'Education', icon: '📚', product_count: 19 },
-    { id: 'mock-15', name: 'Healthcare', icon: '🏥', product_count: 5 },
-    { id: 'mock-16', name: 'Entertainment', icon: '🎮', product_count: 8 },
-    { id: 'mock-17', name: 'Travel', icon: '✈️', product_count: 4 },
-    { id: 'mock-18', name: 'Food & Beverage', icon: '🍕', product_count: 3 }
+    ...getToolTypeSpecificMockCategories(toolType)
   ] : categories;
 
   return (

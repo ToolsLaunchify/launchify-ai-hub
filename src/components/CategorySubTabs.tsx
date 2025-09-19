@@ -68,26 +68,26 @@ const CategorySubTabs: React.FC<CategorySubTabsProps> = ({
         </div>
 
         {/* Category Grid - Multi-row Layout */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5">
           {categories.map((category) => (
             <Button
               key={category.id}
               variant={activeCategory === category.id ? "default" : "outline"}
               size="sm"
               onClick={() => onCategorySelect(category.id)}
-              className={`rounded-full px-4 py-2.5 text-sm font-medium transition-all border-2 min-w-0 ${
+              className={`rounded-full px-4 py-2.5 text-sm font-medium transition-all border-2 min-w-[120px] h-auto ${
                 activeCategory === category.id
                   ? 'bg-gradient-primary text-white shadow-glow border-primary/30 hover:shadow-accent-glow'
                   : 'bg-card/80 text-foreground hover:bg-primary/5 hover:border-primary/40 border-border/60 hover:text-primary'
               }`}
             >
-              <div className="flex items-center justify-center min-w-0 w-full">
-                <span className="mr-1.5 text-base flex-shrink-0">{category.icon || '📂'}</span>
-                <span className="truncate flex-1">{category.name}</span>
+              <div className="flex items-center justify-center gap-1.5 w-full">
+                <span className="text-base flex-shrink-0">{category.icon || '📂'}</span>
+                <span className="text-center leading-tight">{category.name}</span>
                 {category.product_count !== undefined && (
                   <Badge 
                     variant="secondary" 
-                    className={`ml-1.5 text-xs font-medium flex-shrink-0 ${
+                    className={`ml-1 text-xs font-medium flex-shrink-0 ${
                       activeCategory === category.id 
                         ? 'bg-white/25 text-white border-white/20' 
                         : 'bg-primary/10 text-primary border-primary/20'

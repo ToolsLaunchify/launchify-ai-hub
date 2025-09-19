@@ -58,9 +58,9 @@ const ToolTypeTabsSection: React.FC<ToolTypeTabsSectionProps> = ({
   ];
 
   return (
-    <div className="bg-background border-b border-border">
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="bg-card/50 backdrop-blur-sm border-b border-border">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex flex-wrap justify-center gap-3">
           {toolTypes.map((toolType) => {
             const Icon = toolType.icon;
             const isActive = activeToolType === toolType.id;
@@ -68,49 +68,44 @@ const ToolTypeTabsSection: React.FC<ToolTypeTabsSectionProps> = ({
             return (
               <Button
                 key={toolType.id}
-                variant="ghost"
+                variant={isActive ? "default" : "ghost"}
                 onClick={() => onToolTypeSelect(toolType.id)}
-                className={`h-auto p-6 flex flex-col items-center space-y-3 group transition-all duration-300 ${
+                className={`h-14 px-6 flex items-center space-x-3 group transition-all duration-300 rounded-full border ${
                   isActive
                     ? 'bg-gradient-primary text-white shadow-glow border-primary/20'
-                    : 'hover:shadow-elegant hover:-translate-y-1 border-border'
-                } border rounded-lg`}
+                    : 'hover:bg-card hover:shadow-md hover:border-primary/20 border-border/50 bg-background/80'
+                }`}
               >
-                <div className={`p-3 rounded-full transition-all duration-300 ${
+                <div className={`p-2 rounded-full transition-all duration-300 ${
                   isActive 
                     ? 'bg-white/20' 
-                    : 'bg-gradient-subtle group-hover:scale-110'
+                    : 'bg-primary/10 group-hover:bg-primary/20'
                 }`}>
-                  <Icon className={`h-6 w-6 ${
+                  <Icon className={`h-4 w-4 ${
                     isActive ? 'text-white' : 'text-primary'
                   }`} />
                 </div>
                 
-                <div className="text-center">
-                  <h3 className={`font-semibold text-sm ${
+                <div className="flex items-center space-x-2">
+                  <span className={`font-medium text-sm ${
                     isActive ? 'text-white' : 'text-foreground group-hover:text-primary'
                   } transition-colors`}>
                     {toolType.name}
-                  </h3>
-                  <p className={`text-xs mt-1 ${
-                    isActive ? 'text-white/80' : 'text-muted-foreground'
-                  }`}>
-                    {toolType.description}
-                  </p>
+                  </span>
+                  
+                  {isLoading ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Badge 
+                      variant="secondary" 
+                      className={`text-xs px-2 py-0.5 ${
+                        isActive ? 'bg-white/20 text-white border-white/20' : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {toolType.count}
+                    </Badge>
+                  )}
                 </div>
-
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Badge 
-                    variant="secondary" 
-                    className={`text-xs ${
-                      isActive ? 'bg-white/20 text-white border-white/20' : ''
-                    }`}
-                  >
-                    {toolType.count} tools
-                  </Badge>
-                )}
               </Button>
             );
           })}

@@ -287,9 +287,14 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Enhanced Tab Styles for Better Visibility */
+  /* Enhanced Tab Styles for Better Visibility */
 [data-state="inactive"] {
   @apply bg-muted/50 text-muted-foreground border border-border/50 hover:bg-muted/70 hover:text-foreground hover:border-border;
+}
+
+/* Enhanced Shadows for Better Depth */
+.shadow-elegant {
+  box-shadow: 0 4px 20px -4px hsl(var(--foreground) / 0.1), 0 8px 16px -8px hsl(var(--primary) / 0.1);
 }
 
 /* Interactive Elements */

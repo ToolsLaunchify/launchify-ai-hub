@@ -40,52 +40,71 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
 
   return (
     <Link to={`/${product.slug || product.id}`} className="block group">
-      <Card className="h-full bg-card hover:shadow-elegant transition-all duration-300 border-border group-hover:border-primary/20 group-hover:-translate-y-1">
-        <CardContent className="p-6">
-          {/* Header with badges */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              {product.is_featured && (
-                <Badge className="mb-2 bg-gradient-primary text-white border-none">
-                  Featured
-                </Badge>
-              )}
-              {product.is_free && (
-                <Badge className="mb-2 bg-gradient-accent text-white border-none">
-                  Free
-                </Badge>
-              )}
-            </div>
-            
-            {/* Product icon/image placeholder */}
-            <div className="w-12 h-12 bg-gradient-subtle rounded-lg flex items-center justify-center text-2xl group-hover:scale-110 transition-transform duration-300">
-              {product.image_url ? (
-                <img 
-                  src={product.image_url} 
-                  alt={product.name}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <span className="text-primary">🔧</span>
-              )}
-            </div>
+      <Card className="h-full bg-card hover:shadow-lg transition-all duration-300 border-border group-hover:border-primary/20 group-hover:-translate-y-2 overflow-hidden">
+        <CardContent className="p-4">
+          {/* Product icon/image */}
+          <div className="w-full h-32 bg-gradient-subtle rounded-lg flex items-center justify-center mb-4 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+            {product.image_url ? (
+              <img 
+                src={product.image_url} 
+                alt={product.name}
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.parentElement!.innerHTML = '<span class="text-4xl">🔧</span>';
+                }}
+              />
+            ) : (
+              <span className="text-4xl">🔧</span>
+            )}
+          </div>
+
+          {/* Badges */}
+          <div className="flex flex-wrap gap-2 mb-3">
+            {product.is_featured && (
+              <Badge className="text-xs bg-gradient-primary text-white border-none">
+                Featured
+              </Badge>
+            )}
+            {product.is_free && (
+              <Badge className="text-xs bg-gradient-accent text-white border-none">
+                Free
+              </Badge>
+            )}
+            {product.category && (
+              <Badge variant="secondary" className="text-xs">
+                {product.category.name}
+              </Badge>
+            )}
           </div>
 
           {/* Product name */}
-          <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2 line-clamp-1">
+          <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors mb-2 line-clamp-1">
             {product.name}
           </h3>
 
           {/* Product description */}
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[2.5rem]">
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3 min-h-[2.5rem]">
             {product.description || 'No description available'}
           </p>
 
-          {/* Category badge */}
-          {product.category && (
-            <Badge variant="secondary" className="mb-4 text-xs">
-              {product.category.name}
-            </Badge>
+          {/* Price display */}
+          {!product.is_free && (product.original_price || product.discounted_price) && (
+            <div className="mb-3">
+              <div className="flex items-center gap-2">
+                {product.original_price && product.original_price !== product.discounted_price && (
+                  <span className="text-sm text-muted-foreground line-through">
+                    {formatPrice(product.original_price)}
+                  </span>
+                )}
+                {product.discounted_price && (
+                  <span className="text-lg font-bold text-primary">
+                    {formatPrice(product.discounted_price)}
+                  </span>
+                )}
+              </div>
+            </div>
           )}
 
           {/* Stats */}
@@ -94,34 +113,22 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
               <Clock className="w-3 h-3 mr-1" />
               {timeAgo(product.created_at)}
             </span>
-            <span>{(product.views_count || 0).toLocaleString()} views</span>
+            <span className="flex items-center">
+              <Star className="w-3 h-3 mr-1" />
+              {(product.views_count || 0).toLocaleString()}
+            </span>
           </div>
-
-          {/* Price display */}
-          {!product.is_free && (product.original_price || product.discounted_price) && (
-            <div className="mb-4">
-              {product.original_price && product.original_price !== product.discounted_price && (
-                <span className="text-sm text-muted-foreground line-through block">
-                  {formatPrice(product.original_price)}
-                </span>
-              )}
-              {product.discounted_price && (
-                <span className="text-lg font-bold text-primary">
-                  {formatPrice(product.discounted_price)}
-                </span>
-              )}
-            </div>
-          )}
         </CardContent>
 
-        <CardFooter className="p-6 pt-0">
+        <CardFooter className="p-4 pt-0">
           <Button
-            variant={product.is_free ? "accent" : "hero"}
+            variant={product.is_free ? "accent" : "default"}
+            size="sm"
             className="w-full group-hover:shadow-glow transition-all duration-300"
             onClick={handleCTAClick}
           >
             <span>{product.cta_button_text || (product.is_free ? 'Use Tool' : 'Get Now')}</span>
-            <ExternalLink className="ml-2 h-4 w-4" />
+            <ExternalLink className="ml-2 h-3 w-3" />
           </Button>
         </CardFooter>
       </Card>

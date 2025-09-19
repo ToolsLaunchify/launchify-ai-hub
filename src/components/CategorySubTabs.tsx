@@ -39,22 +39,27 @@ const CategorySubTabs: React.FC<CategorySubTabsProps> = ({
   }
 
   return (
-    <div className="border-b border-border bg-background/50 backdrop-blur-sm">
+    <div className="bg-muted/30 border-b border-border shadow-sm">
       <div className="container mx-auto px-4">
-        <div className="flex items-center space-x-1 py-4 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center space-x-2 py-3 overflow-x-auto scrollbar-hide">
           {/* All Categories Button */}
           <Button
-            variant={activeCategory === null ? "default" : "ghost"}
+            variant={activeCategory === null ? "default" : "outline"}
             size="sm"
             onClick={() => onCategorySelect(null)}
-            className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+            className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all border ${
               activeCategory === null
-                ? 'bg-gradient-primary text-white shadow-glow'
-                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                ? 'bg-gradient-primary text-white shadow-glow border-primary/20'
+                : 'bg-background text-foreground hover:bg-card hover:border-primary/20 border-border'
             }`}
           >
             All Categories
-            <Badge variant="secondary" className="ml-2 text-xs">
+            <Badge 
+              variant="secondary" 
+              className={`ml-2 text-xs ${
+                activeCategory === null ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
+              }`}
+            >
               {categories.reduce((total, cat) => total + (cat.product_count || 0), 0)}
             </Badge>
           </Button>
@@ -63,19 +68,24 @@ const CategorySubTabs: React.FC<CategorySubTabsProps> = ({
           {categories.map((category) => (
             <Button
               key={category.id}
-              variant={activeCategory === category.id ? "default" : "ghost"}
+              variant={activeCategory === category.id ? "default" : "outline"}
               size="sm"
               onClick={() => onCategorySelect(category.id)}
-              className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+              className={`flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all border ${
                 activeCategory === category.id
-                  ? 'bg-gradient-primary text-white shadow-glow'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ? 'bg-gradient-primary text-white shadow-glow border-primary/20'
+                  : 'bg-background text-foreground hover:bg-card hover:border-primary/20 border-border'
               }`}
             >
-              <span className="mr-2">{category.icon || '📂'}</span>
+              <span className="mr-2 text-base">{category.icon || '📂'}</span>
               {category.name}
               {category.product_count !== undefined && (
-                <Badge variant="secondary" className="ml-2 text-xs">
+                <Badge 
+                  variant="secondary" 
+                  className={`ml-2 text-xs ${
+                    activeCategory === category.id ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
+                  }`}
+                >
                   {category.product_count}
                 </Badge>
               )}

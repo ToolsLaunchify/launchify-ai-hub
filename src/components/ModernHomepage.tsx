@@ -9,6 +9,8 @@ import ProductGridDisplay from './ProductGridDisplay';
 import { useProductStats } from '@/hooks/useProductStats';
 import { useCategoriesByProductType } from '@/hooks/useCategories';
 import { useProducts } from '@/hooks/useProducts';
+import percentageCalculatorIcon from '@/assets/percentage-calculator-icon.jpg';
+import bmiCalculatorIcon from '@/assets/bmi-calculator-icon.jpg';
 
 const ModernHomepage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,7 +39,7 @@ const ModernHomepage: React.FC = () => {
       slug: 'percentage-calculator',
       description: 'Calculate percentages, percentage changes, and percentage of totals with ease.',
       rich_description: null,
-      image_url: null,
+      image_url: percentageCalculatorIcon,
       category_id: null,
       product_type: 'free_tools',
       is_free: true,
@@ -64,7 +66,7 @@ const ModernHomepage: React.FC = () => {
       slug: 'bmi-calculator',
       description: 'Calculate your Body Mass Index using metric or imperial units.',
       rich_description: null,
-      image_url: null,
+      image_url: bmiCalculatorIcon,
       category_id: null,
       product_type: 'free_tools',
       is_free: true,
@@ -87,8 +89,10 @@ const ModernHomepage: React.FC = () => {
     }
   ] : [];
 
-  // Combine database products with static free tools
-  const products = [...staticFreeTools, ...databaseProducts];
+  // For free tools, only show static tools. For other types, combine with database products
+  const products = activeToolType === 'free_tools' 
+    ? staticFreeTools 
+    : [...staticFreeTools, ...databaseProducts];
 
   // Reset category when tool type changes
   useEffect(() => {

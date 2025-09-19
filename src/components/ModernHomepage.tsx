@@ -23,11 +23,72 @@ const ModernHomepage: React.FC = () => {
   const { data: categories = [], isLoading: categoriesLoading } = useCategoriesByProductType(activeToolType);
   
   // Products query based on active filters
-  const { data: products = [], isLoading: productsLoading } = useProducts({
+  const { data: databaseProducts = [], isLoading: productsLoading } = useProducts({
     productType: activeToolType,
     categoryId: activeCategory || undefined,
     limit: 20
   });
+
+  // Static free tools that are not in the database
+  const staticFreeTools = activeToolType === 'free_tools' ? [
+    {
+      id: 'percentage-calculator',
+      name: 'Percentage Calculator',
+      slug: 'percentage-calculator',
+      description: 'Calculate percentages, percentage changes, and percentage of totals with ease.',
+      rich_description: null,
+      image_url: null,
+      category_id: null,
+      product_type: 'free_tools',
+      is_free: true,
+      is_featured: false,
+      is_newly_launched: true,
+      is_popular: false,
+      is_trending: false,
+      is_editors_choice: false,
+      original_price: null,
+      discounted_price: null,
+      currency: null,
+      affiliate_link: '/tools/percentage-calculator',
+      payment_link: null,
+      cta_button_text: 'Use Tool',
+      views_count: 0,
+      saves_count: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      category: null
+    },
+    {
+      id: 'bmi-calculator',
+      name: 'BMI Calculator',
+      slug: 'bmi-calculator',
+      description: 'Calculate your Body Mass Index using metric or imperial units.',
+      rich_description: null,
+      image_url: null,
+      category_id: null,
+      product_type: 'free_tools',
+      is_free: true,
+      is_featured: false,
+      is_newly_launched: true,
+      is_popular: false,
+      is_trending: false,
+      is_editors_choice: false,
+      original_price: null,
+      discounted_price: null,
+      currency: null,
+      affiliate_link: '/tools/bmi-calculator',
+      payment_link: null,
+      cta_button_text: 'Use Tool',
+      views_count: 0,
+      saves_count: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      category: null
+    }
+  ] : [];
+
+  // Combine database products with static free tools
+  const products = [...staticFreeTools, ...databaseProducts];
 
   // Reset category when tool type changes
   useEffect(() => {

@@ -153,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                   isActive('/tools') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
                 }`}
               >
-                Tools
+                Free Tools
               </Link>
             </NavigationMenuItem>
 

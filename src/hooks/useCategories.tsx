@@ -34,7 +34,48 @@ export const useCategoriesByProductType = (productType: string) => {
   return useQuery({
     queryKey: ['categories-by-product-type', productType],
     queryFn: async (): Promise<Category[]> => {
-      // Get categories that have products of the specified type
+      // Special handling for free_tools - return empty since we only show static tools
+      if (productType === 'free_tools') {
+        return [];
+      }
+
+      // Handle paid_tools by finding categories with products that have prices
+      if (productType === 'paid_tools') {
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('categories')
+          .select(`
+            id,
+            name,
+            slug,
+            description,
+            icon,
+            sort_order,
+            parent_id
+          `)
+          .is('parent_id', null)
+          .order('sort_order', { ascending: true });
+
+        if (categoriesError) throw categoriesError;
+
+        const categoriesWithCounts = await Promise.all(
+          (categoriesData || []).map(async (category) => {
+            const { count } = await supabase
+              .from('products')
+              .select('*', { count: 'exact', head: true })
+              .eq('category_id', category.id)
+              .or('original_price.gt.0,discounted_price.gt.0,purchase_price.gt.0');
+
+            return {
+              ...category,
+              product_count: count || 0
+            };
+          })
+        );
+
+        return categoriesWithCounts.filter(cat => cat.product_count > 0);
+      }
+
+      // For ai_tools and software, get categories that have products of the specified type
       const { data, error } = await supabase
         .from('categories')
         .select(`

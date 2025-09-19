@@ -309,3 +309,37 @@
 .pulse {
   @apply animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite];
 }
+
+/* Enhanced Tab Visibility Utilities */
+.tab-container-elevated {
+  background: hsl(var(--card) / 0.95);
+  border: 1px solid hsl(var(--border) / 0.8);
+  box-shadow: 0 4px 12px -2px hsl(var(--primary) / 0.1);
+}
+
+.tab-inactive-high-contrast {
+  background: hsl(var(--background) / 0.98);
+  border: 1.5px solid hsl(var(--border) / 0.8);
+  color: hsl(var(--foreground) / 0.9);
+  box-shadow: 0 2px 8px -2px hsl(var(--foreground) / 0.08);
+}
+
+.tab-inactive-high-contrast:hover {
+  background: hsl(var(--primary) / 0.08);
+  border-color: hsl(var(--primary) / 0.5);
+  color: hsl(var(--primary));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px hsl(var(--primary) / 0.2);
+}
+
+.tab-active-enhanced {
+  background: var(--gradient-primary);
+  border: 1.5px solid hsl(var(--primary) / 0.4);
+  color: white;
+  box-shadow: var(--shadow-glow), 0 4px 12px -2px hsl(var(--primary) / 0.3);
+}
+
+.tab-active-enhanced:hover {
+  box-shadow: var(--shadow-accent-glow), 0 6px 16px -4px hsl(var(--primary) / 0.4);
+  transform: translateY(-1px);
+}

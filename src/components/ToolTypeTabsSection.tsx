@@ -58,9 +58,9 @@ const ToolTypeTabsSection: React.FC<ToolTypeTabsSectionProps> = ({
   ];
 
   return (
-    <div className="bg-card/50 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-wrap justify-center gap-3">
+    <div className="tab-container-elevated backdrop-blur-sm border-b">
+      <div className="container mx-auto px-4 py-5">
+        <div className="flex flex-wrap justify-center gap-4">
           {toolTypes.map((toolType) => {
             const Icon = toolType.icon;
             const isActive = activeToolType === toolType.id;
@@ -68,12 +68,12 @@ const ToolTypeTabsSection: React.FC<ToolTypeTabsSectionProps> = ({
             return (
               <Button
                 key={toolType.id}
-                variant={isActive ? "default" : "ghost"}
+                variant="ghost"
                 onClick={() => onToolTypeSelect(toolType.id)}
-                className={`h-14 px-6 flex items-center space-x-3 group transition-all duration-300 rounded-full border ${
+                className={`h-16 px-8 flex items-center space-x-4 group transition-all duration-300 rounded-full font-medium ${
                   isActive
-                    ? 'bg-gradient-primary text-white shadow-glow border-primary/20'
-                    : 'hover:bg-card hover:shadow-md hover:border-primary/20 border-border/50 bg-background/80'
+                    ? 'tab-active-enhanced'
+                    : 'tab-inactive-high-contrast'
                 }`}
               >
                 <div className={`p-2 rounded-full transition-all duration-300 ${

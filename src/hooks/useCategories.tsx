@@ -34,9 +34,18 @@ export const useCategoriesByProductType = (productType: string) => {
   return useQuery({
     queryKey: ['categories-by-product-type', productType],
     queryFn: async (): Promise<Category[]> => {
-      // Special handling for free_tools - return empty since we only show static tools
+      // Special handling for free_tools - return virtual Calculator category
       if (productType === 'free_tools') {
-        return [];
+        return [{
+          id: 'calculator',
+          name: 'Calculator',
+          slug: 'calculator',
+          description: 'Essential calculation tools',
+          icon: '🧮',
+          sort_order: 1,
+          parent_id: null,
+          product_count: 2
+        }];
       }
 
       // Get all top-level categories

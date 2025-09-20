@@ -103,7 +103,7 @@ const ModernHomepage: React.FC = () => {
 
   // Handle different product types
   const displayProducts = activeToolType === 'free_tools' 
-    ? staticFreeTools 
+    ? (activeCategory === 'calculator' || activeCategory === null ? staticFreeTools : [])
     : databaseProducts;
 
   // Reset category and sub tab when tool type changes
@@ -148,7 +148,7 @@ const ModernHomepage: React.FC = () => {
   };
 
   // Show sidebar layout for tool types with categories
-  const showSidebarLayout = activeToolType !== 'free_tools' && categories && categories.length > 0;
+  const showSidebarLayout = categories && categories.length > 0;
 
   return (
     <div className="min-h-screen bg-background">

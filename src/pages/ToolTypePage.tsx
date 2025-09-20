@@ -24,7 +24,7 @@ const ToolTypePage: React.FC = () => {
     'ai-tools': 'ai_tools',
     'software': 'software',
     'free-tools': 'free_tools',
-    'paid-tools': 'paid_tools'
+    'paid-tools': 'digital_products'
   };
 
   const productType = productTypeMapping[type || ''];

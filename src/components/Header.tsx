@@ -86,44 +86,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium">
-                <Tag className="w-4 h-4 mr-2" />
-                Categories
-              </NavigationMenuTrigger>
-              <NavigationMenuContent className="min-w-[500px] p-4">
-                <div className="grid grid-cols-3 gap-3">
-                  {categories.slice(0, 9).map((category) => (
-                    <NavigationMenuLink asChild key={category.id}>
-                      <Link
-                        to={`/category/${category.slug}`}
-                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-smooth menu-item-hover focus:bg-gradient-to-r focus:from-primary/10 focus:to-primary-glow/10 focus:text-primary"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{category.icon}</span>
-                            <div className="text-sm font-medium leading-none">{category.name}</div>
-                          </div>
-                          <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-                            {category.product_count}
-                          </span>
-                        </div>
-                      </Link>
-                    </NavigationMenuLink>
-                  ))}
-                </div>
-                <div className="mt-4 pt-3 border-t">
-                  <NavigationMenuLink asChild>
-                    <Link
-                      to="/browse"
-                      className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-center text-sm font-medium"
-                    >
-                      View All Categories
-                    </Link>
-                  </NavigationMenuLink>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
 
             <NavigationMenuItem>
               <Link
@@ -293,33 +255,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                     ))}
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Categories
-                    </div>
-                    {categories.slice(0, 5).map((category) => (
-                      <Link
-                        key={category.id}
-                        to={`/category/${category.slug}`}
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                      >
-                        <span className="text-base">{category.icon}</span>
-                        <span>{category.name}</span>
-                        <Badge variant="secondary" className="ml-auto">
-                          {category.product_count}
-                        </Badge>
-                      </Link>
-                    ))}
-                    <Link
-                      to="/browse"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-primary hover:text-primary/80"
-                    >
-                      <Tag className="h-4 w-4" />
-                      <span>View All Categories</span>
-                    </Link>
-                  </div>
                 </nav>
 
                 {/* Mobile User Menu */}

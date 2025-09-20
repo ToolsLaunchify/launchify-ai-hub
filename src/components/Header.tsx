@@ -58,8 +58,9 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
         </div>
 
         {/* Desktop Navigation */}
-        <NavigationMenu className="hidden md:flex mr-6">
-          <NavigationMenuList className="space-x-2">
+        <div className="relative z-50">
+          <NavigationMenu className="hidden md:flex mr-6">
+            <NavigationMenuList className="space-x-2">
             
             <NavigationMenuItem>
               <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground">
@@ -168,8 +169,9 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
               </Link>
             </NavigationMenuItem>
 
-          </NavigationMenuList>
-        </NavigationMenu>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
 
         {/* Spacer */}
         <div className="flex-1"></div>

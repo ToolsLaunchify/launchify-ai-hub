@@ -40,9 +40,24 @@ interface UseProductsOptions {
   categoryId?: string;
   productType?: string;
   limit?: number;
+  isPaid?: boolean;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export const useProducts = (options: UseProductsOptions = {}) => {
+  const {
+    isFree,
+    isNewlyLaunched,
+    isFeatured,
+    categoryId,
+    productType,
+    limit,
+    isPaid,
+    sortBy = 'created_at',
+    sortOrder = 'desc'
+  } = options;
+
   return useQuery({
     queryKey: ['products', options],
     queryFn: async (): Promise<Product[]> => {
@@ -51,44 +66,62 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         .select(`
           *,
           category:categories(id, name, slug)
-        `)
-        .order('created_at', { ascending: false });
+        `);
 
       // Apply filters
-      if (options.isFree !== undefined) {
-        query = query.eq('is_free', options.isFree);
+      if (isFree !== undefined) {
+        query = query.eq('is_free', isFree);
       }
 
-      if (options.isNewlyLaunched !== undefined) {
-        query = query.eq('is_newly_launched', options.isNewlyLaunched);
+      if (isNewlyLaunched !== undefined) {
+        query = query.eq('is_newly_launched', isNewlyLaunched);
       }
 
-      if (options.isFeatured !== undefined) {
-        query = query.eq('is_featured', options.isFeatured);
+      if (isFeatured !== undefined) {
+        query = query.eq('is_featured', isFeatured);
       }
 
-      if (options.categoryId) {
-        query = query.eq('category_id', options.categoryId);
+      if (categoryId) {
+        query = query.eq('category_id', categoryId);
       }
 
-      if (options.productType) {
-        if (options.productType === 'paid_tools') {
+      if (productType) {
+        if (productType === 'paid_tools') {
           // For paid tools, filter products with any pricing from any product type
-          query = query.or('original_price.gt.0,discounted_price.gt.0,purchase_price.gt.0');
-        } else if (options.productType === 'software') {
+          query = query.or('original_price.gt.0,discounted_price.gt.0');
+        } else if (productType === 'software') {
           // Software includes both 'software' and 'digital_products' types
           query = query.in('product_type', ['software', 'digital_products']);
-        } else if (options.productType === 'free_tools') {
+        } else if (productType === 'free_tools') {
           // For free_tools, return empty query as we handle these statically in ModernHomepage
           return [];
         } else {
           // For other types (ai_tools), filter by exact product type
-          query = query.eq('product_type', options.productType);
+          query = query.eq('product_type', productType);
         }
       }
 
-      if (options.limit) {
-        query = query.limit(options.limit);
+      if (isPaid === true) {
+        query = query.or('original_price.gt.0,discounted_price.gt.0');
+      }
+
+      if (limit) {
+        query = query.limit(limit);
+      }
+
+      // Apply sorting
+      const ascending = sortOrder === 'asc';
+      if (sortBy === 'name') {
+        query = query.order('name', { ascending });
+      } else if (sortBy === 'views_count') {
+        query = query.order('views_count', { ascending });
+      } else if (sortBy === 'saves_count') {
+        query = query.order('saves_count', { ascending });
+      } else if (sortBy === 'original_price') {
+        query = query.order('original_price', { ascending, nullsFirst: false });
+      } else {
+        // Default to created_at
+        query = query.order('created_at', { ascending });
       }
 
       const { data, error } = await query;

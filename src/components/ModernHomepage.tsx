@@ -4,8 +4,10 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import ToolTypeTabsSection from './ToolTypeTabsSection';
-import CategorySubTabs from './CategorySubTabs';
+import ToolSidebar from './ToolSidebar';
+import ProductViewControls from './ProductViewControls';
 import ProductGridDisplay from './ProductGridDisplay';
+import ProductListView from './ProductListView';
 import { useProductStats } from '@/hooks/useProductStats';
 import { useCategoriesByProductType } from '@/hooks/useCategories';
 import { useProducts } from '@/hooks/useProducts';
@@ -18,6 +20,10 @@ const ModernHomepage: React.FC = () => {
   // State management
   const [activeToolType, setActiveToolType] = useState('ai_tools');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubTab, setActiveSubTab] = useState<'all' | 'featured' | 'newly_launched'>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Data fetching
@@ -26,9 +32,15 @@ const ModernHomepage: React.FC = () => {
   
   // Products query based on active filters
   const { data: databaseProducts = [], isLoading: productsLoading } = useProducts({
-    productType: activeToolType,
+    productType: activeToolType === 'paid_tools' ? undefined : activeToolType,
     categoryId: activeCategory || undefined,
-    limit: 20
+    limit: 200,
+    isPaid: activeToolType === 'paid_tools' ? true : undefined,
+    isFree: activeToolType === 'free_tools' ? true : undefined,
+    isFeatured: activeSubTab === 'featured' ? true : undefined,
+    isNewlyLaunched: activeSubTab === 'newly_launched' ? true : undefined,
+    sortBy: sortBy,
+    sortOrder: sortOrder
   });
 
   // Static free tools that are not in the database
@@ -90,13 +102,14 @@ const ModernHomepage: React.FC = () => {
   ] : [];
 
   // Handle different product types
-  const products = activeToolType === 'free_tools' 
+  const displayProducts = activeToolType === 'free_tools' 
     ? staticFreeTools 
     : databaseProducts;
 
-  // Reset category when tool type changes
+  // Reset category and sub tab when tool type changes
   useEffect(() => {
     setActiveCategory(null);
+    setActiveSubTab('all');
   }, [activeToolType]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -114,6 +127,10 @@ const ModernHomepage: React.FC = () => {
     setActiveCategory(categoryId);
   };
 
+  const handleSubTabSelect = (subTab: 'all' | 'featured' | 'newly_launched') => {
+    setActiveSubTab(subTab);
+  };
+
   const getToolTypeDisplayName = (toolType: string) => {
     const names = {
       ai_tools: 'AI Tools',
@@ -129,6 +146,9 @@ const ModernHomepage: React.FC = () => {
     const category = categories.find(cat => cat.id === activeCategory);
     return category?.name || null;
   };
+
+  // Show sidebar layout for tool types with categories
+  const showSidebarLayout = activeToolType !== 'free_tools' && categories && categories.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -177,42 +197,66 @@ const ModernHomepage: React.FC = () => {
         isLoading={statsLoading}
       />
 
-      {/* Category Sub-tabs - Only show if there are categories for this tool type */}
-      {categories.length > 0 && (
-        <CategorySubTabs
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategorySelect={handleCategorySelect}
-          isLoading={categoriesLoading}
-          toolType={getToolTypeDisplayName(activeToolType)}
-        />
-      )}
+      {/* Main Content Area */}
+      {showSidebarLayout ? (
+        <div className="flex min-h-screen">
+          {/* Sidebar */}
+          <ToolSidebar
+            categories={categories || []}
+            activeCategory={activeCategory}
+            onCategorySelect={handleCategorySelect}
+            productCount={displayProducts.length}
+            activeSubTab={activeSubTab}
+            onSubTabSelect={handleSubTabSelect}
+            activeToolType={activeToolType}
+          />
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Section Header */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            {getToolTypeDisplayName(activeToolType)}
-            {getCurrentCategoryName() && (
-              <span className="text-primary"> • {getCurrentCategoryName()}</span>
-            )}
-          </h2>
-          <p className="text-muted-foreground">
-            {activeCategory 
-              ? `Explore ${getCurrentCategoryName()} tools and solutions`
-              : `Browse all ${getToolTypeDisplayName(activeToolType).toLowerCase()} available`
-            }
-          </p>
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col">
+            <ProductViewControls
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              sortOrder={sortOrder}
+              onSortOrderChange={setSortOrder}
+              totalCount={displayProducts.length}
+            />
+
+            <div className="flex-1 p-6">
+              {viewMode === 'grid' ? (
+                <ProductGridDisplay
+                  products={displayProducts}
+                  isLoading={productsLoading}
+                  categoryName={getCurrentCategoryName()}
+                />
+              ) : (
+                <ProductListView
+                  products={displayProducts}
+                />
+              )}
+            </div>
+          </div>
         </div>
+      ) : (
+        /* Simple layout for Free Tools */
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              {getToolTypeDisplayName(activeToolType)}
+            </h2>
+            <p className="text-muted-foreground">
+              Essential calculators and utilities - completely free to use
+            </p>
+          </div>
 
-        {/* Products Grid */}
-        <ProductGridDisplay
-          products={products}
-          isLoading={productsLoading}
-          categoryName={getCurrentCategoryName()}
-        />
-      </div>
+          <ProductGridDisplay
+            products={displayProducts}
+            isLoading={productsLoading}
+            categoryName={getCurrentCategoryName()}
+          />
+        </div>
+      )}
     </div>
   );
 };

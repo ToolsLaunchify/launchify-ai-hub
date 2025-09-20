@@ -70,10 +70,10 @@ const ToolTypeTabsSection: React.FC<ToolTypeTabsSectionProps> = ({
                 key={toolType.id}
                 variant="ghost"
                 onClick={() => onToolTypeSelect(toolType.id)}
-                className={`h-16 px-8 flex items-center space-x-4 group transition-all duration-300 rounded-full font-medium ${
+                className={`h-16 px-8 flex items-center space-x-4 group transition-all duration-300 rounded-full font-medium border-animated ${
                   isActive
                     ? 'tab-active-enhanced'
-                    : 'tab-inactive-high-contrast'
+                    : 'tab-inactive-enhanced-borders'
                 }`}
               >
                 <div className={`p-2 rounded-full transition-all duration-300 ${
@@ -88,7 +88,7 @@ const ToolTypeTabsSection: React.FC<ToolTypeTabsSectionProps> = ({
                 
                 <div className="flex items-center space-x-2">
                   <span className={`font-medium text-sm ${
-                    isActive ? 'text-white' : 'text-foreground group-hover:text-primary'
+                    isActive ? 'text-white' : 'text-foreground group-hover:text-white'
                   } transition-colors`}>
                     {toolType.name}
                   </span>

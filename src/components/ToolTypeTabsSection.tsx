@@ -70,11 +70,25 @@ const ToolTypeTabsSection: React.FC<ToolTypeTabsSectionProps> = ({
                 key={toolType.id}
                 variant="ghost"
                 onClick={() => onToolTypeSelect(toolType.id)}
-                className={`h-16 px-8 flex items-center space-x-4 group transition-all duration-300 rounded-full font-medium border-animated ${
+                className={`h-16 px-8 flex items-center space-x-4 group transition-all duration-500 rounded-full font-medium border-animated ${
                   isActive
-                    ? 'tab-active-enhanced'
-                    : 'tab-inactive-enhanced-borders'
+                    ? `tab-active-enhanced tab-active-${toolType.id}`
+                    : `tab-inactive-enhanced tab-inactive-${toolType.id}`
                 }`}
+                style={{
+                  '--tool-gradient': `linear-gradient(135deg, ${toolType.gradient.replace('from-', '').replace('to-', '').replace('-500', '').replace('-600', '').split(' ').map(color => {
+                    const colorMap: { [key: string]: string } = {
+                      'blue': 'hsl(217, 91%, 60%)',
+                      'purple': 'hsl(262, 83%, 58%)',
+                      'green': 'hsl(142, 71%, 45%)',
+                      'emerald': 'hsl(160, 84%, 39%)',
+                      'teal': 'hsl(173, 80%, 40%)',
+                      'orange': 'hsl(25, 95%, 53%)',
+                      'red': 'hsl(0, 84%, 60%)'
+                    };
+                    return colorMap[color] || color;
+                  }).join(', ')})`
+                } as React.CSSProperties}
               >
                 <div className={`p-2 rounded-full transition-all duration-300 ${
                   isActive 

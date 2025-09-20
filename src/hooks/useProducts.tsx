@@ -119,8 +119,11 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         query = query.order('saves_count', { ascending });
       } else if (sortBy === 'original_price') {
         query = query.order('original_price', { ascending, nullsFirst: false });
+      } else if (sortBy === 'newly_added') {
+        // Newly added always sorts by created_at desc (newest first)
+        query = query.order('created_at', { ascending: false });
       } else {
-        // Default to created_at
+        // Default to created_at with specified order
         query = query.order('created_at', { ascending });
       }
 

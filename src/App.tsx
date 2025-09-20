@@ -23,6 +23,7 @@ import BlogPostPage from "./pages/BlogPostPage";
 import PageContent from "./components/PageContent";
 import SmartSlugRouter from "./components/SmartSlugRouter";
 import ToolsPage from "./pages/ToolsPage";
+import UserDashboard from "./pages/UserDashboard";
 import PercentageCalculator from "./components/tools/PercentageCalculator";
 import BMICalculator from "./components/tools/BMICalculator";
 
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/category/:slug" element={<CategoryPage />} />
                 <Route path="/type/:type" element={<ToolTypePage />} />
                 <Route path="/saved" element={<SavedProductsPage />} />
+                <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
                 

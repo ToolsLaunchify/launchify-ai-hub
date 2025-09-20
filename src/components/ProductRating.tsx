@@ -3,7 +3,6 @@ import { Star, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,7 +15,7 @@ interface Rating {
   review?: string;
   created_at: string;
   user_id: string;
-  user_email?: string;
+  product_id: string;
 }
 
 interface ProductRatingProps {
@@ -36,14 +35,15 @@ const ProductRating: React.FC<ProductRatingProps> = ({ productId, productName })
   const { data: ratingsData, isLoading } = useQuery({
     queryKey: ['product-ratings', productId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Using any type since the Supabase types haven't been regenerated yet
+      const { data, error } = await (supabase as any)
         .from('product_ratings')
         .select('*')
         .eq('product_id', productId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return data as Rating[] || [];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -65,7 +65,7 @@ const ProductRating: React.FC<ProductRatingProps> = ({ productId, productName })
 
       if (userExistingRating) {
         // Update existing rating
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('product_ratings')
           .update({
             rating,
@@ -77,7 +77,7 @@ const ProductRating: React.FC<ProductRatingProps> = ({ productId, productName })
         if (error) throw error;
       } else {
         // Create new rating
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('product_ratings')
           .insert({
             product_id: productId,
@@ -208,7 +208,7 @@ const ProductRating: React.FC<ProductRatingProps> = ({ productId, productName })
               <>
                 <StarRating rating={Math.round(averageRating)} />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Based on {ratingsData.length} review{ratingsData.length !== 1 ? 's' : ''}
+                  Based on {ratingsData?.length || 0} review{(ratingsData?.length || 0) !== 1 ? 's' : ''}
                 </p>
               </>
             )}

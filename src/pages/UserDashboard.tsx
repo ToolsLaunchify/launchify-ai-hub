@@ -346,7 +346,7 @@ const UserDashboard: React.FC = () => {
                     {savedProducts.slice(0, 3).map((item) => (
                       <ModernProductCard 
                         key={item.id} 
-                        product={item.products!} 
+                        product={item.products! as any} 
                       />
                     ))}
                   </div>
@@ -383,7 +383,7 @@ const UserDashboard: React.FC = () => {
                     {savedProducts.map((item) => (
                       <ModernProductCard 
                         key={item.id} 
-                        product={item.products!} 
+                        product={item.products! as any} 
                       />
                     ))}
                   </div>
@@ -423,7 +423,7 @@ const UserDashboard: React.FC = () => {
                     {recommendations.map((product) => (
                       <ModernProductCard 
                         key={product.id} 
-                        product={product} 
+                        product={product as any} 
                       />
                     ))}
                   </div>

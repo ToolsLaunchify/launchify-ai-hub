@@ -201,9 +201,9 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem asChild>
-                    <Link to="/profile" className="w-full">
+                    <Link to="/dashboard" className="w-full">
                       <User className="mr-2 h-4 w-4" />
-                      Profile
+                      Dashboard
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

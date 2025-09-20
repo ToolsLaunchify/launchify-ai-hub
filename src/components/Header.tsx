@@ -63,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
             <NavigationMenuList className="space-x-2">
             
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground">
+              <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium">
                 <Briefcase className="w-4 h-4 mr-2" />
                 Products
               </NavigationMenuTrigger>
@@ -73,7 +73,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                     <NavigationMenuLink asChild key={type.name}>
                       <Link
                         to={type.href}
-                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-smooth menu-item-hover focus:bg-gradient-to-r focus:from-primary/10 focus:to-primary-glow/10 focus:text-primary"
                       >
                         <div className="text-sm font-medium leading-none">{type.name}</div>
                         <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
@@ -87,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
             </NavigationMenuItem>
 
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 text-muted-foreground hover:text-accent-foreground">
+              <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium">
                 <Tag className="w-4 h-4 mr-2" />
                 Categories
               </NavigationMenuTrigger>
@@ -97,7 +97,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                     <NavigationMenuLink asChild key={category.id}>
                       <Link
                         to={`/category/${category.slug}`}
-                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-smooth menu-item-hover focus:bg-gradient-to-r focus:from-primary/10 focus:to-primary-glow/10 focus:text-primary"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">

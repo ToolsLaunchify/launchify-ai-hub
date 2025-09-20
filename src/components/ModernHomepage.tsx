@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,16 @@ import bmiCalculatorIcon from '@/assets/bmi-calculator-icon.jpg';
 
 const ModernHomepage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get initial tab from URL parameter, default to 'ai_tools'
+  const getInitialTab = () => {
+    const tab = searchParams.get('tab');
+    return ['ai_tools', 'software', 'free_tools', 'paid_tools'].includes(tab || '') ? tab! : 'ai_tools';
+  };
   
   // State management
-  const [activeToolType, setActiveToolType] = useState('ai_tools');
+  const [activeToolType, setActiveToolType] = useState(getInitialTab());
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeSubTab, setActiveSubTab] = useState<'all' | 'featured' | 'newly_launched'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -121,6 +128,8 @@ const ModernHomepage: React.FC = () => {
 
   const handleToolTypeSelect = (toolType: string) => {
     setActiveToolType(toolType);
+    // Update URL parameter when tab is selected
+    setSearchParams({ tab: toolType });
   };
 
   const handleCategorySelect = (categoryId: string | null) => {

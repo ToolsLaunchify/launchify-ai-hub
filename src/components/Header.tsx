@@ -89,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
             <NavigationMenuItem>
               <Link
-                to="/"
+                to="/?tab=ai_tools"
                 className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 text-muted-foreground`}
               >
                 AI Tools
@@ -98,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
             <NavigationMenuItem>
               <Link
-                to="/"
+                to="/?tab=software"
                 className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 text-muted-foreground`}
               >
                 Software
@@ -107,7 +107,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
             <NavigationMenuItem>
               <Link
-                to="/"
+                to="/?tab=free_tools"
                 className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 text-muted-foreground`}
               >
                 Free Tools

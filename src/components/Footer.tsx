@@ -190,6 +190,11 @@ const Footer: React.FC = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/?tab=free_tools" className="text-muted-foreground hover:text-primary transition-colors">
+                    Free Tools
+                  </Link>
+                </li>
+                <li>
                   <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">
                     Blog
                   </Link>

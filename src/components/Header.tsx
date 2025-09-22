@@ -34,12 +34,6 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
     return location.pathname === path;
   };
 
-  const productTypes = [
-    { name: 'AI Tools', href: '/type/ai-tools', description: 'Artificial Intelligence powered tools' },
-    { name: 'Software', href: '/type/software', description: 'Desktop and web applications' },
-    { name: 'Free Tools', href: '/tools', description: 'Free online calculators and utilities' },
-    { name: 'Paid Tools', href: '/type/paid-tools', description: 'Courses, templates, and digital assets' },
-  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -63,54 +57,13 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
             <NavigationMenuList className="space-x-2">
             
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="h-10 px-4 py-2 text-sm font-medium">
-                <Briefcase className="w-4 h-4 mr-2" />
-                Products
-              </NavigationMenuTrigger>
-              <NavigationMenuContent className="min-w-[400px] p-4">
-                <div className="grid grid-cols-2 gap-3">
-                  {productTypes.map((type) => (
-                    <NavigationMenuLink asChild key={type.name}>
-                      <Link
-                        to={type.href}
-                        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-smooth menu-item-hover focus:bg-gradient-to-r focus:from-primary/10 focus:to-primary-glow/10 focus:text-primary"
-                      >
-                        <div className="text-sm font-medium leading-none">{type.name}</div>
-                        <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
-                          {type.description}
-                        </p>
-                      </Link>
-                    </NavigationMenuLink>
-                  ))}
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-
-
-            <NavigationMenuItem>
               <Link
-                to="/?tab=ai_tools"
-                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 text-muted-foreground`}
+                to="/about"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
+                  isActive('/about') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                }`}
               >
-                AI Tools
-              </Link>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <Link
-                to="/?tab=software"
-                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 text-muted-foreground`}
-              >
-                Software
-              </Link>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <Link
-                to="/?tab=free_tools"
-                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 text-muted-foreground`}
-              >
-                Free Tools
+                About Us
               </Link>
             </NavigationMenuItem>
 
@@ -122,6 +75,17 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                 }`}
               >
                 Blog
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link
+                to="/contact"
+                className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-all hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 ${
+                  isActive('/contact') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                Contact
               </Link>
             </NavigationMenuItem>
 
@@ -231,24 +195,27 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
 
                 {/* Mobile Navigation */}
                 <nav className="space-y-2">
-
-                  <div className="space-y-2">
-                    <div className="px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Product Types
-                    </div>
-                    {productTypes.map((type) => (
-                      <Link
-                        key={type.name}
-                        to={type.href}
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                      >
-                        <Briefcase className="h-4 w-4" />
-                        <span>{type.name}</span>
-                      </Link>
-                    ))}
-                  </div>
-
+                  <Link
+                    to="/about"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  >
+                    About Us
+                  </Link>
+                  <Link
+                    to="/blog"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  >
+                    Blog
+                  </Link>
+                  <Link
+                    to="/contact"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  >
+                    Contact
+                  </Link>
                 </nav>
 
                 {/* Mobile User Menu */}

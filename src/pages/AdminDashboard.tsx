@@ -20,7 +20,9 @@ import {
   Mail,
   BookOpen,
   Settings2,
-  ShoppingCart
+  ShoppingCart,
+  Brain,
+  CreditCard
 } from 'lucide-react';
 import ProductsManagement from '@/components/admin/ProductsManagement';
 import CategoriesManagement from '@/components/admin/CategoriesManagement';
@@ -32,6 +34,8 @@ import { AdvancedAnalyticsDashboard } from '@/components/admin/AdvancedAnalytics
 import { LeadsManagement } from '@/components/admin/LeadsManagement';
 import NewsletterManagement from '@/components/admin/NewsletterManagement';
 import OrdersManagement from '@/components/admin/OrdersManagement';
+import { ToolIntelligenceManagement } from '@/components/admin/ToolIntelligenceManagement';
+import { PaymentManagement } from '@/components/admin/PaymentManagement';
 import { useRealAdminStats } from '@/hooks/useRealAdminStats';
 
 const AdminDashboard: React.FC = () => {
@@ -96,7 +100,7 @@ const AdminDashboard: React.FC = () => {
 
         {/* Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-11 mb-8 bg-muted/50 p-1 rounded-lg">
+          <TabsList className="grid w-full grid-cols-13 mb-8 bg-muted/50 p-1 rounded-lg">
             <TabsTrigger 
               value="overview" 
               className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
@@ -173,6 +177,20 @@ const AdminDashboard: React.FC = () => {
             >
               <ShoppingCart className="h-4 w-4" />
               Orders
+            </TabsTrigger>
+            <TabsTrigger 
+              value="tool-intelligence" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <Brain className="h-4 w-4" />
+              Tool Intelligence
+            </TabsTrigger>
+            <TabsTrigger 
+              value="payment-management" 
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+            >
+              <CreditCard className="h-4 w-4" />
+              Payment Management
             </TabsTrigger>
           </TabsList>
 
@@ -327,6 +345,16 @@ const AdminDashboard: React.FC = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics">
             <AdvancedAnalyticsDashboard />
+          </TabsContent>
+
+          {/* Tool Intelligence Tab */}
+          <TabsContent value="tool-intelligence">
+            <ToolIntelligenceManagement />
+          </TabsContent>
+
+          {/* Payment Management Tab */}
+          <TabsContent value="payment-management">
+            <PaymentManagement />
           </TabsContent>
         </Tabs>
       </div>

@@ -258,6 +258,63 @@ export type Database = {
           },
         ]
       }
+      discovered_tools: {
+        Row: {
+          affiliate_info: Json | null
+          category: string | null
+          created_at: string
+          description: string | null
+          external_url: string | null
+          has_affiliate_program: boolean | null
+          id: string
+          launch_date: string | null
+          name: string
+          pricing_info: Json | null
+          priority_score: number | null
+          source_id: string | null
+          source_platform: string
+          status: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          affiliate_info?: Json | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          external_url?: string | null
+          has_affiliate_program?: boolean | null
+          id?: string
+          launch_date?: string | null
+          name: string
+          pricing_info?: Json | null
+          priority_score?: number | null
+          source_id?: string | null
+          source_platform: string
+          status?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          affiliate_info?: Json | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          external_url?: string | null
+          has_affiliate_program?: boolean | null
+          id?: string
+          launch_date?: string | null
+          name?: string
+          pricing_info?: Json | null
+          priority_score?: number | null
+          source_id?: string | null
+          source_platform?: string
+          status?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
@@ -716,6 +773,214 @@ export type Database = {
             columns: ["parent_category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tool_insights: {
+        Row: {
+          action_required: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          insight_type: string
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          priority: string | null
+          related_tool_data: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_required?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          insight_type: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          priority?: string | null
+          related_tool_data?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_required?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          insight_type?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          priority?: string | null
+          related_tool_data?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tool_payment_configs: {
+        Row: {
+          collect_company: boolean | null
+          collect_email: boolean | null
+          collect_phone: boolean | null
+          created_at: string
+          currency: string | null
+          custom_fields: Json | null
+          id: string
+          is_active: boolean | null
+          is_payment_enabled: boolean | null
+          payment_page_url: string | null
+          payment_type: string | null
+          price: number | null
+          product_id: string
+          razorpay_plan_id: string | null
+          refund_policy_url: string | null
+          setup_fee: number | null
+          stripe_price_id: string | null
+          terms_url: string | null
+          trial_period_days: number | null
+          updated_at: string
+        }
+        Insert: {
+          collect_company?: boolean | null
+          collect_email?: boolean | null
+          collect_phone?: boolean | null
+          created_at?: string
+          currency?: string | null
+          custom_fields?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_payment_enabled?: boolean | null
+          payment_page_url?: string | null
+          payment_type?: string | null
+          price?: number | null
+          product_id: string
+          razorpay_plan_id?: string | null
+          refund_policy_url?: string | null
+          setup_fee?: number | null
+          stripe_price_id?: string | null
+          terms_url?: string | null
+          trial_period_days?: number | null
+          updated_at?: string
+        }
+        Update: {
+          collect_company?: boolean | null
+          collect_email?: boolean | null
+          collect_phone?: boolean | null
+          created_at?: string
+          currency?: string | null
+          custom_fields?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_payment_enabled?: boolean | null
+          payment_page_url?: string | null
+          payment_type?: string | null
+          price?: number | null
+          product_id?: string
+          razorpay_plan_id?: string | null
+          refund_policy_url?: string | null
+          setup_fee?: number | null
+          stripe_price_id?: string | null
+          terms_url?: string | null
+          trial_period_days?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tool_payment_configs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tool_purchases: {
+        Row: {
+          amount_paid: number | null
+          created_at: string
+          currency: string | null
+          custom_data: Json | null
+          customer_company: string | null
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          next_billing_date: string | null
+          payment_date: string | null
+          payment_gateway: string | null
+          payment_status: string | null
+          payment_type: string | null
+          product_id: string
+          subscription_id: string | null
+          subscription_status: string | null
+          transaction_id: string | null
+          trial_end_date: string | null
+          updated_at: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          amount_paid?: number | null
+          created_at?: string
+          currency?: string | null
+          custom_data?: Json | null
+          customer_company?: string | null
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          next_billing_date?: string | null
+          payment_date?: string | null
+          payment_gateway?: string | null
+          payment_status?: string | null
+          payment_type?: string | null
+          product_id: string
+          subscription_id?: string | null
+          subscription_status?: string | null
+          transaction_id?: string | null
+          trial_end_date?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          amount_paid?: number | null
+          created_at?: string
+          currency?: string | null
+          custom_data?: Json | null
+          customer_company?: string | null
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          next_billing_date?: string | null
+          payment_date?: string | null
+          payment_gateway?: string | null
+          payment_status?: string | null
+          payment_type?: string | null
+          product_id?: string
+          subscription_id?: string | null
+          subscription_status?: string | null
+          transaction_id?: string | null
+          trial_end_date?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tool_purchases_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]

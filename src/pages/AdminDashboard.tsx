@@ -100,94 +100,94 @@ const AdminDashboard: React.FC = () => {
 
         {/* Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-13 mb-8 bg-muted/50 p-1 rounded-lg">
+          <TabsList className="w-full flex flex-wrap gap-1 mb-8 bg-muted/50 p-2 rounded-lg h-auto justify-start">
             <TabsTrigger 
               value="overview" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <BarChart3 className="h-4 w-4" />
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="products" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <Package className="h-4 w-4" />
               Products
             </TabsTrigger>
             <TabsTrigger 
               value="categories" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <Settings className="h-4 w-4" />
               Categories
             </TabsTrigger>
             <TabsTrigger 
               value="pages" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <PenSquare className="h-4 w-4" />
               Pages
             </TabsTrigger>
             <TabsTrigger 
               value="blog" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <BookOpen className="h-4 w-4" />
               Blog
             </TabsTrigger>
             <TabsTrigger 
               value="footer" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <Settings2 className="h-4 w-4" />
               Footer
             </TabsTrigger>
             <TabsTrigger 
               value="users" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <Users className="h-4 w-4" />
               Users
             </TabsTrigger>
             <TabsTrigger 
               value="leads" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <Mail className="h-4 w-4" />
               Leads
             </TabsTrigger>
             <TabsTrigger 
               value="newsletter" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <Mail className="h-4 w-4" />
               Newsletter
             </TabsTrigger>
             <TabsTrigger 
               value="analytics" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <BarChart3 className="h-4 w-4" />
               Analytics
             </TabsTrigger>
             <TabsTrigger 
               value="orders" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <ShoppingCart className="h-4 w-4" />
               Orders
             </TabsTrigger>
             <TabsTrigger 
               value="tool-intelligence" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <Brain className="h-4 w-4" />
               Tool Intelligence
             </TabsTrigger>
             <TabsTrigger 
               value="payment-management" 
-              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all"
+              className="flex items-center gap-2 bg-background data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap"
             >
               <CreditCard className="h-4 w-4" />
               Payment Management

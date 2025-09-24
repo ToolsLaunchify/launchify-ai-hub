@@ -8,11 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { CreditCard, DollarSign, Users, Settings, Plus, Edit } from 'lucide-react';
+import { CreditCard, DollarSign, Users, Settings, Plus, Edit, Download, Filter, Search, AlertTriangle } from 'lucide-react';
 import { usePaymentConfigs, useToolPurchases, useCreatePaymentConfig, useUpdatePaymentConfig } from '@/hooks/usePaymentConfigs';
 import { useProducts } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export const PaymentManagement = () => {
   const { data: paymentConfigs = [], isLoading: loadingConfigs } = usePaymentConfigs();
@@ -24,6 +25,8 @@ export const PaymentManagement = () => {
 
   const [selectedConfig, setSelectedConfig] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [formData, setFormData] = useState({
     product_id: '',
     is_payment_enabled: false,
@@ -40,6 +43,17 @@ export const PaymentManagement = () => {
     refund_policy_url: '',
     trial_period_days: 0,
     setup_fee: 0,
+    custom_fields: [],
+    auto_renewal: true,
+    grace_period_days: 7,
+    proration_enabled: true,
+    tax_rate: 0,
+    discount_enabled: false,
+    discount_percentage: 0,
+    max_users: 0,
+    feature_limits: {},
+    collect_address: false,
+    support_url: '',
   });
 
   const totalRevenue = purchases
@@ -105,6 +119,17 @@ export const PaymentManagement = () => {
       refund_policy_url: '',
       trial_period_days: 0,
       setup_fee: 0,
+      custom_fields: [],
+      auto_renewal: true,
+      grace_period_days: 7,
+      proration_enabled: true,
+      tax_rate: 0,
+      discount_enabled: false,
+      discount_percentage: 0,
+      max_users: 0,
+      feature_limits: {},
+      collect_address: false,
+      support_url: '',
     });
   };
 
@@ -126,6 +151,17 @@ export const PaymentManagement = () => {
       refund_policy_url: config.refund_policy_url || '',
       trial_period_days: config.trial_period_days || 0,
       setup_fee: config.setup_fee || 0,
+      custom_fields: config.custom_fields || [],
+      auto_renewal: true,
+      grace_period_days: 7,
+      proration_enabled: true,
+      tax_rate: 0,
+      discount_enabled: false,
+      discount_percentage: 0,
+      max_users: 0,
+      feature_limits: {},
+      collect_address: false,
+      support_url: '',
     });
     setIsEditing(true);
   };
@@ -133,6 +169,22 @@ export const PaymentManagement = () => {
   // Get products that don't have payment configs yet
   const availableProducts = products.filter(
     p => !paymentConfigs.some(c => c.product_id === p.id) && p.product_type === 'paid_tools'
+  );
+
+  // Filter configurations based on search and status
+  const filteredConfigs = paymentConfigs.filter(config => {
+    const matchesSearch = config.products?.name.toLowerCase().includes(searchTerm.toLowerCase()) || false;
+    const matchesStatus = filterStatus === 'all' || 
+      (filterStatus === 'enabled' && config.is_payment_enabled) ||
+      (filterStatus === 'disabled' && !config.is_payment_enabled);
+    return matchesSearch && matchesStatus;
+  });
+
+  // Filter purchases
+  const filteredPurchases = purchases.filter(purchase => 
+    purchase.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    purchase.customer_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (purchase.products?.name.toLowerCase().includes(searchTerm.toLowerCase()) || false)
   );
 
   return (
@@ -152,195 +204,265 @@ export const PaymentManagement = () => {
               Configure Payment
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {selectedConfig ? 'Edit Payment Configuration' : 'Create Payment Configuration'}
               </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="product">Select Tool</Label>
-                  <Select 
-                    value={formData.product_id} 
-                    onValueChange={(value) => setFormData({ ...formData, product_id: value })}
-                    disabled={!!selectedConfig}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a tool" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {selectedConfig && selectedConfig.products && (
-                        <SelectItem value={selectedConfig.product_id}>
-                          {selectedConfig.products.name}
-                        </SelectItem>
-                      )}
-                      {availableProducts.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="payment-enabled"
-                    checked={formData.is_payment_enabled}
-                    onCheckedChange={(checked) => setFormData({ ...formData, is_payment_enabled: checked })}
-                  />
-                  <Label htmlFor="payment-enabled">Enable Payment</Label>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="payment-type">Payment Type</Label>
-                  <Select 
-                    value={formData.payment_type} 
-                    onValueChange={(value) => setFormData({ ...formData, payment_type: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="one_time">One Time</SelectItem>
-                      <SelectItem value="monthly">Monthly Subscription</SelectItem>
-                      <SelectItem value="yearly">Yearly Subscription</SelectItem>
-                      <SelectItem value="custom">Custom</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="price">Price</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select 
-                    value={formData.currency} 
-                    onValueChange={(value) => setFormData({ ...formData, currency: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="USD">USD</SelectItem>
-                      <SelectItem value="INR">INR</SelectItem>
-                      <SelectItem value="EUR">EUR</SelectItem>
-                      <SelectItem value="GBP">GBP</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="trial-days">Trial Period (Days)</Label>
-                  <Input
-                    id="trial-days"
-                    type="number"
-                    value={formData.trial_period_days}
-                    onChange={(e) => setFormData({ ...formData, trial_period_days: parseInt(e.target.value) || 0 })}
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="payment-url">Payment Page URL</Label>
-                <Input
-                  id="payment-url"
-                  type="url"
-                  value={formData.payment_page_url}
-                  onChange={(e) => setFormData({ ...formData, payment_page_url: e.target.value })}
-                  placeholder="https://your-payment-page.com"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="razorpay-plan">Razorpay Plan ID</Label>
-                  <Input
-                    id="razorpay-plan"
-                    value={formData.razorpay_plan_id}
-                    onChange={(e) => setFormData({ ...formData, razorpay_plan_id: e.target.value })}
-                    placeholder="plan_xxxxxxxxxx"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="stripe-price">Stripe Price ID</Label>
-                  <Input
-                    id="stripe-price"
-                    value={formData.stripe_price_id}
-                    onChange={(e) => setFormData({ ...formData, stripe_price_id: e.target.value })}
-                    placeholder="price_xxxxxxxxxx"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label>Customer Information to Collect</Label>
-                <div className="flex flex-wrap gap-4 mt-2">
+            <div className="space-y-6">
+              {/* Basic Configuration */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Basic Configuration</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="product">Select Tool</Label>
+                    <Select 
+                      value={formData.product_id} 
+                      onValueChange={(value) => setFormData({ ...formData, product_id: value })}
+                      disabled={!!selectedConfig}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a tool" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedConfig && selectedConfig.products && (
+                          <SelectItem value={selectedConfig.product_id}>
+                            {selectedConfig.products.name}
+                          </SelectItem>
+                        )}
+                        {availableProducts.map((product) => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="flex items-center space-x-2">
                     <Switch
+                      id="payment-enabled"
+                      checked={formData.is_payment_enabled}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_payment_enabled: checked })}
+                    />
+                    <Label htmlFor="payment-enabled">Enable Payment</Label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing Configuration */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Pricing Configuration</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="payment-type">Payment Type</Label>
+                    <Select 
+                      value={formData.payment_type} 
+                      onValueChange={(value) => setFormData({ ...formData, payment_type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="one_time">One Time Payment</SelectItem>
+                        <SelectItem value="monthly">Monthly Subscription</SelectItem>
+                        <SelectItem value="yearly">Yearly Subscription</SelectItem>
+                        <SelectItem value="weekly">Weekly Subscription</SelectItem>
+                        <SelectItem value="lifetime">Lifetime Access</SelectItem>
+                        <SelectItem value="custom">Custom Plan</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="price">Price ({formData.currency})</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="currency">Currency</Label>
+                    <Select 
+                      value={formData.currency} 
+                      onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="USD">USD - US Dollar</SelectItem>
+                        <SelectItem value="EUR">EUR - Euro</SelectItem>
+                        <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                        <SelectItem value="INR">INR - Indian Rupee</SelectItem>
+                        <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                        <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
+                        <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Advanced Pricing Options */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Advanced Pricing Options</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="setup-fee">Setup Fee ({formData.currency})</Label>
+                    <Input
+                      id="setup-fee"
+                      type="number"
+                      step="0.01"
+                      value={formData.setup_fee}
+                      onChange={(e) => setFormData({ ...formData, setup_fee: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="trial-days">Free Trial (Days)</Label>
+                    <Input
+                      id="trial-days"
+                      type="number"
+                      value={formData.trial_period_days}
+                      onChange={(e) => setFormData({ ...formData, trial_period_days: parseInt(e.target.value) || 0 })}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="tax-rate">Tax Rate (%)</Label>
+                    <Input
+                      id="tax-rate"
+                      type="number"
+                      step="0.01"
+                      value={formData.tax_rate}
+                      onChange={(e) => setFormData({ ...formData, tax_rate: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Gateway Configuration */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Payment Gateway Configuration</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="payment-url">Payment Page URL</Label>
+                    <Input
+                      id="payment-url"
+                      type="url"
+                      value={formData.payment_page_url}
+                      onChange={(e) => setFormData({ ...formData, payment_page_url: e.target.value })}
+                      placeholder="https://your-payment-page.com"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="razorpay-plan">Razorpay Plan ID</Label>
+                    <Input
+                      id="razorpay-plan"
+                      value={formData.razorpay_plan_id}
+                      onChange={(e) => setFormData({ ...formData, razorpay_plan_id: e.target.value })}
+                      placeholder="plan_xxxxxxxxxx"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="stripe-price">Stripe Price ID</Label>
+                    <Input
+                      id="stripe-price"
+                      value={formData.stripe_price_id}
+                      onChange={(e) => setFormData({ ...formData, stripe_price_id: e.target.value })}
+                      placeholder="price_xxxxxxxxxx"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="terms-url">Terms & Conditions URL</Label>
+                    <Input
+                      id="terms-url"
+                      type="url"
+                      value={formData.terms_url}
+                      onChange={(e) => setFormData({ ...formData, terms_url: e.target.value })}
+                      placeholder="https://your-site.com/terms"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Customer Data Collection */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Customer Data Collection</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
                       id="collect-email"
                       checked={formData.collect_email}
-                      onCheckedChange={(checked) => setFormData({ ...formData, collect_email: checked })}
+                      onCheckedChange={(checked) => setFormData({ ...formData, collect_email: !!checked })}
                     />
-                    <Label htmlFor="collect-email">Email</Label>
+                    <Label htmlFor="collect-email">Email (Required)</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Switch
+                    <Checkbox
                       id="collect-phone"
                       checked={formData.collect_phone}
-                      onCheckedChange={(checked) => setFormData({ ...formData, collect_phone: checked })}
+                      onCheckedChange={(checked) => setFormData({ ...formData, collect_phone: !!checked })}
                     />
-                    <Label htmlFor="collect-phone">Phone</Label>
+                    <Label htmlFor="collect-phone">Phone Number</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Switch
+                    <Checkbox
                       id="collect-company"
                       checked={formData.collect_company}
-                      onCheckedChange={(checked) => setFormData({ ...formData, collect_company: checked })}
+                      onCheckedChange={(checked) => setFormData({ ...formData, collect_company: !!checked })}
                     />
-                    <Label htmlFor="collect-company">Company</Label>
+                    <Label htmlFor="collect-company">Company Name</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="collect-address"
+                      checked={formData.collect_address || false}
+                      onCheckedChange={(checked) => setFormData({ ...formData, collect_address: !!checked })}
+                    />
+                    <Label htmlFor="collect-address">Billing Address</Label>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="terms-url">Terms & Conditions URL</Label>
-                  <Input
-                    id="terms-url"
-                    type="url"
-                    value={formData.terms_url}
-                    onChange={(e) => setFormData({ ...formData, terms_url: e.target.value })}
-                    placeholder="https://your-site.com/terms"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="refund-url">Refund Policy URL</Label>
-                  <Input
-                    id="refund-url"
-                    type="url"
-                    value={formData.refund_policy_url}
-                    onChange={(e) => setFormData({ ...formData, refund_policy_url: e.target.value })}
-                    placeholder="https://your-site.com/refund"
-                  />
+              {/* Additional URLs */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Legal & Support URLs</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="refund-url">Refund Policy URL</Label>
+                    <Input
+                      id="refund-url"
+                      type="url"
+                      value={formData.refund_policy_url}
+                      onChange={(e) => setFormData({ ...formData, refund_policy_url: e.target.value })}
+                      placeholder="https://your-site.com/refund"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="support-url">Support URL</Label>
+                    <Input
+                      id="support-url"
+                      type="url"
+                      value={formData.support_url || ''}
+                      onChange={(e) => setFormData({ ...formData, support_url: e.target.value })}
+                      placeholder="https://your-site.com/support"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex space-x-2 pt-4">
+              {/* Action Buttons */}
+              <div className="flex space-x-2 pt-6 border-t">
                 <Button onClick={handleSaveConfig} className="flex-1">
                   {selectedConfig ? 'Update Configuration' : 'Create Configuration'}
                 </Button>
@@ -408,6 +530,34 @@ export const PaymentManagement = () => {
         </Card>
       </div>
 
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search tools, customers, or transactions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-64"
+            />
+          </div>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="enabled">Enabled</SelectItem>
+              <SelectItem value="disabled">Disabled</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Export Data
+        </Button>
+      </div>
+
       <Tabs defaultValue="configurations" className="space-y-4">
         <TabsList>
           <TabsTrigger value="configurations">Payment Configurations</TabsTrigger>
@@ -416,18 +566,24 @@ export const PaymentManagement = () => {
 
         <TabsContent value="configurations" className="space-y-4">
           {loadingConfigs ? (
-            <div>Loading payment configurations...</div>
-          ) : paymentConfigs.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <span className="ml-2">Loading payment configurations...</span>
+            </div>
+          ) : filteredConfigs.length === 0 ? (
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center text-muted-foreground">
-                  No payment configurations yet. Start by configuring payment for your paid tools.
+                  {paymentConfigs.length === 0 
+                    ? "No payment configurations yet. Start by configuring payment for your paid tools."
+                    : "No configurations match your search criteria."
+                  }
                 </div>
               </CardContent>
             </Card>
           ) : (
             <div className="grid gap-4">
-              {paymentConfigs.map((config) => (
+              {filteredConfigs.map((config) => (
                 <Card key={config.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -490,18 +646,24 @@ export const PaymentManagement = () => {
 
         <TabsContent value="purchases" className="space-y-4">
           {loadingPurchases ? (
-            <div>Loading purchases...</div>
-          ) : purchases.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <span className="ml-2">Loading purchases...</span>
+            </div>
+          ) : filteredPurchases.length === 0 ? (
             <Card>
               <CardContent className="pt-6">
                 <div className="text-center text-muted-foreground">
-                  No purchases yet. Customers will appear here when they make purchases.
+                  {purchases.length === 0 
+                    ? "No purchases yet. Customers will appear here when they make purchases."
+                    : "No purchases match your search criteria."
+                  }
                 </div>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-4">
-              {purchases.map((purchase) => (
+              {filteredPurchases.map((purchase) => (
                 <Card key={purchase.id}>
                   <CardHeader>
                     <div className="flex items-center justify-between">

@@ -109,6 +109,7 @@ const ProductsManagement: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [filterProductType, setFilterProductType] = useState('all');
   const [richDescription, setRichDescription] = useState('');
   const [fileAttachments, setFileAttachments] = useState<any[]>([]);
   const [videoCourses, setVideoCourses] = useState<any[]>([]);
@@ -118,7 +119,7 @@ const ProductsManagement: React.FC = () => {
 
   // Fetch products
   const { data: products = [], isLoading: productsLoading } = useQuery({
-    queryKey: ['admin-products', searchQuery, filterCategory],
+    queryKey: ['admin-products', searchQuery, filterCategory, filterProductType],
     queryFn: async () => {
       let query = supabase
         .from('products')
@@ -131,6 +132,10 @@ const ProductsManagement: React.FC = () => {
 
       if (filterCategory !== 'all') {
         query = query.eq('category_id', filterCategory);
+      }
+
+      if (filterProductType !== 'all') {
+        query = query.eq('product_type', filterProductType);
       }
 
       const { data, error } = await query;
@@ -1161,7 +1166,7 @@ const ProductsManagement: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 flex-wrap gap-2">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -1182,6 +1187,18 @@ const ProductsManagement: React.FC = () => {
                 {category.name}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+        <Select value={filterProductType} onValueChange={setFilterProductType}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="ai_tools">AI Tools</SelectItem>
+            <SelectItem value="software">Software</SelectItem>
+            <SelectItem value="free_tools">Free Tools</SelectItem>
+            <SelectItem value="paid_tools">Paid Tools</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -1205,6 +1222,7 @@ const ProductsManagement: React.FC = () => {
                 <TableRow>
                   <TableHead>Product</TableHead>
                   <TableHead>Category</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Revenue Type</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Status</TableHead>
@@ -1233,6 +1251,15 @@ const ProductsManagement: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell>{getCategoryName(product.category_id)}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {product.product_type === 'ai_tools' ? 'AI Tools' :
+                         product.product_type === 'software' ? 'Software' :
+                         product.product_type === 'free_tools' ? 'Free Tools' :
+                         product.product_type === 'paid_tools' ? 'Paid Tools' :
+                         product.product_type || 'Software'}
+                      </Badge>
+                    </TableCell>
                     <TableCell>
                       <RevenueTypeIndicator 
                         revenueType={(product.revenue_type as 'affiliate' | 'payment' | 'free') || 'free'} 

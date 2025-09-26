@@ -44,8 +44,14 @@ export const useResumes = () => {
       if (!user) return [];
 
       const { data, error } = await supabase
-        .from('user_resumes' as any)
-        .select('*')
+        .from('user_resumes')
+        .select(`
+          *,
+          resume_templates (
+            name,
+            template_data
+          )
+        `)
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
@@ -65,8 +71,14 @@ export const useResume = (resumeId: string) => {
       if (!user || !resumeId) return null;
 
       const { data, error } = await supabase
-        .from('user_resumes' as any)
-        .select('*')
+        .from('user_resumes')
+        .select(`
+          *,
+          resume_templates (
+            name,
+            template_data
+          )
+        `)
         .eq('id', resumeId)
         .eq('user_id', user.id)
         .maybeSingle();
@@ -83,7 +95,7 @@ export const useResumeTemplates = () => {
     queryKey: ['resume-templates'],
     queryFn: async (): Promise<ResumeTemplate[]> => {
       const { data, error } = await supabase
-        .from('resume_templates' as any)
+        .from('resume_templates')
         .select('*')
         .eq('is_active', true)
         .order('name');
@@ -107,12 +119,12 @@ export const useCreateResume = () => {
       if (!user) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
-        .from('user_resumes' as any)
+        .from('user_resumes')
         .insert({
           user_id: user.id,
           title: resumeData.title,
           template_id: resumeData.template_id || null,
-          sections: resumeData.sections || [],
+          sections: JSON.stringify(resumeData.sections || []) as any,
         })
         .select()
         .single();
@@ -141,8 +153,11 @@ export const useUpdateResume = () => {
       if (!user) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
-        .from('user_resumes' as any)
-        .update(updates)
+        .from('user_resumes')
+        .update({
+          ...updates,
+          sections: updates.sections ? JSON.stringify(updates.sections) as any : undefined,
+        })
         .eq('id', resumeId)
         .eq('user_id', user.id)
         .select()
@@ -167,7 +182,7 @@ export const useDeleteResume = () => {
       if (!user) throw new Error('User not authenticated');
 
       const { error } = await supabase
-        .from('user_resumes' as any)
+        .from('user_resumes')
         .delete()
         .eq('id', resumeId)
         .eq('user_id', user.id);

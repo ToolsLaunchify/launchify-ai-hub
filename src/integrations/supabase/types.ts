@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      ats_scores: {
+        Row: {
+          analysis_data: Json
+          created_at: string
+          id: string
+          resume_id: string
+          score: number
+        }
+        Insert: {
+          analysis_data?: Json
+          created_at?: string
+          id?: string
+          resume_id: string
+          score: number
+        }
+        Update: {
+          analysis_data?: Json
+          created_at?: string
+          id?: string
+          resume_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ats_scores_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "user_resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -706,6 +738,74 @@ export type Database = {
           },
         ]
       }
+      resume_collaborations: {
+        Row: {
+          collaborator_id: string
+          created_at: string
+          id: string
+          permission_level: string
+          resume_id: string
+        }
+        Insert: {
+          collaborator_id: string
+          created_at?: string
+          id?: string
+          permission_level?: string
+          resume_id: string
+        }
+        Update: {
+          collaborator_id?: string
+          created_at?: string
+          id?: string
+          permission_level?: string
+          resume_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resume_collaborations_resume_id_fkey"
+            columns: ["resume_id"]
+            isOneToOne: false
+            referencedRelation: "user_resumes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resume_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_premium: boolean
+          name: string
+          preview_image_url: string | null
+          template_data: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_premium?: boolean
+          name: string
+          preview_image_url?: string | null
+          template_data?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_premium?: boolean
+          name?: string
+          preview_image_url?: string | null
+          template_data?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -981,6 +1081,47 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_resumes: {
+        Row: {
+          created_at: string
+          id: string
+          is_public: boolean
+          sections: Json
+          template_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          sections?: Json
+          template_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          sections?: Json
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_resumes_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "resume_templates"
             referencedColumns: ["id"]
           },
         ]

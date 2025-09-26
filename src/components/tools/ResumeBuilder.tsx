@@ -31,6 +31,9 @@ import ResumePersonalSection from './resume/ResumePersonalSection';
 import ResumeExperienceSection from './resume/ResumeExperienceSection';
 import ResumeEducationSection from './resume/ResumeEducationSection';
 import ResumeSkillsSection from './resume/ResumeSkillsSection';
+import ResumeSectionManager from './resume/ResumeSectionManager';
+import ResumeProjectsSection from './resume/ResumeProjectsSection';
+import ResumeSummarySection from './resume/ResumeSummarySection';
 
 const ResumeBuilder: React.FC = () => {
   const navigate = useNavigate();
@@ -46,9 +49,10 @@ const ResumeBuilder: React.FC = () => {
   const [resumeTitle, setResumeTitle] = useState('Untitled Resume');
   const [resumeSections, setResumeSections] = useState<any[]>([
     { id: '1', type: 'personal', title: 'Personal Information', content: {}, order: 1 },
-    { id: '2', type: 'experience', title: 'Work Experience', content: { items: [] }, order: 2 },
-    { id: '3', type: 'education', title: 'Education', content: { items: [] }, order: 3 },
-    { id: '4', type: 'skills', title: 'Skills', content: { items: [] }, order: 4 },
+    { id: '2', type: 'summary', title: 'Professional Summary', content: { text: '' }, order: 2 },
+    { id: '3', type: 'experience', title: 'Work Experience', content: { items: [] }, order: 3 },
+    { id: '4', type: 'education', title: 'Education', content: { items: [] }, order: 4 },
+    { id: '5', type: 'skills', title: 'Skills', content: { items: [] }, order: 5 },
   ]);
 
   const { data: resume, isLoading: resumeLoading } = useResume(resumeId || '');
@@ -161,9 +165,12 @@ const ResumeBuilder: React.FC = () => {
       case 'experience': return Briefcase;
       case 'education': return GraduationCap;
       case 'skills': return Code;
-      case 'projects': return FileText;
-      case 'certifications': return Award;
-      case 'languages': return Globe;
+    case 'projects': return FileText;
+    case 'certifications': return Award;
+    case 'languages': return Globe;
+    case 'awards': return Award;
+    case 'references': return User;
+    case 'summary': return FileText;
       default: return FileText;
     }
   };
@@ -255,60 +262,68 @@ const ResumeBuilder: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Editor Panel */}
               <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      Resume Sections
-                      <Button variant="outline" size="sm">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Section
-                      </Button>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {resumeSections.map((section) => {
-                        const IconComponent = getSectionIcon(section.type);
-                        return (
-                          <Card key={section.id} className="border-l-4 border-l-primary">
-                            <CardHeader className="pb-3">
-                              <CardTitle className="flex items-center space-x-2 text-base">
-                                <IconComponent className="w-4 h-4" />
-                                <span>{section.title}</span>
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              {section.type === 'personal' && (
-                                <ResumePersonalSection
-                                  content={section.content || {}}
-                                  onChange={(content) => updateSection(section.id, content)}
-                                />
-                              )}
-                              {section.type === 'experience' && (
-                                <ResumeExperienceSection
-                                  content={section.content?.items ? section.content : { items: [] }}
-                                  onChange={(content) => updateSection(section.id, content)}
-                                />
-                              )}
-                              {section.type === 'education' && (
-                                <ResumeEducationSection
-                                  content={section.content?.items ? section.content : { items: [] }}
-                                  onChange={(content) => updateSection(section.id, content)}
-                                />
-                              )}
-                              {section.type === 'skills' && (
-                                <ResumeSkillsSection
-                                  content={section.content?.items ? section.content : { items: [] }}
-                                  onChange={(content) => updateSection(section.id, content)}
-                                />
-                              )}
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Section Management */}
+                <ResumeSectionManager 
+                  sections={resumeSections}
+                  onUpdateSections={setResumeSections}
+                />
+
+                {/* Section Editors */}
+                <div className="space-y-4">
+                  {resumeSections
+                    .sort((a, b) => a.order - b.order)
+                    .map((section) => {
+                      const IconComponent = getSectionIcon(section.type);
+                      return (
+                        <Card key={section.id} className="border-l-4 border-l-primary">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="flex items-center space-x-2 text-base">
+                              <IconComponent className="w-4 h-4" />
+                              <span>{section.title}</span>
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            {section.type === 'personal' && (
+                              <ResumePersonalSection
+                                content={section.content || {}}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'summary' && (
+                              <ResumeSummarySection
+                                content={section.content || { text: '' }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'experience' && (
+                              <ResumeExperienceSection
+                                content={section.content?.items ? section.content : { items: [] }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'education' && (
+                              <ResumeEducationSection
+                                content={section.content?.items ? section.content : { items: [] }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'skills' && (
+                              <ResumeSkillsSection
+                                content={section.content?.items ? section.content : { items: [] }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'projects' && (
+                              <ResumeProjectsSection
+                                content={section.content?.items ? section.content : { items: [] }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                </div>
               </div>
 
               {/* Live Preview Panel */}

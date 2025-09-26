@@ -645,7 +645,7 @@ const ProductsManagement: React.FC = () => {
                     <SelectItem value="ai_tools">AI Tools</SelectItem>
                     <SelectItem value="software">Software</SelectItem>
                     <SelectItem value="free_tools">Free Tools</SelectItem>
-                    <SelectItem value="paid_tools">Paid Tools</SelectItem>
+                    <SelectItem value="digital_products">Digital Products</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1198,7 +1198,7 @@ const ProductsManagement: React.FC = () => {
             <SelectItem value="ai_tools">AI Tools</SelectItem>
             <SelectItem value="software">Software</SelectItem>
             <SelectItem value="free_tools">Free Tools</SelectItem>
-            <SelectItem value="paid_tools">Paid Tools</SelectItem>
+            <SelectItem value="digital_products">Digital Products</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -1256,7 +1256,7 @@ const ProductsManagement: React.FC = () => {
                         {product.product_type === 'ai_tools' ? 'AI Tools' :
                          product.product_type === 'software' ? 'Software' :
                          product.product_type === 'free_tools' ? 'Free Tools' :
-                         product.product_type === 'paid_tools' ? 'Paid Tools' :
+                         product.product_type === 'digital_products' ? 'Digital Products' :
                          product.product_type || 'Software'}
                       </Badge>
                     </TableCell>

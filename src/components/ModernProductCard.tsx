@@ -15,6 +15,12 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
     e.preventDefault();
     e.stopPropagation();
     
+    // For embedded tools, navigate to the tool URL
+    if (product.is_embedded_tool && product.tool_url) {
+      window.location.href = product.tool_url;
+      return;
+    }
+    
     if (product.affiliate_link) {
       window.open(product.affiliate_link, '_blank');
     } else if (product.payment_link) {
@@ -38,8 +44,21 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
     return `${Math.ceil(diffDays / 30)} months ago`;
   };
 
+  // For embedded tools, link directly to the tool URL
+  const linkTo = product.is_embedded_tool && product.tool_url 
+    ? product.tool_url 
+    : `/${product.slug || product.id}`;
+  
+  const LinkComponent = product.is_embedded_tool && product.tool_url 
+    ? ({ children, className }: { children: React.ReactNode; className: string }) => (
+        <a href={product.tool_url} className={className}>{children}</a>
+      )
+    : ({ children, className }: { children: React.ReactNode; className: string }) => (
+        <Link to={linkTo} className={className}>{children}</Link>
+      );
+
   return (
-    <Link to={`/${product.slug || product.id}`} className="block group">
+    <LinkComponent className="block group">
       <Card className="h-full bg-card hover:shadow-lg transition-all duration-300 border-border group-hover:border-primary/20 group-hover:-translate-y-2 overflow-hidden">
         <CardContent className="p-4">
           {/* Product icon/image */}
@@ -132,7 +151,7 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
           </Button>
         </CardFooter>
       </Card>
-    </Link>
+    </LinkComponent>
   );
 };
 

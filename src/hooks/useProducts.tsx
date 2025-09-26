@@ -16,6 +16,8 @@ export interface Product {
   is_popular: boolean | null;
   is_trending: boolean | null;
   is_editors_choice: boolean | null;
+  is_embedded_tool: boolean | null;
+  tool_url: string | null;
   original_price: number | null;
   discounted_price: number | null;
   currency: string | null;

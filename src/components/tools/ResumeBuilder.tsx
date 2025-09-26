@@ -31,6 +31,7 @@ import ResumePersonalSection from './resume/ResumePersonalSection';
 import ResumeExperienceSection from './resume/ResumeExperienceSection';
 import ResumeEducationSection from './resume/ResumeEducationSection';
 import ResumeSkillsSection from './resume/ResumeSkillsSection';
+import ResumeExporter from './resume/ResumeExporter';
 
 const ResumeBuilder: React.FC = () => {
   const navigate = useNavigate();
@@ -111,19 +112,7 @@ const ResumeBuilder: React.FC = () => {
     }
   };
 
-  const handleExport = () => {
-    toast({
-      title: "Export Feature",
-      description: "Export functionality will be available soon!",
-    });
-  };
-
-  const handleShare = () => {
-    toast({
-      title: "Share Feature",
-      description: "Sharing functionality will be available soon!",
-    });
-  };
+  // Export and share functionality is now handled by ResumeExporter component
 
   const updateSection = (sectionId: string, content: any) => {
     setResumeSections(prev => 
@@ -188,14 +177,10 @@ const ResumeBuilder: React.FC = () => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
+              <ResumeExporter 
+                resumeElementId="resume-preview" 
+                resumeTitle={resumeTitle}
+              />
               <Button size="sm" onClick={handleSave} disabled={createResume.isPending || updateResume.isPending}>
                 <Save className="w-4 h-4 mr-2" />
                 {createResume.isPending || updateResume.isPending ? 'Saving...' : 'Save'}
@@ -298,10 +283,12 @@ const ResumeBuilder: React.FC = () => {
                     <CardTitle className="text-sm text-muted-foreground">Live Preview</CardTitle>
                   </CardHeader>
                   <CardContent className="h-full">
-                    <ResumePreview
-                      sections={resumeSections}
-                      template={templates?.find(t => t.id === selectedTemplate)}
-                    />
+                    <div id="resume-preview">
+                      <ResumePreview
+                        sections={resumeSections}
+                        template={templates?.find(t => t.id === selectedTemplate)}
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -310,11 +297,13 @@ const ResumeBuilder: React.FC = () => {
 
           <TabsContent value="preview" className="mt-6">
             <div className="max-w-4xl mx-auto">
-              <ResumePreview
-                sections={resumeSections}
-                template={templates?.find(t => t.id === selectedTemplate)}
-                fullSize
-              />
+              <div id="resume-preview-full">
+                <ResumePreview
+                  sections={resumeSections}
+                  template={templates?.find(t => t.id === selectedTemplate)}
+                  fullSize
+                />
+              </div>
             </div>
           </TabsContent>
         </Tabs>

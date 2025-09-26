@@ -15,9 +15,9 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
     e.preventDefault();
     e.stopPropagation();
     
-    // For embedded tools, navigate to the tool URL
+    // For embedded tools, open in new window
     if (product.is_embedded_tool && product.tool_url) {
-      window.location.href = product.tool_url;
+      window.open(product.tool_url, '_blank', 'noopener,noreferrer');
       return;
     }
     
@@ -44,14 +44,25 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
     return `${Math.ceil(diffDays / 30)} months ago`;
   };
 
-  // For embedded tools, link directly to the tool URL
+  // For embedded tools, open in new window when clicked
   const linkTo = product.is_embedded_tool && product.tool_url 
     ? product.tool_url 
     : `/${product.slug || product.id}`;
   
   const LinkComponent = product.is_embedded_tool && product.tool_url 
     ? ({ children, className }: { children: React.ReactNode; className: string }) => (
-        <a href={product.tool_url} className={className}>{children}</a>
+        <a 
+          href={product.tool_url} 
+          className={className}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(product.tool_url, '_blank', 'noopener,noreferrer');
+          }}
+        >
+          {children}
+        </a>
       )
     : ({ children, className }: { children: React.ReactNode; className: string }) => (
         <Link to={linkTo} className={className}>{children}</Link>

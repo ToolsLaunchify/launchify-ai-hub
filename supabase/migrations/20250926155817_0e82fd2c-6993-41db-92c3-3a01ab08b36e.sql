@@ -1,0 +1,7 @@
+-- Add more sample resume templates with preview images  
+INSERT INTO resume_templates (name, description, template_data, preview_image_url, is_premium) VALUES
+('Corporate Executive', 'A sophisticated template for C-level positions', '{"colors":{"primary":"#1a365d","secondary":"#4a5568"},"style":"executive","layout":"traditional"}', '/src/assets/template-executive.png', true),
+('Creative Portfolio', 'Perfect for designers and creative professionals', '{"colors":{"primary":"#7c3aed","secondary":"#a855f7"},"style":"creative","layout":"modern"}', '/src/assets/template-creative.png', false),
+('Tech Professional', 'Clean, minimal design for software engineers', '{"colors":{"primary":"#059669","secondary":"#10b981"},"style":"minimal","layout":"single-column"}', '/src/assets/template-tech.png', false),
+('Academic Research', 'Formal template for researchers and academics', '{"colors":{"primary":"#dc2626","secondary":"#ef4444"},"style":"academic","layout":"detailed"}', '/src/assets/template-academic.png', false),
+('Sales & Marketing', 'Dynamic template for sales professionals', '{"colors":{"primary":"#ea580c","secondary":"#fb923c"},"style":"dynamic","layout":"achievement-focused"}', '/src/assets/template-sales.png', false);

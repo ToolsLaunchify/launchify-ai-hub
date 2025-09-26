@@ -31,7 +31,6 @@ import ResumePersonalSection from './resume/ResumePersonalSection';
 import ResumeExperienceSection from './resume/ResumeExperienceSection';
 import ResumeEducationSection from './resume/ResumeEducationSection';
 import ResumeSkillsSection from './resume/ResumeSkillsSection';
-import ResumeExporter from './resume/ResumeExporter';
 
 const ResumeBuilder: React.FC = () => {
   const navigate = useNavigate();
@@ -112,7 +111,39 @@ const ResumeBuilder: React.FC = () => {
     }
   };
 
-  // Export and share functionality is now handled by ResumeExporter component
+  const handleExport = () => {
+    toast({
+      title: "Export Feature Coming Soon",
+      description: "PDF export functionality will be available shortly!",
+    });
+  };
+
+  const handleShare = async () => {
+    try {
+      const url = window.location.href;
+      
+      if (navigator.share) {
+        await navigator.share({
+          title: resumeTitle,
+          text: 'Check out my resume!',
+          url: url
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({
+          title: "Link Copied",
+          description: "Resume link copied to clipboard!",
+        });
+      }
+    } catch (error) {
+      console.error('Share error:', error);
+      toast({
+        title: "Share Failed", 
+        description: "Unable to share resume. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const updateSection = (sectionId: string, content: any) => {
     setResumeSections(prev => 
@@ -177,10 +208,14 @@ const ResumeBuilder: React.FC = () => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <ResumeExporter 
-                resumeElementId="resume-preview" 
-                resumeTitle={resumeTitle}
-              />
+              <Button variant="outline" size="sm" onClick={handleShare}>
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
               <Button size="sm" onClick={handleSave} disabled={createResume.isPending || updateResume.isPending}>
                 <Save className="w-4 h-4 mr-2" />
                 {createResume.isPending || updateResume.isPending ? 'Saving...' : 'Save'}

@@ -13,10 +13,10 @@ export const useProductStats = () => {
   return useQuery({
     queryKey: ['product-stats'],
     queryFn: async (): Promise<ProductStats> => {
-      // Get all products with their types and pricing info
+      // Get all products with their types, pricing info, and revenue type
       const { data: productData, error: productError } = await supabase
         .from('products')
-        .select('product_type, original_price, discounted_price, purchase_price');
+        .select('product_type, original_price, discounted_price, purchase_price, revenue_type');
 
       if (productError) throw productError;
 
@@ -46,12 +46,14 @@ export const useProductStats = () => {
           stats.software += 1;
         }
         
-        // Count paid tools (products with any price > 0)
-        const hasPricing = (product.original_price && product.original_price > 0) ||
-                          (product.discounted_price && product.discounted_price > 0) ||
-                          (product.purchase_price && product.purchase_price > 0);
+        // Count paid tools based on revenue_type or pricing
+        const isPaid = product.revenue_type === 'payment' || 
+                      product.revenue_type === 'affiliate' ||
+                      (product.original_price && product.original_price > 0) ||
+                      (product.discounted_price && product.discounted_price > 0) ||
+                      (product.purchase_price && product.purchase_price > 0);
         
-        if (hasPricing) {
+        if (isPaid) {
           stats.paid_tools += 1;
         }
         

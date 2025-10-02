@@ -119,24 +119,6 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
             {product.description || 'No description available'}
           </p>
 
-          {/* Price display */}
-          {!product.is_free && (product.original_price || product.discounted_price) && (
-            <div className="mb-3">
-              <div className="flex items-center gap-2">
-                {product.original_price && product.original_price !== product.discounted_price && (
-                  <span className="text-sm text-muted-foreground line-through">
-                    {formatPrice(product.original_price)}
-                  </span>
-                )}
-                {product.discounted_price && (
-                  <span className="text-lg font-bold text-primary">
-                    {formatPrice(product.discounted_price)}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Stats */}
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
             <span className="flex items-center">

@@ -149,21 +149,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </div>
               
               <div className="flex flex-col items-end space-y-2 ml-4">
-                {!isFree && (
-                  <div className="text-right">
-                    {originalPrice && originalPrice !== discountedPrice && (
-                      <span className="text-sm text-muted-foreground line-through">
-                        {formatPrice(originalPrice)}
-                      </span>
-                    )}
-                    {discountedPrice && (
-                      <div className="text-lg font-bold text-primary">
-                        {formatPrice(discountedPrice)}
-                      </div>
-                    )}
-                  </div>
-                )}
-                
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="ghost"
@@ -279,21 +264,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
       
       <CardFooter className="p-4 pt-0">
         <div className="flex items-center justify-between w-full">
-          {!isFree && (
-            <div className="flex flex-col">
-              {originalPrice && originalPrice !== discountedPrice && (
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatPrice(originalPrice)}
-                </span>
-              )}
-              {discountedPrice && (
-                <span className="text-lg font-bold text-primary">
-                  {formatPrice(discountedPrice)}
-                </span>
-              )}
-            </div>
-          )}
-          
           <Button
             variant={isFree ? "accent" : "hero"}
             size="sm"

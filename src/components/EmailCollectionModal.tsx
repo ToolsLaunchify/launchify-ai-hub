@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { validateLeadData } from '@/lib/validation';
+import { z } from 'zod';
 
 interface EmailCollectionModalProps {
   isOpen: boolean;
@@ -98,17 +100,22 @@ export const EmailCollectionModal: React.FC<EmailCollectionModalProps> = ({
     setIsLoading(true);
 
     try {
+      // Validate and sanitize input data
+      const validatedData = validateLeadData({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+      });
+
       const sourceInfo = getSourceInfo();
       
       const leadData = {
         product_id: productId,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || null,
+        ...validatedData,
         utm_source: sourceInfo.utm_source,
         utm_medium: sourceInfo.utm_medium,
         utm_campaign: sourceInfo.utm_campaign,
-        ip_address: null, // Will be handled by backend if needed
+        ip_address: null,
         user_agent: navigator.userAgent,
         referrer: document.referrer || null,
       };
@@ -133,8 +140,13 @@ export const EmailCollectionModal: React.FC<EmailCollectionModalProps> = ({
       onClose();
 
     } catch (error) {
-      console.error('Error in email collection:', error);
-      toast.error('An error occurred. Please try again.');
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError.message);
+      } else {
+        console.error('Error in email collection:', error);
+        toast.error('An error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -165,6 +177,7 @@ export const EmailCollectionModal: React.FC<EmailCollectionModalProps> = ({
               placeholder="Enter your full name"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
+              maxLength={100}
               required
             />
           </div>
@@ -177,6 +190,7 @@ export const EmailCollectionModal: React.FC<EmailCollectionModalProps> = ({
               placeholder="Enter your email address"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
+              maxLength={255}
               required
             />
           </div>
@@ -189,6 +203,7 @@ export const EmailCollectionModal: React.FC<EmailCollectionModalProps> = ({
               placeholder="Enter your phone number"
               value={formData.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
+              maxLength={20}
             />
           </div>
 

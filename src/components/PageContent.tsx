@@ -4,6 +4,7 @@ import { usePageBySlug } from '@/hooks/usePages';
 import { SEOHead } from '@/components/SEOHead';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 const PageContent: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -56,7 +57,7 @@ const PageContent: React.FC = () => {
             
             <div 
               className="prose-lg leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: page.content || '' }} 
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content || '') }} 
             />
           </article>
         </div>

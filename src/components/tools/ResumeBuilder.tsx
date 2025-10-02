@@ -54,6 +54,7 @@ const ResumeBuilder: React.FC = () => {
   const [activeTab, setActiveTab] = useState(isNewResume ? 'template' : 'build');
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [resumeTitle, setResumeTitle] = useState('Untitled Resume');
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [resumeSections, setResumeSections] = useState<any[]>([
     { id: '1', type: 'personal', title: 'Personal Information', content: {}, order: 1 },
     { id: '2', type: 'summary', title: 'Professional Summary', content: { text: '' }, order: 2 },
@@ -243,7 +244,28 @@ const ResumeBuilder: React.FC = () => {
               <Separator orientation="vertical" className="h-6" />
               <div className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-primary" />
-                <h1 className="text-xl font-semibold">{resumeTitle}</h1>
+                {isEditingTitle ? (
+                  <Input
+                    value={resumeTitle}
+                    onChange={(e) => setResumeTitle(e.target.value)}
+                    onBlur={() => setIsEditingTitle(false)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setIsEditingTitle(false);
+                      }
+                    }}
+                    className="h-8 text-xl font-semibold border-0 focus-visible:ring-1 px-2 w-auto min-w-[200px]"
+                    autoFocus
+                  />
+                ) : (
+                  <h1 
+                    className="text-xl font-semibold cursor-pointer hover:text-primary transition-colors"
+                    onClick={() => setIsEditingTitle(true)}
+                    title="Click to edit title"
+                  >
+                    {resumeTitle}
+                  </h1>
+                )}
                 <Badge variant="secondary" className="ml-2">
                   {isNewResume ? 'New' : 'Draft'}
                 </Badge>

@@ -27,6 +27,7 @@ import UserDashboard from "./pages/UserDashboard";
 import PercentageCalculator from "./components/tools/PercentageCalculator";
 import BMICalculator from "./components/tools/BMICalculator";
 import ResumeBuilderPage from "./pages/ResumeBuilderPage";
+import ResumeBuilderLandingPage from "./pages/ResumeBuilderLandingPage";
 
 const queryClient = new QueryClient();
 
@@ -60,7 +61,8 @@ const App = () => (
                 <Route path="/tools" element={<ToolsPage />} />
                 <Route path="/tools/percentage-calculator" element={<PercentageCalculator />} />
                 <Route path="/tools/bmi-calculator" element={<BMICalculator />} />
-                <Route path="/tools/resume-builder" element={<ResumeBuilderPage />} />
+                <Route path="/tools/resume-builder" element={<ResumeBuilderLandingPage />} />
+                <Route path="/tools/resume-builder/app" element={<ResumeBuilderPage />} />
                 
                 {/* Dynamic page route for any other pages */}
                 <Route path="/page/:slug" element={<PageContent />} />

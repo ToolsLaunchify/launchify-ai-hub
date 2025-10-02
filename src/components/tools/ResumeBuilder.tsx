@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   FileText, 
   Download, 
@@ -297,6 +299,29 @@ const ResumeBuilder: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Editor Panel */}
               <div className="space-y-6">
+                {/* Resume Title Editor */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Resume Title</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <Label htmlFor="resume-title">Give your resume a name</Label>
+                      <Input
+                        id="resume-title"
+                        type="text"
+                        placeholder="e.g., Software Engineer Resume"
+                        value={resumeTitle}
+                        onChange={(e) => setResumeTitle(e.target.value)}
+                        className="text-lg"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        This title is for your reference and won't appear on the resume
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Section Management */}
                 <ResumeSectionManager 
                   sections={resumeSections}

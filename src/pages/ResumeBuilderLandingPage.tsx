@@ -103,8 +103,8 @@ const ResumeBuilderLandingPage: React.FC = () => {
 
   const faqs = [
     {
-      question: 'Is the Resume Builder really free?',
-      answer: 'Yes! Our Resume Builder is completely free to use. Create unlimited resumes, access all templates, and export as PDF without any cost.'
+      question: 'What does the Resume Builder cost?',
+      answer: 'Contact us for pricing information. We offer flexible plans to suit your needs.'
     },
     {
       question: 'Are the resumes ATS-friendly?',
@@ -120,7 +120,7 @@ const ResumeBuilderLandingPage: React.FC = () => {
     },
     {
       question: 'Do I need to create an account?',
-      answer: 'Yes, a free account is required to save your resumes and access them later. Sign up takes less than 30 seconds.'
+      answer: 'Yes, an account is required to save your resumes and access them later. Sign up takes less than 30 seconds.'
     },
     {
       question: 'Can I create multiple resumes?',
@@ -131,10 +131,10 @@ const ResumeBuilderLandingPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Professional Resume Builder - Free Online CV Maker | Tools Launchify</title>
-        <meta name="description" content="Create professional resumes in minutes with our free resume builder. Choose from 9 ATS-friendly templates, real-time preview, and high-quality PDF export." />
-        <meta property="og:title" content="Professional Resume Builder - Free Online CV Maker" />
-        <meta property="og:description" content="Build stunning resumes with our free online resume builder. 9 professional templates, ATS-friendly, instant PDF download." />
+        <title>Professional Resume Builder - Online CV Maker | Tools Launchify</title>
+        <meta name="description" content="Create professional resumes in minutes with our resume builder. Choose from 9 ATS-friendly templates, real-time preview, and high-quality PDF export." />
+        <meta property="og:title" content="Professional Resume Builder - Online CV Maker" />
+        <meta property="og:description" content="Build stunning resumes with our online resume builder. 9 professional templates, ATS-friendly, instant PDF download." />
         <meta property="og:type" content="website" />
         <link rel="canonical" href={`${window.location.origin}/tools/resume-builder`} />
       </Helmet>
@@ -146,7 +146,7 @@ const ResumeBuilderLandingPage: React.FC = () => {
             <div className="text-center space-y-6">
               <Badge className="bg-gradient-primary text-primary-foreground text-sm px-4 py-1">
                 <Sparkles className="w-3 h-3 mr-1 inline" />
-                Free Professional Resume Builder
+                Professional Resume Builder
               </Badge>
               
               <h1 className="text-4xl md:text-6xl font-bold text-foreground">
@@ -162,7 +162,7 @@ const ResumeBuilderLandingPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
                 <Button asChild size="lg" variant="hero" className="text-lg px-8 py-6">
                   <Link to="/tools/resume-builder/app">
-                    Start Building Free
+                    Start Building Now
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
                 </Button>
@@ -232,7 +232,7 @@ const ResumeBuilderLandingPage: React.FC = () => {
             <div className="text-center mt-12">
               <Button asChild size="lg" variant="premium">
                 <Link to="/tools/resume-builder/app">
-                  Try All Templates Free
+                  Try All Templates
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -359,7 +359,7 @@ const ResumeBuilderLandingPage: React.FC = () => {
               className="text-lg px-8 py-6"
             >
               <Link to="/tools/resume-builder/app">
-                Start Building for Free
+                Start Building Now
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>

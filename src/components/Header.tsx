@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, User, Heart, Settings, LogOut, Home, Briefcase, Tag, Grid3X3, ChevronDown } from 'lucide-react';
+import { Search, Menu, User, Heart, Settings, LogOut, Home, Briefcase, Tag, Grid3X3, ChevronDown, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -106,6 +106,12 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                   Saved
                 </Link>
               </Button>
+              <Button variant="ghost" size="sm" asChild className="rounded-xl">
+                <Link to="/my-resumes">
+                  <FileText className="h-4 w-4 mr-2" />
+                  My Resumes
+                </Link>
+              </Button>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -130,6 +136,12 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                     <Link to="/saved" className="w-full">
                       <Heart className="mr-2 h-4 w-4" />
                       Saved Products
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-resumes" className="w-full">
+                      <FileText className="mr-2 h-4 w-4" />
+                      My Resumes
                     </Link>
                   </DropdownMenuItem>
                   {isAdmin && (
@@ -240,6 +252,15 @@ const Header: React.FC<HeaderProps> = ({ onSearch }) => {
                       >
                         <Heart className="h-4 w-4" />
                         <span>Saved Products</span>
+                      </Link>
+
+                      <Link
+                        to="/my-resumes"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                      >
+                        <FileText className="h-4 w-4" />
+                        <span>My Resumes</span>
                       </Link>
 
                       {isAdmin && (

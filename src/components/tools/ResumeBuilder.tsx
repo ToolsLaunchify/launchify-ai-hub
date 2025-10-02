@@ -236,10 +236,10 @@ const ResumeBuilder: React.FC = () => {
             <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
-                onClick={() => navigate('/tools')}
+                onClick={() => navigate('/my-resumes')}
                 className="text-muted-foreground hover:text-foreground"
               >
-                ← Back to Tools
+                ← My Resumes
               </Button>
               <Separator orientation="vertical" className="h-6" />
               <div className="flex items-center space-x-2">

@@ -11,7 +11,8 @@ import {
   Eye,
   Bookmark,
   Settings,
-  Grid3X3
+  Grid3X3,
+  FileText
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ import { useSavedProducts } from '@/hooks/useSavedProducts';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import ModernProductCard from '@/components/ModernProductCard';
+import MyResumes from '@/components/MyResumes';
 
 const UserDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -157,8 +159,14 @@ const UserDashboard: React.FC = () => {
         .select('id', { count: 'exact' })
         .eq('user_id', user.id);
 
+      const { data: resumeCount } = await supabase
+        .from('user_resumes')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id);
+
       return {
         savedCount: savedCount?.length || 0,
+        resumeCount: resumeCount?.length || 0,
         joinDate: user.created_at,
         profileLevel: Math.floor((savedCount?.length || 0) / 5) + 1,
       };
@@ -225,7 +233,7 @@ const UserDashboard: React.FC = () => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Saved Tools</CardTitle>
@@ -235,6 +243,19 @@ const UserDashboard: React.FC = () => {
               <div className="text-2xl font-bold">{userStats?.savedCount || 0}</div>
               <p className="text-xs text-muted-foreground">
                 Tools in your collection
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">My Resumes</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{userStats?.resumeCount || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                Professional resumes
               </p>
             </CardContent>
           </Card>
@@ -274,9 +295,10 @@ const UserDashboard: React.FC = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="saved">Saved Tools</TabsTrigger>
+            <TabsTrigger value="resumes">My Resumes</TabsTrigger>
             <TabsTrigger value="recommendations">For You</TabsTrigger>
           </TabsList>
 
@@ -401,6 +423,10 @@ const UserDashboard: React.FC = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="resumes" className="space-y-6">
+            <MyResumes />
           </TabsContent>
 
           <TabsContent value="recommendations" className="space-y-6">

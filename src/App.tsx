@@ -28,6 +28,7 @@ import PercentageCalculator from "./components/tools/PercentageCalculator";
 import BMICalculator from "./components/tools/BMICalculator";
 import ResumeBuilderPage from "./pages/ResumeBuilderPage";
 import ResumeBuilderLandingPage from "./pages/ResumeBuilderLandingPage";
+import MyResumes from "./components/MyResumes";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
                 <Route path="/type/:type" element={<ToolTypePage />} />
                 <Route path="/saved" element={<SavedProductsPage />} />
                 <Route path="/dashboard" element={<UserDashboard />} />
+                <Route path="/my-resumes" element={<MyResumes />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
                 

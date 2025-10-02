@@ -38,6 +38,7 @@ import ResumeCertificationsSection from './resume/ResumeCertificationsSection';
 import ResumeLanguagesSection from './resume/ResumeLanguagesSection';
 import ResumeAwardsSection from './resume/ResumeAwardsSection';
 import ResumeReferencesSection from './resume/ResumeReferencesSection';
+import html2pdf from 'html2pdf.js';
 
 const ResumeBuilder: React.FC = () => {
   const navigate = useNavigate();
@@ -119,11 +120,40 @@ const ResumeBuilder: React.FC = () => {
     }
   };
 
-  const handleExport = () => {
-    toast({
-      title: "Export Feature Coming Soon",
-      description: "PDF export functionality will be available shortly!",
-    });
+  const handleExport = async () => {
+    try {
+      toast({
+        title: "Generating PDF",
+        description: "Please wait while we create your resume PDF...",
+      });
+
+      const element = document.getElementById('resume-preview');
+      if (!element) {
+        throw new Error('Resume preview not found');
+      }
+
+      const opt = {
+        margin: 0.5,
+        filename: `${resumeTitle.replace(/\s+/g, '_')}_Resume.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const }
+      };
+
+      await html2pdf().set(opt).from(element).save();
+
+      toast({
+        title: "Success",
+        description: "Your resume has been exported as PDF!",
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting your resume. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleShare = async () => {
@@ -259,6 +289,7 @@ const ResumeBuilder: React.FC = () => {
               templates={templates || []}
               selectedTemplate={selectedTemplate}
               onSelectTemplate={setSelectedTemplate}
+              onContinue={() => setActiveTab('build')}
             />
           </TabsContent>
 
@@ -360,7 +391,7 @@ const ResumeBuilder: React.FC = () => {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm text-muted-foreground">Live Preview</CardTitle>
                   </CardHeader>
-                  <CardContent className="h-full">
+                  <CardContent className="h-full overflow-y-auto">
                     <div id="resume-preview">
                       <ResumePreview
                         sections={resumeSections}

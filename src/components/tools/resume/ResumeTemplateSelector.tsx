@@ -2,30 +2,59 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { ResumeTemplate } from '@/hooks/useResumes';
+import templateClassic from '@/assets/template-classic.png';
+import templateModern from '@/assets/template-modern.png';
+import templateAcademic from '@/assets/template-academic.png';
+import templateExecutive from '@/assets/template-executive.png';
+import templateCreative from '@/assets/template-creative.png';
+import templateSales from '@/assets/template-sales.png';
+import templateTech from '@/assets/template-tech.png';
+import templateMinimal from '@/assets/template-minimal.png';
+import templateProfessional from '@/assets/template-professional.png';
 
 interface ResumeTemplateSelectorProps {
   templates: ResumeTemplate[];
   selectedTemplate: string | null;
   onSelectTemplate: (templateId: string) => void;
+  onContinue?: () => void;
 }
+
+const templateImages: Record<string, string> = {
+  'classic': templateClassic,
+  'modern': templateModern,
+  'academic': templateAcademic,
+  'executive': templateExecutive,
+  'creative': templateCreative,
+  'sales': templateSales,
+  'tech': templateTech,
+  'minimal': templateMinimal,
+  'professional': templateProfessional,
+};
 
 const ResumeTemplateSelector: React.FC<ResumeTemplateSelectorProps> = ({
   templates,
   selectedTemplate,
   onSelectTemplate,
+  onContinue,
 }) => {
   const { toast } = useToast();
 
-  const handleSelectTemplate = (templateId: string, templateName: string) => {
+  const handleSelectTemplate = (templateId: string) => {
     onSelectTemplate(templateId);
     toast({
       title: "Template Selected",
-      description: `${templateName} template has been selected. Continue to build your resume.`,
+      description: "You can now proceed to build your resume.",
     });
   };
+
+  const getTemplateImage = (templateName: string) => {
+    const key = templateName.toLowerCase();
+    return templateImages[key] || templateImages['modern'];
+  };
+  
   if (templates.length === 0) {
     return (
       <div className="text-center py-12">
@@ -43,14 +72,22 @@ const ResumeTemplateSelector: React.FC<ResumeTemplateSelectorProps> = ({
         </p>
       </div>
 
+      {selectedTemplate && onContinue && (
+        <div className="flex justify-center">
+          <Button onClick={onContinue} size="lg" className="gap-2">
+            Continue to Build Resume
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {templates.map((template) => (
           <Card 
             key={template.id} 
-            className={`cursor-pointer transition-all hover:shadow-lg ${
+            className={`transition-all hover:shadow-lg ${
               selectedTemplate === template.id ? 'ring-2 ring-primary' : ''
             }`}
-            onClick={() => handleSelectTemplate(template.id, template.name)}
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
@@ -70,26 +107,11 @@ const ResumeTemplateSelector: React.FC<ResumeTemplateSelectorProps> = ({
             <CardContent>
               {/* Template Preview */}
               <div className="aspect-[8.5/11] bg-gradient-subtle rounded-lg mb-4 overflow-hidden">
-                {template.preview_image_url ? (
-                  <img 
-                    src={template.preview_image_url} 
-                    alt={`${template.name} preview`}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
-                    <div className="text-center p-4">
-                      <div className="w-full h-4 bg-primary/20 rounded mb-2"></div>
-                      <div className="w-3/4 h-3 bg-primary/15 rounded mb-2"></div>
-                      <div className="w-1/2 h-3 bg-primary/15 rounded mb-4"></div>
-                      <div className="space-y-2">
-                        <div className="w-full h-2 bg-primary/10 rounded"></div>
-                        <div className="w-5/6 h-2 bg-primary/10 rounded"></div>
-                        <div className="w-4/5 h-2 bg-primary/10 rounded"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <img 
+                  src={template.preview_image_url || getTemplateImage(template.name)} 
+                  alt={`${template.name} preview`}
+                  className="w-full h-full object-cover"
+                />
               </div>
               
               {template.description && (
@@ -101,25 +123,21 @@ const ResumeTemplateSelector: React.FC<ResumeTemplateSelectorProps> = ({
               <Button 
                 variant={selectedTemplate === template.id ? "default" : "outline"}
                 className="w-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSelectTemplate(template.id, template.name);
-                }}
+                onClick={() => handleSelectTemplate(template.id)}
               >
-                {selectedTemplate === template.id ? 'Selected' : 'Select Template'}
+                {selectedTemplate === template.id ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Selected
+                  </>
+                ) : (
+                  'Select Template'
+                )}
               </Button>
             </CardContent>
           </Card>
         ))}
       </div>
-
-      {selectedTemplate && (
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground mb-4">
-            Template selected! Continue to build your resume.
-          </p>
-        </div>
-      )}
     </div>
   );
 };

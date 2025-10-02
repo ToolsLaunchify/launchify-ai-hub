@@ -16,15 +16,28 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
   template,
   fullSize = false,
 }) => {
+  // Get all sections
   const personalSection = sections.find(s => s.type === 'personal');
+  const summarySection = sections.find(s => s.type === 'summary');
   const experienceSection = sections.find(s => s.type === 'experience');
   const educationSection = sections.find(s => s.type === 'education');
   const skillsSection = sections.find(s => s.type === 'skills');
+  const projectsSection = sections.find(s => s.type === 'projects');
+  const certificationsSection = sections.find(s => s.type === 'certifications');
+  const languagesSection = sections.find(s => s.type === 'languages');
+  const awardsSection = sections.find(s => s.type === 'awards');
+  const referencesSection = sections.find(s => s.type === 'references');
 
   const personalInfo = personalSection?.content || {};
+  const summary = summarySection?.content?.summary || '';
   const experiences = experienceSection?.content?.items || [];
   const education = educationSection?.content?.items || [];
   const skills = skillsSection?.content?.items || [];
+  const projects = projectsSection?.content?.items || [];
+  const certifications = certificationsSection?.content?.items || [];
+  const languages = languagesSection?.content?.items || [];
+  const awards = awardsSection?.content?.items || [];
+  const references = referencesSection?.content?.items || [];
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -80,15 +93,20 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
               </div>
             )}
           </div>
-          
-          {personalInfo.summary && (
-            <div className="mt-4 text-gray-700 max-w-3xl mx-auto">
-              <p className="text-sm leading-relaxed">{personalInfo.summary}</p>
-            </div>
-          )}
         </div>
 
         <Separator />
+
+        {/* Professional Summary */}
+        {summary && (
+          <>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-3">Professional Summary</h2>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">{summary}</p>
+            </div>
+            <Separator />
+          </>
+        )}
 
         {/* Work Experience */}
         {experiences.length > 0 && (
@@ -190,6 +208,164 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
           </div>
         )}
 
+        {/* Projects */}
+        {projects.length > 0 && (
+          <>
+            {(experiences.length > 0 || education.length > 0 || skills.length > 0) && <Separator />}
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Projects</h2>
+              <div className="space-y-4">
+                {projects.map((project: any) => (
+                  <div key={project.id} className="space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">{project.name}</h3>
+                        {project.role && <p className="text-gray-700 font-medium">{project.role}</p>}
+                      </div>
+                      {project.startDate && (
+                        <div className="text-sm text-gray-600 text-right">
+                          <p>
+                            {formatDate(project.startDate)} - {project.isOngoing ? 'Present' : formatDate(project.endDate)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    {project.description && (
+                      <p className="text-sm text-gray-700 whitespace-pre-line">{project.description}</p>
+                    )}
+                    {project.technologies && project.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {project.technologies.map((tech: string, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {tech}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    {project.link && (
+                      <p className="text-sm text-blue-600">
+                        <a href={project.link} target="_blank" rel="noopener noreferrer">{project.link}</a>
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Certifications */}
+        {certifications.length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Certifications</h2>
+              <div className="space-y-3">
+                {certifications.map((cert: any) => (
+                  <div key={cert.id} className="space-y-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{cert.name}</h3>
+                        <p className="text-gray-700 text-sm">{cert.issuer}</p>
+                      </div>
+                      {cert.date && (
+                        <p className="text-sm text-gray-600">{formatDate(cert.date)}</p>
+                      )}
+                    </div>
+                    {cert.credentialId && (
+                      <p className="text-xs text-gray-600">Credential ID: {cert.credentialId}</p>
+                    )}
+                    {cert.credentialUrl && (
+                      <p className="text-xs text-blue-600">
+                        <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer">View Certificate</a>
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Languages */}
+        {languages.length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Languages</h2>
+              <div className="grid grid-cols-2 gap-3">
+                {languages.map((lang: any) => (
+                  <div key={lang.id} className="flex justify-between items-center">
+                    <span className="font-medium text-gray-900">{lang.name}</span>
+                    <Badge variant="outline" className="text-xs">{lang.proficiency}</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Awards */}
+        {awards.length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Awards & Honors</h2>
+              <div className="space-y-3">
+                {awards.map((award: any) => (
+                  <div key={award.id} className="space-y-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{award.title}</h3>
+                        <p className="text-gray-700 text-sm">{award.issuer}</p>
+                      </div>
+                      {award.date && (
+                        <p className="text-sm text-gray-600">{formatDate(award.date)}</p>
+                      )}
+                    </div>
+                    {award.description && (
+                      <p className="text-sm text-gray-700 whitespace-pre-line">{award.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* References */}
+        {references.length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">References</h2>
+              <div className="space-y-4">
+                {references.map((ref: any) => (
+                  <div key={ref.id} className="space-y-1">
+                    <h3 className="font-semibold text-gray-900">{ref.name}</h3>
+                    {ref.position && <p className="text-gray-700 text-sm">{ref.position}</p>}
+                    {ref.company && <p className="text-gray-700 text-sm">{ref.company}</p>}
+                    <div className="flex gap-4 text-sm text-gray-600 mt-1">
+                      {ref.email && (
+                        <div className="flex items-center gap-1">
+                          <Mail className="w-3 h-3" />
+                          <span>{ref.email}</span>
+                        </div>
+                      )}
+                      {ref.phone && (
+                        <div className="flex items-center gap-1">
+                          <Phone className="w-3 h-3" />
+                          <span>{ref.phone}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Template Info */}
         {template && (
           <div className="text-center text-xs text-gray-500 mt-8">
@@ -199,7 +375,9 @@ const ResumePreview: React.FC<ResumePreviewProps> = ({
 
         {/* Empty State */}
         {!personalInfo.firstName && !personalInfo.lastName && experiences.length === 0 && 
-         education.length === 0 && skills.length === 0 && (
+         education.length === 0 && skills.length === 0 && projects.length === 0 &&
+         certifications.length === 0 && languages.length === 0 && awards.length === 0 &&
+         references.length === 0 && !summary && (
           <div className="text-center py-12 text-gray-500">
             <p>Start building your resume by filling out the sections on the left.</p>
           </div>

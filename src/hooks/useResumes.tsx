@@ -4,7 +4,7 @@ import { useAuth } from './useAuth';
 
 export interface ResumeSection {
   id: string;
-  type: 'personal' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'languages';
+  type: 'personal' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'languages' | 'awards' | 'references' | 'summary';
   title: string;
   content: any;
   order: number;
@@ -124,7 +124,7 @@ export const useCreateResume = () => {
           user_id: user.id,
           title: resumeData.title,
           template_id: resumeData.template_id || null,
-          sections: JSON.stringify(resumeData.sections || []) as any,
+          sections: (resumeData.sections || []) as any,
         })
         .select()
         .single();
@@ -156,7 +156,7 @@ export const useUpdateResume = () => {
         .from('user_resumes')
         .update({
           ...updates,
-          sections: updates.sections ? JSON.stringify(updates.sections) as any : undefined,
+          sections: updates.sections as any,
         })
         .eq('id', resumeId)
         .eq('user_id', user.id)

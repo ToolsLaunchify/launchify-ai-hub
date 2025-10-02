@@ -34,6 +34,10 @@ import ResumeSkillsSection from './resume/ResumeSkillsSection';
 import ResumeSectionManager from './resume/ResumeSectionManager';
 import ResumeProjectsSection from './resume/ResumeProjectsSection';
 import ResumeSummarySection from './resume/ResumeSummarySection';
+import ResumeCertificationsSection from './resume/ResumeCertificationsSection';
+import ResumeLanguagesSection from './resume/ResumeLanguagesSection';
+import ResumeAwardsSection from './resume/ResumeAwardsSection';
+import ResumeReferencesSection from './resume/ResumeReferencesSection';
 
 const ResumeBuilder: React.FC = () => {
   const navigate = useNavigate();
@@ -44,7 +48,7 @@ const ResumeBuilder: React.FC = () => {
   const resumeId = searchParams.get('id');
   const isNewResume = !resumeId;
   
-  const [activeTab, setActiveTab] = useState('build');
+  const [activeTab, setActiveTab] = useState(isNewResume ? 'template' : 'build');
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [resumeTitle, setResumeTitle] = useState('Untitled Resume');
   const [resumeSections, setResumeSections] = useState<any[]>([
@@ -315,6 +319,30 @@ const ResumeBuilder: React.FC = () => {
                             )}
                             {section.type === 'projects' && (
                               <ResumeProjectsSection
+                                content={section.content?.items ? section.content : { items: [] }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'certifications' && (
+                              <ResumeCertificationsSection
+                                content={section.content?.items ? section.content : { items: [] }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'languages' && (
+                              <ResumeLanguagesSection
+                                content={section.content?.items ? section.content : { items: [] }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'awards' && (
+                              <ResumeAwardsSection
+                                content={section.content?.items ? section.content : { items: [] }}
+                                onChange={(content) => updateSection(section.id, content)}
+                              />
+                            )}
+                            {section.type === 'references' && (
+                              <ResumeReferencesSection
                                 content={section.content?.items ? section.content : { items: [] }}
                                 onChange={(content) => updateSection(section.id, content)}
                               />

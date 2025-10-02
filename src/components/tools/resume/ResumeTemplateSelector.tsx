@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import type { ResumeTemplate } from '@/hooks/useResumes';
 
 interface ResumeTemplateSelectorProps {
@@ -16,6 +17,15 @@ const ResumeTemplateSelector: React.FC<ResumeTemplateSelectorProps> = ({
   selectedTemplate,
   onSelectTemplate,
 }) => {
+  const { toast } = useToast();
+
+  const handleSelectTemplate = (templateId: string, templateName: string) => {
+    onSelectTemplate(templateId);
+    toast({
+      title: "Template Selected",
+      description: `${templateName} template has been selected. Continue to build your resume.`,
+    });
+  };
   if (templates.length === 0) {
     return (
       <div className="text-center py-12">
@@ -40,7 +50,7 @@ const ResumeTemplateSelector: React.FC<ResumeTemplateSelectorProps> = ({
             className={`cursor-pointer transition-all hover:shadow-lg ${
               selectedTemplate === template.id ? 'ring-2 ring-primary' : ''
             }`}
-            onClick={() => onSelectTemplate(template.id)}
+            onClick={() => handleSelectTemplate(template.id, template.name)}
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
@@ -93,7 +103,7 @@ const ResumeTemplateSelector: React.FC<ResumeTemplateSelectorProps> = ({
                 className="w-full"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onSelectTemplate(template.id);
+                  handleSelectTemplate(template.id, template.name);
                 }}
               >
                 {selectedTemplate === template.id ? 'Selected' : 'Select Template'}

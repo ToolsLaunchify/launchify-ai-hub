@@ -90,15 +90,29 @@ export const useProducts = (options: UseProductsOptions = {}) => {
       if (productType) {
         if (productType === 'free_tools') {
           // Only show products explicitly categorized as free_tools
-          query = query.eq('product_type', 'free_tools');
+          // Double-check with revenue_type and is_free for data integrity
+          query = query
+            .eq('product_type', 'free_tools')
+            .eq('is_free', true)
+            .eq('revenue_type', 'free');
         } else if (productType === 'paid_tools') {
           // For paid tools, filter products with any pricing from any product type
-          query = query.or('original_price.gt.0,discounted_price.gt.0');
+          // Include products with affiliate or payment revenue types
+          query = query.or('original_price.gt.0,discounted_price.gt.0,revenue_type.eq.affiliate,revenue_type.eq.payment,revenue_type.eq.paid');
         } else if (productType === 'software') {
           // Software includes both 'software' and 'digital_products' types
-          query = query.in('product_type', ['software', 'digital_products']);
+          // Exclude free_tools to prevent overlap
+          query = query
+            .in('product_type', ['software', 'digital_products'])
+            .neq('product_type', 'free_tools');
+        } else if (productType === 'ai_tools') {
+          // AI Tools must be explicitly categorized as ai_tools
+          // Exclude free_tools to prevent overlap
+          query = query
+            .eq('product_type', 'ai_tools')
+            .neq('product_type', 'free_tools');
         } else {
-          // For other types (ai_tools), filter by exact product type
+          // For any other types, filter by exact product type
           query = query.eq('product_type', productType);
         }
       }

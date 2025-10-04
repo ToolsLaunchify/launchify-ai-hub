@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import ToolTypeTabsSection from './ToolTypeTabsSection';
+import ProductTypeFilter from './ProductTypeFilter';
 import ToolSidebar from './ToolSidebar';
 import ProductViewControls from './ProductViewControls';
 import ProductGridDisplay from './ProductGridDisplay';
@@ -11,21 +11,18 @@ import ProductListView from './ProductListView';
 import { useProductStats } from '@/hooks/useProductStats';
 import { useCategoriesByProductType } from '@/hooks/useCategories';
 import { useProducts } from '@/hooks/useProducts';
+import { useProductTypeFilter } from '@/hooks/useProductTypeFilter';
 
 const ModernHomepage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   
-  // Get initial tab from URL parameter, default to 'ai_tools'
-  const getInitialTab = () => {
-    const tab = searchParams.get('tab');
-    // Don't allow paid_tools tab for now (hidden until we have paid products)
-    if (tab === 'paid_tools') return 'ai_tools';
-    return ['ai_tools', 'software', 'free_tools'].includes(tab || '') ? tab! : 'ai_tools';
-  };
+  // Use the product type filter hook with URL sync
+  const { activeType: activeToolType, setActiveType: setActiveToolType } = useProductTypeFilter({
+    defaultType: 'ai_tools',
+    syncWithUrl: true
+  });
   
   // State management
-  const [activeToolType, setActiveToolType] = useState(getInitialTab());
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeSubTab, setActiveSubTab] = useState<'all' | 'featured' | 'newly_launched'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -61,10 +58,8 @@ const ModernHomepage: React.FC = () => {
     }
   };
 
-  const handleToolTypeSelect = (toolType: string) => {
+  const handleToolTypeSelect = (toolType: any) => {
     setActiveToolType(toolType);
-    // Update URL parameter when tab is selected
-    setSearchParams({ tab: toolType });
   };
 
   const handleCategorySelect = (categoryId: string | null) => {
@@ -133,12 +128,13 @@ const ModernHomepage: React.FC = () => {
         </div>
       </div>
 
-      {/* Tool Type Tabs */}
-      <ToolTypeTabsSection
-        activeToolType={activeToolType}
-        onToolTypeSelect={handleToolTypeSelect}
+      {/* Product Type Filter */}
+      <ProductTypeFilter
+        activeType={activeToolType}
+        onTypeChange={handleToolTypeSelect}
         productStats={productStats}
         isLoading={statsLoading}
+        layout="horizontal"
       />
 
       {/* Main Content Area */}

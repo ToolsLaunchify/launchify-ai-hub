@@ -27,32 +27,18 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
     return `${Math.ceil(diffDays / 30)} months ago`;
   };
 
-  // For embedded tools, open in new window when clicked
+  // For embedded tools, use tool_url, otherwise use product slug/id
   const linkTo = product.is_embedded_tool && product.tool_url 
     ? product.tool_url 
     : `/${product.slug || product.id}`;
-  
-  const LinkComponent = product.is_embedded_tool && product.tool_url 
-    ? ({ children, className }: { children: React.ReactNode; className: string }) => (
-        <a 
-          href={product.tool_url} 
-          className={className}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => {
-            e.preventDefault();
-            window.open(product.tool_url, '_blank', 'noopener,noreferrer');
-          }}
-        >
-          {children}
-        </a>
-      )
-    : ({ children, className }: { children: React.ReactNode; className: string }) => (
-        <Link to={linkTo} className={className}>{children}</Link>
-      );
 
   return (
-    <LinkComponent className="block group">
+    <a 
+      href={linkTo} 
+      className="block group"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <Card className="h-full bg-card hover:shadow-lg transition-all duration-300 border-border group-hover:border-primary/20 group-hover:-translate-y-2 overflow-hidden">
         <CardContent className="p-4">
           {/* Product icon/image */}
@@ -126,7 +112,7 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
           </Button>
         </CardFooter>
       </Card>
-    </LinkComponent>
+    </a>
   );
 };
 

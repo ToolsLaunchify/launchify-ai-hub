@@ -86,7 +86,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   if (variant === 'list') {
     return (
-      <Link to={`/${product.slug || product.id}`} className="block group">
+      <a 
+        href={`/${product.slug || product.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block group"
+      >
         <Card className="card-hover border-glow">
           <div className="flex items-start p-4 space-x-4">
             <div className="flex-shrink-0">
@@ -170,12 +175,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
       </Card>
-      </Link>
+      </a>
     );
   }
 
   return (
-    <Link to={`/${product.slug || product.id}`} className="block group">
+    <a 
+      href={`/${product.slug || product.id}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block group"
+    >
       <Card className="card-hover border-glow group">
         <CardHeader className="p-0">
           <div className="relative overflow-hidden rounded-t-lg">
@@ -260,9 +270,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <ExternalLink className="h-3 w-3" />
           </Button>
         </div>
-      </CardFooter>
-    </Card>
-    </Link>
+          </CardFooter>
+        </Card>
+      </a>
   );
 };
 

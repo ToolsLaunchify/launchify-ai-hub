@@ -57,11 +57,19 @@ const ToolTypeTabsSection: React.FC<ToolTypeTabsSectionProps> = ({
     }
   ];
 
+  // Filter out Paid Tools tab if there are no paid tools
+  const visibleToolTypes = toolTypes.filter(toolType => {
+    if (toolType.id === 'paid_tools' && toolType.count === 0) {
+      return false;
+    }
+    return true;
+  });
+
   return (
     <div className="tab-container-elevated backdrop-blur-sm border-b">
       <div className="container mx-auto px-4 py-5">
         <div className="flex flex-wrap justify-center gap-4">
-          {toolTypes.map((toolType) => {
+          {visibleToolTypes.map((toolType) => {
             const Icon = toolType.icon;
             const isActive = activeToolType === toolType.id;
             

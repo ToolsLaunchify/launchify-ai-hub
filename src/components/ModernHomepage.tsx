@@ -19,7 +19,9 @@ const ModernHomepage: React.FC = () => {
   // Get initial tab from URL parameter, default to 'ai_tools'
   const getInitialTab = () => {
     const tab = searchParams.get('tab');
-    return ['ai_tools', 'software', 'free_tools', 'paid_tools'].includes(tab || '') ? tab! : 'ai_tools';
+    // Don't allow paid_tools tab for now (hidden until we have paid products)
+    if (tab === 'paid_tools') return 'ai_tools';
+    return ['ai_tools', 'software', 'free_tools'].includes(tab || '') ? tab! : 'ai_tools';
   };
   
   // State management

@@ -1,155 +1,203 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import ProductCard from '@/components/ProductCard';
-import { Card } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useProductTypeFilter, ProductType } from '@/hooks/useProductTypeFilter';
+import { useCategoriesByProductType } from '@/hooks/useCategories';
+import { useProducts } from '@/hooks/useProducts';
+import { useProductStats } from '@/hooks/useProductStats';
+import ProductTypeFilter from '@/components/ProductTypeFilter';
+import ToolSidebar from '@/components/ToolSidebar';
+import ProductViewControls from '@/components/ProductViewControls';
+import ProductGridDisplay from '@/components/ProductGridDisplay';
+import ProductListView from '@/components/ProductListView';
+import { Skeleton } from '@/components/ui/skeleton';
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  image_url: string | null;
-  category_id: string | null;
-  product_type: string | null;
-  is_free: boolean | null;
-  is_featured: boolean | null;
-  original_price: number | null;
-  discounted_price: number | null;
-  currency: string | null;
-  affiliate_link: string | null;
-  payment_link: string | null;
-  cta_button_text: string | null;
-  views_count: number | null;
-  saves_count: number | null;
-  created_at: string;
-  category?: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-}
-
-const ProductTypePage: React.FC = () => {
+const ProductTypePage = () => {
   const { type } = useParams<{ type: string }>();
-
-  const { data: products = [], isLoading, error } = useQuery({
-    queryKey: ['products-by-type', type],
-    queryFn: async (): Promise<Product[]> => {
-      let productType = type;
-      
-      // Map URL segments to database product types
-      const typeMapping: Record<string, string> = {
-        'ai-tools': 'ai_tools',
-        'free-tools': 'free_tools',
-        'paid-tools': 'paid_tools',
-        'software': 'software'
-      };
-
-      if (type && typeMapping[type]) {
-        productType = typeMapping[type];
-      }
-
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          *,
-          category:categories(id, name, slug)
-        `)
-        .eq('product_type', productType)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!type,
+  
+  // Map URL-friendly types to database product types
+  const productTypeMapping: Record<string, ProductType> = {
+    'ai-tools': 'ai_tools',
+    'software': 'software',
+    'free-tools': 'free_tools',
+    'paid-tools': 'paid_tools',
+  };
+  
+  const mappedType = type ? productTypeMapping[type] : 'ai_tools';
+  
+  // State management
+  const { activeType, setActiveType } = useProductTypeFilter({
+    defaultType: mappedType,
+    syncWithUrl: false, // We handle URL manually
   });
-
-  const getPageTitle = () => {
-    const titleMap: Record<string, string> = {
-      'ai-tools': 'AI Tools',
-      'free-tools': 'Free Tools',
-      'paid-tools': 'Paid Tools',
-      'software': 'Software'
-    };
-    return titleMap[type || ''] || 'Products';
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubTab, setActiveSubTab] = useState<'all' | 'featured' | 'newly_launched'>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortBy, setSortBy] = useState<string>('newly_added');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Fetch categories for the active type
+  const { data: categories, isLoading: categoriesLoading } = useCategoriesByProductType(activeType);
+  
+  // Fetch product stats
+  const { data: productStats, isLoading: statsLoading } = useProductStats();
+  
+  // Build product filters
+  const productFilters: any = {
+    productType: activeType,
+    sortBy,
+    sortOrder,
+  };
+  
+  if (activeCategory) {
+    productFilters.categoryId = activeCategory;
+  }
+  
+  if (activeSubTab === 'featured') {
+    productFilters.isFeatured = true;
+  } else if (activeSubTab === 'newly_launched') {
+    productFilters.isNewlyLaunched = true;
+  }
+  
+  // Fetch products
+  const { data: products = [], isLoading: productsLoading } = useProducts(productFilters);
+  
+  // Helper function to get page title based on type
+  const getPageTitle = (type: string | undefined): string => {
+    switch (type) {
+      case 'ai-tools':
+        return 'AI Tools';
+      case 'software':
+        return 'Software';
+      case 'free-tools':
+        return 'Free Tools';
+      case 'paid-tools':
+        return 'Paid Tools';
+      default:
+        return 'Tools';
+    }
+  };
+  
+  // Helper function to get page description
+  const getPageDescription = (type: string | undefined): string => {
+    switch (type) {
+      case 'ai-tools':
+        return 'Explore our collection of AI-powered tools and solutions';
+      case 'software':
+        return 'Discover software tools and applications';
+      case 'free-tools':
+        return 'Browse our collection of free tools and resources';
+      case 'paid-tools':
+        return 'Premium tools and paid solutions';
+      default:
+        return 'Browse our tools collection';
+    }
   };
 
-  const handleSaveProduct = (productId: string) => {
-    console.log('Save product:', productId);
-  };
-
-  if (isLoading) {
+  if (!mappedType) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-muted rounded w-1/4 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i} className="h-80 bg-muted"></Card>
-            ))}
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-4">Page Not Found</h1>
+            <p className="text-muted-foreground mb-6">The tool type you're looking for doesn't exist.</p>
+            <Button asChild>
+              <Link to="/">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Home
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Error Loading Products</h1>
-        <p className="text-muted-foreground">There was an error loading the products.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">{getPageTitle()}</h1>
-        <p className="text-muted-foreground">
-          Discover amazing {getPageTitle().toLowerCase()} to boost your productivity
-        </p>
-      </div>
-
-      {products.length === 0 ? (
-        <div className="text-center py-12">
-          <h2 className="text-xl font-semibold mb-2">No products found</h2>
-          <p className="text-muted-foreground">
-            No {getPageTitle().toLowerCase()} available at the moment.
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-6">
+          <Button variant="ghost" asChild className="mb-4">
+            <Link to="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Link>
+          </Button>
+          
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            {getPageTitle(type)}
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            {getPageDescription(type)}
           </p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={{
-                id: product.id,
-                name: product.name,
-                description: product.description || '',
-                image: product.image_url || '/placeholder.svg',
-                category: product.category?.name || 'Uncategorized',
-                isFree: product.is_free || false,
-                isFeatured: product.is_featured || false,
-                originalPrice: product.original_price || undefined,
-                discountedPrice: product.discounted_price || undefined,
-                currency: (product.currency as 'USD' | 'INR') || 'USD',
-                ctaText: product.cta_button_text || 'Learn More',
-                launchDate: product.created_at,
-                viewsCount: product.views_count || 0,
-                slug: product.slug,
-                isAffiliate: !!product.affiliate_link,
-                affiliateLink: product.affiliate_link || undefined,
-                paymentLink: product.payment_link || undefined,
-              }}
-              onSave={handleSaveProduct}
-              isAuthenticated={false}
+
+        {/* Two-Column Layout */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left Sidebar */}
+          <aside className="w-full lg:w-64 space-y-4 flex-shrink-0">
+            {/* Product Type Filter */}
+            <div className="bg-card rounded-lg border p-4">
+              <h3 className="text-sm font-semibold text-foreground mb-3">Filter by Type</h3>
+              <ProductTypeFilter
+                activeType={activeType}
+                onTypeChange={setActiveType}
+                productStats={productStats}
+                isLoading={statsLoading}
+                layout="vertical"
+              />
+            </div>
+
+            {/* Category Sidebar */}
+            <ToolSidebar
+              categories={categories || []}
+              activeCategory={activeCategory}
+              onCategorySelect={setActiveCategory}
+              productCount={products.length}
+              activeSubTab={activeSubTab}
+              onSubTabSelect={setActiveSubTab}
+              activeToolType={activeType}
             />
-          ))}
+          </aside>
+
+          {/* Main Content */}
+          <main className="flex-1 min-w-0">
+            {/* View Controls */}
+            <div className="mb-6">
+              <ProductViewControls
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+                sortOrder={sortOrder}
+                onSortOrderChange={setSortOrder}
+                totalCount={products.length}
+              />
+            </div>
+
+            {/* Products Display */}
+            {categoriesLoading || productsLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <Skeleton key={i} className="h-64" />
+                ))}
+              </div>
+            ) : viewMode === 'grid' ? (
+              <ProductGridDisplay
+                products={products}
+                isLoading={productsLoading}
+                categoryName={activeCategory ? categories?.find(c => c.id === activeCategory)?.name : undefined}
+              />
+            ) : (
+              <ProductListView
+                products={products}
+              />
+            )}
+          </main>
         </div>
-      )}
+      </div>
     </div>
   );
 };

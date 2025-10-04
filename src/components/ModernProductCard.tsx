@@ -11,23 +11,6 @@ interface ModernProductCardProps {
 }
 
 const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
-  const handleCTAClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // For embedded tools, open in new window
-    if (product.is_embedded_tool && product.tool_url) {
-      window.open(product.tool_url, '_blank', 'noopener,noreferrer');
-      return;
-    }
-    
-    if (product.affiliate_link) {
-      window.open(product.affiliate_link, '_blank');
-    } else if (product.payment_link) {
-      window.open(product.payment_link, '_blank');
-    }
-  };
-
   const formatPrice = (price: number) => {
     return product.currency === 'USD' ? `$${price}` : `₹${price}`;
   };
@@ -137,7 +120,6 @@ const ModernProductCard: React.FC<ModernProductCardProps> = ({ product }) => {
             variant={product.is_free ? "accent" : "default"}
             size="sm"
             className="w-full group-hover:shadow-glow transition-all duration-300"
-            onClick={handleCTAClick}
           >
             <span>{product.cta_button_text || (product.is_free ? 'Use Tool' : 'Get Now')}</span>
             <ExternalLink className="ml-2 h-3 w-3" />

@@ -60,14 +60,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     affiliateLink
   } = product;
 
-  const handleCTAClick = () => {
-    if (isAffiliate && affiliateLink) {
-      window.open(affiliateLink, '_blank');
-    } else if (paymentLink) {
-      window.open(paymentLink, '_blank');
-    }
-  };
-
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -167,11 +159,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   <Button
                     variant={isFree ? "accent" : "hero"}
                     size="sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleCTAClick();
-                    }}
                     className="flex items-center space-x-1"
                   >
                     <span>{ctaText}</span>
@@ -267,11 +254,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <Button
             variant={isFree ? "accent" : "hero"}
             size="sm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleCTAClick();
-            }}
             className="ml-auto flex items-center space-x-1"
           >
             <span>{ctaText}</span>

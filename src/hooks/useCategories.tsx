@@ -34,18 +34,42 @@ export const useCategoriesByProductType = (productType: string) => {
   return useQuery({
     queryKey: ['categories-by-product-type', productType],
     queryFn: async (): Promise<Category[]> => {
-      // Special handling for free_tools - return virtual Calculator category
+      // Special handling for free_tools - query actual categories with free tools
       if (productType === 'free_tools') {
-        return [{
-          id: 'calculator',
-          name: 'Calculator',
-          slug: 'calculator',
-          description: 'Essential calculation tools',
-          icon: '🧮',
-          sort_order: 1,
-          parent_id: null,
-          product_count: 2
-        }];
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('categories')
+          .select(`
+            id,
+            name,
+            slug,
+            description,
+            icon,
+            sort_order,
+            parent_id
+          `)
+          .is('parent_id', null)
+          .order('sort_order', { ascending: true });
+
+        if (categoriesError) throw categoriesError;
+
+        // Count free tools for each category
+        const categoriesWithCounts = await Promise.all(
+          (categoriesData || []).map(async (category) => {
+            const { count } = await supabase
+              .from('products')
+              .select('*', { count: 'exact', head: true })
+              .eq('category_id', category.id)
+              .eq('product_type', 'free_tools');
+
+            return {
+              ...category,
+              product_count: count || 0
+            };
+          })
+        );
+
+        // Only return categories that have free tools
+        return categoriesWithCounts.filter(cat => cat.product_count > 0);
       }
 
       // Get all top-level categories

@@ -24,17 +24,21 @@ export const useProductStats = () => {
       const stats = {
         ai_tools: 0,
         software: 0,
-        free_tools: 2, // Only the 2 static tools (BMI and Percentage calculators)
+        free_tools: 0,
         paid_tools: 0,
-        total: 2 // Start with 2 for the static free tools
+        total: 0
       } as ProductStats;
 
       // Count database products
       (productData || []).forEach(product => {
         const type = product.product_type || 'software';
         
-        // Skip free_tools from database as we only show static tools for this type
-        if (type === 'free_tools') return;
+        // Count free_tools from database
+        if (type === 'free_tools') {
+          stats.free_tools += 1;
+          stats.total += 1;
+          return;
+        }
         
         // Count by product type
         if (type === 'ai_tools') {

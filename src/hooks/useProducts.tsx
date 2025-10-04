@@ -89,8 +89,8 @@ export const useProducts = (options: UseProductsOptions = {}) => {
 
       if (productType) {
         if (productType === 'free_tools') {
-          // Show all products where is_free = true OR price = 0, regardless of product_type
-          query = query.or('is_free.eq.true,and(original_price.eq.0,discounted_price.eq.0),and(original_price.is.null,discounted_price.is.null)');
+          // Only show products explicitly categorized as free_tools
+          query = query.eq('product_type', 'free_tools');
         } else if (productType === 'paid_tools') {
           // For paid tools, filter products with any pricing from any product type
           query = query.or('original_price.gt.0,discounted_price.gt.0');

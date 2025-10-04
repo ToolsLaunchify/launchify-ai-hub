@@ -653,6 +653,16 @@ const ProductsManagement: React.FC = () => {
                     <SelectItem value="paid_tools">Paid Tools</SelectItem>
                   </SelectContent>
                 </Select>
+                <div className="mt-2 p-3 bg-muted/50 rounded-md border border-border">
+                  <p className="text-sm font-medium text-foreground mb-2">📍 Where will this appear?</p>
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p><strong>AI Tools:</strong> Appears in "AI Tools" tab</p>
+                    <p><strong>Software:</strong> Appears in "Software" tab</p>
+                    <p><strong>Free Tools:</strong> Appears in "Free Tools" tab</p>
+                    <p><strong>Paid Tools:</strong> Appears in "Paid Tools" tab</p>
+                    <p className="text-amber-600 dark:text-amber-500 pt-1"><strong>💡 Smart Display:</strong> Products can appear in multiple tabs based on "Is Free" toggle and pricing below</p>
+                  </div>
+                </div>
               </div>
 
               {/* Revenue Type Selection */}

@@ -88,15 +88,15 @@ export const useProducts = (options: UseProductsOptions = {}) => {
       }
 
       if (productType) {
-        if (productType === 'paid_tools') {
+        if (productType === 'free_tools') {
+          // Show all products where is_free = true OR price = 0, regardless of product_type
+          query = query.or('is_free.eq.true,and(original_price.eq.0,discounted_price.eq.0),and(original_price.is.null,discounted_price.is.null)');
+        } else if (productType === 'paid_tools') {
           // For paid tools, filter products with any pricing from any product type
           query = query.or('original_price.gt.0,discounted_price.gt.0');
         } else if (productType === 'software') {
           // Software includes both 'software' and 'digital_products' types
           query = query.in('product_type', ['software', 'digital_products']);
-        } else if (productType === 'free_tools') {
-          // For free_tools, return empty query as we handle these statically in ModernHomepage
-          return [];
         } else {
           // For other types (ai_tools), filter by exact product type
           query = query.eq('product_type', productType);

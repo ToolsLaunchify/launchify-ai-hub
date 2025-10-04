@@ -11,8 +11,6 @@ import ProductListView from './ProductListView';
 import { useProductStats } from '@/hooks/useProductStats';
 import { useCategoriesByProductType } from '@/hooks/useCategories';
 import { useProducts } from '@/hooks/useProducts';
-import percentageCalculatorIcon from '@/assets/percentage-calculator-icon.jpg';
-import bmiCalculatorIcon from '@/assets/bmi-calculator-icon.jpg';
 
 const ModernHomepage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,85 +35,16 @@ const ModernHomepage: React.FC = () => {
   const { data: productStats, isLoading: statsLoading } = useProductStats();
   const { data: categories = [], isLoading: categoriesLoading } = useCategoriesByProductType(activeToolType);
   
-  // Products query based on active filters
-  const { data: databaseProducts = [], isLoading: productsLoading } = useProducts({
-    productType: activeToolType === 'paid_tools' ? undefined : activeToolType,
+  // Products query based on active filters - now all products come from database
+  const { data: displayProducts = [], isLoading: productsLoading } = useProducts({
+    productType: activeToolType,
     categoryId: activeCategory || undefined,
     limit: 200,
-    isPaid: activeToolType === 'paid_tools' ? true : undefined,
-    isFree: activeToolType === 'free_tools' ? true : undefined,
     isFeatured: activeSubTab === 'featured' ? true : undefined,
     isNewlyLaunched: activeSubTab === 'newly_launched' ? true : undefined,
     sortBy: sortBy,
     sortOrder: sortOrder
   });
-
-  // Static free tools that are not in the database
-  const staticFreeTools = activeToolType === 'free_tools' ? [
-    {
-      id: 'percentage-calculator',
-      name: 'Percentage Calculator',
-      slug: 'percentage-calculator',
-      description: 'Calculate percentages, percentage changes, and percentage of totals with ease.',
-      rich_description: null,
-      image_url: percentageCalculatorIcon,
-      category_id: null,
-      product_type: 'free_tools',
-      is_free: true,
-      is_featured: false,
-      is_newly_launched: true,
-      is_popular: false,
-      is_trending: false,
-      is_editors_choice: false,
-      is_embedded_tool: null,
-      tool_url: null,
-      original_price: null,
-      discounted_price: null,
-      currency: null,
-      affiliate_link: '/tools/percentage-calculator',
-      payment_link: null,
-      cta_button_text: 'Use Tool',
-      views_count: 0,
-      saves_count: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      category: null
-    },
-    {
-      id: 'bmi-calculator',
-      name: 'BMI Calculator',
-      slug: 'bmi-calculator',
-      description: 'Calculate your Body Mass Index using metric or imperial units.',
-      rich_description: null,
-      image_url: bmiCalculatorIcon,
-      category_id: null,
-      product_type: 'free_tools',
-      is_free: true,
-      is_featured: false,
-      is_newly_launched: true,
-      is_popular: false,
-      is_trending: false,
-      is_editors_choice: false,
-      is_embedded_tool: null,
-      tool_url: null,
-      original_price: null,
-      discounted_price: null,
-      currency: null,
-      affiliate_link: '/tools/bmi-calculator',
-      payment_link: null,
-      cta_button_text: 'Use Tool',
-      views_count: 0,
-      saves_count: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      category: null
-    }
-  ] : [];
-
-  // Handle different product types
-  const displayProducts = activeToolType === 'free_tools' 
-    ? (activeCategory === 'calculator' || activeCategory === null ? staticFreeTools : [])
-    : databaseProducts;
 
   // Reset category and sub tab when tool type changes
   useEffect(() => {

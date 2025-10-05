@@ -411,6 +411,16 @@ const ProductsManagement: React.FC = () => {
       }
     }
 
+    // Validate that either image URL or uploaded file exists
+    if (!imageUrl && !imageFile) {
+      toast({
+        title: "Image required",
+        description: "Please provide either an image URL or upload an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Enhanced validation with auto-fixing for file attachments
     const validatedAttachments = [];
     
@@ -973,7 +983,7 @@ const ProductsManagement: React.FC = () => {
                 </div>
                 <div>
                   <Label htmlFor="category_id">Category</Label>
-                  <Select name="category_id" defaultValue={editingProduct?.category_id || ''}>
+                  <Select name="category_id" defaultValue={editingProduct?.category_id || undefined}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
@@ -1076,9 +1086,9 @@ const ProductsManagement: React.FC = () => {
                     <Input
                       id="image_url"
                       name="image_url"
-                      type="url"
+                      type="text"
                       defaultValue={editingProduct?.image_url || ''}
-                      placeholder="https://example.com/image.jpg"
+                      placeholder="https://example.com/image.jpg or upload an image below"
                     />
                   </div>
                   <div>

@@ -1471,6 +1471,29 @@ const ProductsManagement: React.FC = () => {
         </TabsList>
       </Tabs>
 
+      {/* Trash Warning Banner */}
+      {showTrash && (
+        <Card className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800">
+          <CardContent className="pt-6">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-600 dark:text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-400">
+                  Auto-Delete Policy
+                </h3>
+                <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-500">
+                  Products in trash are automatically deleted after 90 days. Items close to expiration are highlighted in red.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filters */}
       <div className="flex items-center space-x-4 flex-wrap gap-2">
         <div className="relative flex-1 max-w-sm">
@@ -1554,17 +1577,27 @@ const ProductsManagement: React.FC = () => {
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Category</TableHead>
-                   <TableHead>Type</TableHead>
-                   <TableHead>Revenue</TableHead>
-                   <TableHead>Price</TableHead>
-                   <TableHead>Status</TableHead>
-                   <TableHead className="text-center">Views</TableHead>
-                   <TableHead className="text-center">Saves</TableHead>
-                   <TableHead className="text-center">Affiliate</TableHead>
-                   <TableHead className="text-center">Payment</TableHead>
-                   <TableHead>Actions</TableHead>
+                   <TableHead>Product</TableHead>
+                   <TableHead>Category</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Revenue</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Status</TableHead>
+                    {showTrash ? (
+                      <>
+                        <TableHead>Deleted On</TableHead>
+                        <TableHead className="text-center">Days in Trash</TableHead>
+                        <TableHead className="text-center">Days Remaining</TableHead>
+                      </>
+                    ) : (
+                      <>
+                        <TableHead className="text-center">Views</TableHead>
+                        <TableHead className="text-center">Saves</TableHead>
+                        <TableHead className="text-center">Affiliate</TableHead>
+                        <TableHead className="text-center">Payment</TableHead>
+                      </>
+                    )}
+                    <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1625,31 +1658,95 @@ const ProductsManagement: React.FC = () => {
                         <span className="text-muted-foreground">Not set</span>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <ProductStatusIndicator
-                        hasAffiliateLink={!!product.affiliate_link}
-                        hasPaymentLink={!!product.payment_link}
-                        revenueType={product.revenue_type}
-                      />
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center space-x-1">
-                        <Eye className="h-4 w-4 text-muted-foreground" />
-                        <span>{product.views_count || 0}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center space-x-1">
-                        <Bookmark className="h-4 w-4 text-muted-foreground" />
-                        <span>{product.saves_count || 0}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <span className="font-medium">{getAffiliateClickCount(product.id)}</span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <span className="font-medium">{getPaymentClickCount(product.id)}</span>
-                    </TableCell>
+                     <TableCell>
+                       <ProductStatusIndicator
+                         hasAffiliateLink={!!product.affiliate_link}
+                         hasPaymentLink={!!product.payment_link}
+                         revenueType={product.revenue_type}
+                       />
+                     </TableCell>
+                     {showTrash ? (
+                       <>
+                         <TableCell>
+                           {product.deleted_at ? (
+                             <div className="text-sm">
+                               {new Date(product.deleted_at).toLocaleDateString('en-US', { 
+                                 month: 'short', 
+                                 day: 'numeric', 
+                                 year: 'numeric' 
+                               })}
+                             </div>
+                           ) : (
+                             <span className="text-muted-foreground text-xs">N/A</span>
+                           )}
+                         </TableCell>
+                         <TableCell className="text-center">
+                           {product.deleted_at ? (
+                             <Badge variant="outline">
+                               {Math.floor((Date.now() - new Date(product.deleted_at).getTime()) / (1000 * 60 * 60 * 24))} days
+                             </Badge>
+                           ) : (
+                             <span className="text-muted-foreground text-xs">N/A</span>
+                           )}
+                         </TableCell>
+                         <TableCell className="text-center">
+                           {product.deleted_at ? (() => {
+                             const daysRemaining = 90 - Math.floor((Date.now() - new Date(product.deleted_at).getTime()) / (1000 * 60 * 60 * 24));
+                             const isExpired = daysRemaining <= 0;
+                             const isWarning = daysRemaining > 0 && daysRemaining < 10;
+                             const isCaution = daysRemaining >= 10 && daysRemaining <= 30;
+                             
+                             return (
+                               <div className="flex items-center justify-center space-x-2">
+                                 <Badge 
+                                   variant={isExpired ? "destructive" : "outline"}
+                                   className={
+                                     isExpired 
+                                       ? "bg-red-100 text-red-800 border-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800" 
+                                       : isWarning 
+                                       ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/50 dark:text-red-400 dark:border-red-900"
+                                       : isCaution
+                                       ? "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-400 dark:border-yellow-900"
+                                       : "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border-green-900"
+                                   }
+                                 >
+                                   {isExpired ? (
+                                     <>❌ Expired</>
+                                   ) : isWarning ? (
+                                     <>⚠️ {daysRemaining} days</>
+                                   ) : (
+                                     <>{daysRemaining} days</>
+                                   )}
+                                 </Badge>
+                               </div>
+                             );
+                           })() : (
+                             <span className="text-muted-foreground text-xs">N/A</span>
+                           )}
+                         </TableCell>
+                       </>
+                     ) : (
+                       <>
+                         <TableCell className="text-center">
+                           <div className="flex items-center justify-center space-x-1">
+                             <Eye className="h-4 w-4 text-muted-foreground" />
+                             <span>{product.views_count || 0}</span>
+                           </div>
+                         </TableCell>
+                         <TableCell className="text-center">
+                           <div className="flex items-center justify-center space-x-1">
+                             <Bookmark className="h-4 w-4 text-muted-foreground" />
+                             <span>{product.saves_count || 0}</span>
+                           </div>
+                         </TableCell>
+                         <TableCell className="text-center">
+                           <span className="font-medium">{getAffiliateClickCount(product.id)}</span>
+                         </TableCell>
+                         <TableCell className="text-center">
+                           <span className="font-medium">{getPaymentClickCount(product.id)}</span>
+                         </TableCell>
+                       </>
+                     )}
                     <TableCell>
                       <TooltipProvider>
                         <div className="flex items-center space-x-1">

@@ -1,1 +1,4 @@
 project_id = "gazyicdietwqakxnbwmp"
+
+[functions.auto-delete-trash]
+verify_jwt = false

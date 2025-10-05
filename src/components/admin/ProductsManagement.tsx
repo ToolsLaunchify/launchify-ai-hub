@@ -1461,11 +1461,17 @@ const ProductsManagement: React.FC = () => {
         onValueChange={(v) => setShowTrash(v === "trash")}
         className="w-full"
       >
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="active">
+        <TabsList className="grid w-full max-w-md grid-cols-2 border-2 border-border bg-muted/30 p-1.5">
+          <TabsTrigger 
+            value="active"
+            className="data-[state=active]:border-2 data-[state=active]:border-blue-500 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-950/50 dark:data-[state=active]:text-blue-300 data-[state=active]:shadow-lg transition-all font-semibold"
+          >
             Active Products
           </TabsTrigger>
-          <TabsTrigger value="trash">
+          <TabsTrigger 
+            value="trash"
+            className="data-[state=active]:border-2 data-[state=active]:border-red-500 data-[state=active]:bg-red-50 data-[state=active]:text-red-700 dark:data-[state=active]:bg-red-950/50 dark:data-[state=active]:text-red-300 data-[state=active]:shadow-lg transition-all font-semibold"
+          >
             <Trash2 className="h-4 w-4 mr-2" />
             Trash
           </TabsTrigger>

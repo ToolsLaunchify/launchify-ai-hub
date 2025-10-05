@@ -1454,6 +1454,23 @@ const ProductsManagement: React.FC = () => {
       {/* Analytics Widget */}
       {showAnalytics && <ProductAnalyticsWidget />}
 
+      {/* Trash/Active View Toggle */}
+      <Tabs 
+        value={showTrash ? "trash" : "active"} 
+        onValueChange={(v) => setShowTrash(v === "trash")}
+        className="w-full"
+      >
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="active">
+            Active Products
+          </TabsTrigger>
+          <TabsTrigger value="trash">
+            <Trash2 className="h-4 w-4 mr-2" />
+            Trash
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       {/* Filters */}
       <div className="flex items-center space-x-4 flex-wrap gap-2">
         <div className="relative flex-1 max-w-sm">

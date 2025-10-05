@@ -8,9 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import RichTextEditor from '@/components/ui/rich-text-editor';
 import { RevenueTypeIndicator } from '@/components/RevenueTypeIndicator';
+import { ProductAnalyticsWidget } from '@/components/admin/ProductAnalyticsWidget';
+import { BulkActionsToolbar } from '@/components/admin/BulkActionsToolbar';
+import { ProductStatusIndicator } from '@/components/admin/ProductStatusIndicator';
 import { 
   Dialog, 
   DialogContent, 
@@ -44,7 +48,10 @@ import {
   Search,
   Filter,
   Upload,
-  X
+  X,
+  Bookmark,
+  Copy,
+  BarChart3
 } from 'lucide-react';
 
 interface Product {
@@ -114,6 +121,10 @@ const ProductsManagement: React.FC = () => {
   const [fileAttachments, setFileAttachments] = useState<any[]>([]);
   const [videoCourses, setVideoCourses] = useState<any[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [showAnalytics, setShowAnalytics] = useState(true);
+  const [sortBy, setSortBy] = useState<string>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -587,6 +598,93 @@ const ProductsManagement: React.FC = () => {
     return category ? category.name : 'No Category';
   };
 
+  // Bulk actions handlers
+  const handleSelectAll = () => {
+    if (selectedProducts.length === products.length) {
+      setSelectedProducts([]);
+    } else {
+      setSelectedProducts(products.map(p => p.id));
+    }
+  };
+
+  const handleSelectProduct = (productId: string) => {
+    setSelectedProducts(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      for (const productId of selectedProducts) {
+        await supabase.from('products').delete().eq('id', productId);
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      setSelectedProducts([]);
+      toast({
+        title: "Products deleted",
+        description: `${selectedProducts.length} products have been deleted.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete products.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBulkEdit = async (field: string, value: any) => {
+    try {
+      for (const productId of selectedProducts) {
+        await supabase
+          .from('products')
+          .update({ [field === 'category' ? 'category_id' : field]: value })
+          .eq('id', productId);
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      setSelectedProducts([]);
+      toast({
+        title: "Products updated",
+        description: `${selectedProducts.length} products have been updated.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update products.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDuplicate = (product: Product) => {
+    setEditingProduct({
+      ...product,
+      id: '',
+      name: `${product.name} (Copy)`,
+      slug: `${product.slug}-copy`,
+    });
+    setRichDescription(product.rich_description || '');
+    setFileAttachments(product.file_attachments || []);
+    setVideoCourses(product.video_courses || []);
+    setImageFile(null);
+    setIsDialogOpen(true);
+  };
+
+  // Sort products
+  const sortedProducts = [...products].sort((a, b) => {
+    const order = sortOrder === 'asc' ? 1 : -1;
+    if (sortBy === 'name') {
+      return order * a.name.localeCompare(b.name);
+    } else if (sortBy === 'views_count') {
+      return order * ((a.views_count || 0) - (b.views_count || 0));
+    } else if (sortBy === 'saves_count') {
+      return order * ((a.saves_count || 0) - (b.saves_count || 0));
+    }
+    return order * (new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -595,6 +693,11 @@ const ProductsManagement: React.FC = () => {
           <h2 className="text-2xl font-bold">Products Management</h2>
           <p className="text-muted-foreground">Add, edit, and manage your tools and software listings</p>
         </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowAnalytics(!showAnalytics)}>
+            <BarChart3 className="mr-2 h-4 w-4" />
+            {showAnalytics ? 'Hide' : 'Show'} Analytics
+          </Button>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={openAddDialog}>
@@ -1178,7 +1281,11 @@ const ProductsManagement: React.FC = () => {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
+
+      {/* Analytics Widget */}
+      {showAnalytics && <ProductAnalyticsWidget />}
 
       {/* Filters */}
       <div className="flex items-center space-x-4 flex-wrap gap-2">
@@ -1216,6 +1323,24 @@ const ProductsManagement: React.FC = () => {
             <SelectItem value="paid_tools">Paid Tools</SelectItem>
           </SelectContent>
         </Select>
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="created_at">Date Created</SelectItem>
+            <SelectItem value="name">Name</SelectItem>
+            <SelectItem value="views_count">Views</SelectItem>
+            <SelectItem value="saves_count">Saves</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+        >
+          {sortOrder === 'asc' ? '↑' : '↓'}
+        </Button>
       </div>
 
       {/* Products Table */}
@@ -1235,19 +1360,32 @@ const ProductsManagement: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedProducts.length === products.length && products.length > 0}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </TableHead>
                   <TableHead>Product</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Revenue Type</TableHead>
+                  <TableHead>Revenue</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Views</TableHead>
+                  <TableHead className="text-center">Views</TableHead>
+                  <TableHead className="text-center">Saves</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
+                {sortedProducts.map((product) => (
                   <TableRow key={product.id}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedProducts.includes(product.id)}
+                        onCheckedChange={() => handleSelectProduct(product.id)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         {product.image_url && (
@@ -1298,27 +1436,47 @@ const ProductsManagement: React.FC = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-1">
-                        {product.is_featured && (
-                          <Badge variant="default">Featured</Badge>
-                        )}
-                        {product.is_free && (
-                          <Badge variant="secondary">Free</Badge>
-                        )}
-                      </div>
+                      <ProductStatusIndicator
+                        hasAffiliateLink={!!product.affiliate_link}
+                        hasPaymentLink={!!product.payment_link}
+                        revenueType={product.revenue_type}
+                      />
                     </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center space-x-1">
                         <Eye className="h-4 w-4 text-muted-foreground" />
                         <span>{product.views_count || 0}</span>
                       </div>
                     </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center space-x-1">
+                        <Bookmark className="h-4 w-4 text-muted-foreground" />
+                        <span>{product.saves_count || 0}</span>
+                      </div>
+                    </TableCell>
                     <TableCell>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1">
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          onClick={() => window.open(`/${product.slug || product.id}`, '_blank')}
+                          title="Preview"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDuplicate(product)}
+                          title="Duplicate"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => openEditDialog(product)}
+                          title="Edit"
                         >
                           <PenSquare className="h-4 w-4" />
                         </Button>
@@ -1347,6 +1505,15 @@ const ProductsManagement: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Bulk Actions Toolbar */}
+      <BulkActionsToolbar
+        selectedCount={selectedProducts.length}
+        onBulkDelete={handleBulkDelete}
+        onBulkEdit={handleBulkEdit}
+        onClearSelection={() => setSelectedProducts([])}
+        categories={categories}
+      />
     </div>
   );
 };

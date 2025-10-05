@@ -15,6 +15,23 @@ import { RevenueTypeIndicator } from '@/components/RevenueTypeIndicator';
 import { ProductAnalyticsWidget } from '@/components/admin/ProductAnalyticsWidget';
 import { BulkActionsToolbar } from '@/components/admin/BulkActionsToolbar';
 import { ProductStatusIndicator } from '@/components/admin/ProductStatusIndicator';
+import { useRevenueAnalytics } from '@/hooks/useRevenueAnalytics';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Dialog, 
   DialogContent, 
@@ -125,8 +142,12 @@ const ProductsManagement: React.FC = () => {
   const [showAnalytics, setShowAnalytics] = useState(true);
   const [sortBy, setSortBy] = useState<string>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch revenue analytics for sorting by clicks
+  const { data: revenueAnalytics } = useRevenueAnalytics();
 
   // Fetch products
   const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -243,12 +264,14 @@ const ProductsManagement: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      setDeletingProductId(null);
       toast({
         title: "Product deleted",
         description: "The product has been successfully deleted.",
       });
     },
     onError: (error: any) => {
+      setDeletingProductId(null);
       toast({
         title: "Error",
         description: error.message || "Failed to delete product.",
@@ -256,6 +279,16 @@ const ProductsManagement: React.FC = () => {
       });
     }
   });
+
+  const handleDeleteClick = (productId: string) => {
+    setDeletingProductId(productId);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingProductId) {
+      deleteProductMutation.mutate(deletingProductId);
+    }
+  };
 
   const handleImageUpload = async (file: File): Promise<string> => {
     const fileExt = file.name.split('.').pop();
@@ -672,18 +705,41 @@ const ProductsManagement: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  // Sort products
-  const sortedProducts = [...products].sort((a, b) => {
-    const order = sortOrder === 'asc' ? 1 : -1;
-    if (sortBy === 'name') {
-      return order * a.name.localeCompare(b.name);
-    } else if (sortBy === 'views_count') {
-      return order * ((a.views_count || 0) - (b.views_count || 0));
-    } else if (sortBy === 'saves_count') {
-      return order * ((a.saves_count || 0) - (b.saves_count || 0));
-    }
-    return order * (new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-  });
+  // Sort products with analytics integration
+  const sortedProducts = React.useMemo(() => {
+    return [...products].sort((a, b) => {
+      const order = sortOrder === 'asc' ? 1 : -1;
+      
+      // Handle analytics-based sorting
+      if (sortBy === 'affiliate_clicks') {
+        const aClicks = revenueAnalytics?.clicksByProduct?.find(p => p.product_id === a.id)?.affiliate_clicks || 0;
+        const bClicks = revenueAnalytics?.clicksByProduct?.find(p => p.product_id === b.id)?.affiliate_clicks || 0;
+        return order * (bClicks - aClicks);
+      }
+      
+      if (sortBy === 'payment_clicks') {
+        const aClicks = revenueAnalytics?.clicksByProduct?.find(p => p.product_id === a.id)?.payment_clicks || 0;
+        const bClicks = revenueAnalytics?.clicksByProduct?.find(p => p.product_id === b.id)?.payment_clicks || 0;
+        return order * (bClicks - aClicks);
+      }
+      
+      if (sortBy === 'total_clicks') {
+        const aClicks = revenueAnalytics?.clicksByProduct?.find(p => p.product_id === a.id)?.total_clicks || 0;
+        const bClicks = revenueAnalytics?.clicksByProduct?.find(p => p.product_id === b.id)?.total_clicks || 0;
+        return order * (bClicks - aClicks);
+      }
+      
+      // Handle standard sorting
+      if (sortBy === 'name') {
+        return order * a.name.localeCompare(b.name);
+      } else if (sortBy === 'views_count') {
+        return order * ((a.views_count || 0) - (b.views_count || 0));
+      } else if (sortBy === 'saves_count') {
+        return order * ((a.saves_count || 0) - (b.saves_count || 0));
+      }
+      return order * (new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    });
+  }, [products, sortBy, sortOrder, revenueAnalytics]);
 
   return (
     <div className="space-y-6">
@@ -1324,20 +1380,24 @@ const ProductsManagement: React.FC = () => {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[220px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="created_at">Date Created</SelectItem>
-            <SelectItem value="name">Name</SelectItem>
-            <SelectItem value="views_count">Views</SelectItem>
-            <SelectItem value="saves_count">Saves</SelectItem>
+            <SelectItem value="created_at">📅 Recently Added</SelectItem>
+            <SelectItem value="name">🔤 Name</SelectItem>
+            <SelectItem value="views_count">👁️ Most Views</SelectItem>
+            <SelectItem value="saves_count">🔖 Most Saves</SelectItem>
+            <SelectItem value="affiliate_clicks">💰 Most Affiliate Clicks</SelectItem>
+            <SelectItem value="payment_clicks">💳 Most Payment Clicks</SelectItem>
+            <SelectItem value="total_clicks">📊 Total Clicks</SelectItem>
           </SelectContent>
         </Select>
         <Button
           variant="outline"
           size="icon"
           onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+          title={sortOrder === 'asc' ? 'Ascending' : 'Descending'}
         >
           {sortOrder === 'asc' ? '↑' : '↓'}
         </Button>
@@ -1368,13 +1428,15 @@ const ProductsManagement: React.FC = () => {
                   </TableHead>
                   <TableHead>Product</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Revenue</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-center">Views</TableHead>
-                  <TableHead className="text-center">Saves</TableHead>
-                  <TableHead>Actions</TableHead>
+                   <TableHead>Type</TableHead>
+                   <TableHead>Revenue</TableHead>
+                   <TableHead>Price</TableHead>
+                   <TableHead>Status</TableHead>
+                   <TableHead className="text-center">Views</TableHead>
+                   <TableHead className="text-center">Saves</TableHead>
+                   <TableHead className="text-center">Affiliate</TableHead>
+                   <TableHead className="text-center">Payment</TableHead>
+                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

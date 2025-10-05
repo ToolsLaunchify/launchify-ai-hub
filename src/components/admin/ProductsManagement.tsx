@@ -533,8 +533,12 @@ const ProductsManagement: React.FC = () => {
     const slug = customPermalink || (formData.get('name') as string).toLowerCase().replace(/\s+/g, '-');
     
     // Helper to sanitize UUID fields - convert empty strings to null
-    const sanitizeUUID = (value: string | null): string | null => {
-      if (!value || value === '' || value.trim() === '') return null;
+    const sanitizeUUID = (value: any): string | null => {
+      // Handle null, undefined, empty string, or whitespace
+      if (value === null || value === undefined || value === '' || 
+          (typeof value === 'string' && value.trim() === '')) {
+        return null;
+      }
       return value;
     };
 
@@ -830,13 +834,13 @@ const ProductsManagement: React.FC = () => {
     // Auto-fill the form with extracted data
     setEditingProduct(prev => ({
       ...(prev || {}),
-      id: prev?.id || '',
+      id: prev?.id || undefined,
       name: data.name || prev?.name || '',
       slug: data.slug || prev?.slug || '',
       description: data.description || prev?.description || '',
       rich_description: data.rich_description || prev?.rich_description || '',
       image_url: data.image_url || prev?.image_url || '',
-      category_id: prev?.category_id || '',
+      category_id: prev?.category_id || null,
       product_type: data.product_type || prev?.product_type || 'software',
       original_price: data.original_price || prev?.original_price || 0,
       discounted_price: data.discounted_price || prev?.discounted_price || 0,

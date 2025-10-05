@@ -555,52 +555,61 @@ const ProductsManagement: React.FC = () => {
       return value;
     };
 
-    const productData = {
-      name: formData.get('name') as string,
-      slug: slug,
-      description: formData.get('description') as string,
-      rich_description: richDescription,
-      image_url: imageUrl,
-      category_id: sanitizeUUID(formData.get('category_id') as string),
-      sub_category_id: sanitizeUUID(formData.get('sub_category_id') as string),
-      product_type: formData.get('product_type') as string || 'software',
-      revenue_type: formData.get('revenue_type') as 'affiliate' | 'payment' | 'free' | 'mixed' || 'free',
-      collect_email: formData.get('collect_email') === 'true',
-      original_price: formData.get('original_price') ? Number(formData.get('original_price')) : null,
-      discounted_price: formData.get('discounted_price') ? Number(formData.get('discounted_price')) : null,
-      currency: formData.get('currency') as string || 'USD',
-      is_featured: formData.get('is_featured') === 'on',
-      is_free: formData.get('is_free') === 'on',
-      is_newly_launched: formData.get('is_newly_launched') === 'on',
-      is_popular: formData.get('is_popular') === 'on',
-      is_trending: formData.get('is_trending') === 'on',
-      is_editors_choice: formData.get('is_editors_choice') === 'on',
-      affiliate_link: formData.get('affiliate_link') as string,
-      payment_link: formData.get('payment_link') as string,
-      cta_button_text: formData.get('cta_button_text') as string || 'Learn More',
-      custom_permalink: customPermalink,
-      file_attachments: processedFileAttachments,
-      video_courses: processedVideoCourses,
-      custom_code: formData.get('custom_code') as string,
-      // SEO fields
-      meta_title: formData.get('meta_title') as string,
-      meta_description: formData.get('meta_description') as string,
-      keywords: (formData.get('keywords') as string)?.split(',').map(k => k.trim()).filter(k => k) || [],
-      canonical_url: formData.get('canonical_url') as string,
-      og_image_url: formData.get('og_image_url') as string,
-      // Advanced SEO fields
-      focus_keyword: formData.get('focus_keyword') as string,
-      related_keywords: (formData.get('related_keywords') as string)?.split(',').map(k => k.trim()).filter(k => k) || [],
-      seo_title: formData.get('seo_title') as string,
-      social_title: formData.get('social_title') as string,
-      social_description: formData.get('social_description') as string,
-      twitter_image_url: formData.get('twitter_image_url') as string,
-    };
+    try {
+      const productData = {
+        name: formData.get('name') as string,
+        slug: slug,
+        description: formData.get('description') as string,
+        rich_description: richDescription,
+        image_url: imageUrl,
+        category_id: sanitizeUUID(formData.get('category_id') as string),
+        // sub_category_id removed - field doesn't exist in form
+        product_type: formData.get('product_type') as string || 'software',
+        revenue_type: formData.get('revenue_type') as 'affiliate' | 'payment' | 'free' | 'mixed' || 'free',
+        collect_email: formData.get('collect_email') === 'true',
+        original_price: formData.get('original_price') ? Number(formData.get('original_price')) : null,
+        discounted_price: formData.get('discounted_price') ? Number(formData.get('discounted_price')) : null,
+        currency: formData.get('currency') as string || 'USD',
+        is_featured: formData.get('is_featured') === 'on',
+        is_free: formData.get('is_free') === 'on',
+        is_newly_launched: formData.get('is_newly_launched') === 'on',
+        is_popular: formData.get('is_popular') === 'on',
+        is_trending: formData.get('is_trending') === 'on',
+        is_editors_choice: formData.get('is_editors_choice') === 'on',
+        affiliate_link: formData.get('affiliate_link') as string,
+        payment_link: formData.get('payment_link') as string,
+        cta_button_text: formData.get('cta_button_text') as string || 'Learn More',
+        custom_permalink: customPermalink,
+        file_attachments: processedFileAttachments,
+        video_courses: processedVideoCourses,
+        custom_code: formData.get('custom_code') as string,
+        // SEO fields
+        meta_title: formData.get('meta_title') as string,
+        meta_description: formData.get('meta_description') as string,
+        keywords: (formData.get('keywords') as string)?.split(',').map(k => k.trim()).filter(k => k) || [],
+        canonical_url: formData.get('canonical_url') as string,
+        og_image_url: formData.get('og_image_url') as string,
+        // Advanced SEO fields
+        focus_keyword: formData.get('focus_keyword') as string,
+        related_keywords: (formData.get('related_keywords') as string)?.split(',').map(k => k.trim()).filter(k => k) || [],
+        seo_title: formData.get('seo_title') as string,
+        social_title: formData.get('social_title') as string,
+        social_description: formData.get('social_description') as string,
+        twitter_image_url: formData.get('twitter_image_url') as string,
+      };
 
-    if (editingProduct) {
-      updateProductMutation.mutate({ ...productData, id: editingProduct.id });
-    } else {
-      createProductMutation.mutate(productData);
+      if (editingProduct) {
+        updateProductMutation.mutate({ ...productData, id: editingProduct.id });
+      } else {
+        createProductMutation.mutate(productData);
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      toast({
+        title: "Save Failed",
+        description: "There was an error saving the product. Please check all fields and try again.",
+        variant: "destructive",
+      });
     }
   };
 

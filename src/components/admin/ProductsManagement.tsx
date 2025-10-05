@@ -98,6 +98,7 @@ interface Product {
   saves_count: number;
   created_at: string;
   custom_permalink: string;
+  deleted_at: string | null;
   file_attachments: any[];
   video_courses: any[];
   custom_code: string;

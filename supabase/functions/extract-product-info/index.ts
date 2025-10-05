@@ -254,20 +254,46 @@ CRITICAL REQUIREMENTS:
     const aiContent = aiData.choices[0].message.content;
     
     console.log('AI response received, parsing JSON...');
+    console.log('Response preview (first 500 chars):', aiContent.substring(0, 500));
 
     // Parse AI response and extract JSON
     let extractedData;
     try {
-      // Try to find JSON in the response
-      const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+      // Strip markdown code blocks if present (```json ... ```)
+      let cleanedContent = aiContent.trim();
+      if (cleanedContent.startsWith('```')) {
+        console.log('Removing markdown code blocks from response');
+        // Remove opening ```json or ```
+        cleanedContent = cleanedContent.replace(/^```(?:json)?\s*/i, '');
+        // Remove closing ```
+        cleanedContent = cleanedContent.replace(/\s*```\s*$/i, '');
+      }
+      
+      // Try to find JSON in the cleaned response
+      const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         extractedData = JSON.parse(jsonMatch[0]);
       } else {
-        extractedData = JSON.parse(aiContent);
+        extractedData = JSON.parse(cleanedContent);
       }
+      
+      // Validate essential fields
+      if (!extractedData.name || !extractedData.description) {
+        console.error('Missing required fields. Extracted data:', JSON.stringify(extractedData).substring(0, 500));
+        throw new Error('AI extraction incomplete - missing name or description');
+      }
+      
+      // Warn if rich description is too short
+      if (extractedData.rich_description && extractedData.rich_description.length < 500) {
+        console.warn('Rich description is shorter than expected:', extractedData.rich_description.length, 'characters');
+      } else if (extractedData.rich_description) {
+        console.log('Rich description extracted successfully:', extractedData.rich_description.length, 'characters');
+      }
+      
     } catch (parseError) {
-      console.error('Failed to parse AI response:', aiContent);
-      throw new Error('Failed to parse AI response as JSON');
+      console.error('JSON parse error:', parseError);
+      console.error('Failed content (first 1000 chars):', aiContent.substring(0, 1000));
+      throw new Error(`Failed to parse AI response: ${parseError.message}`);
     }
 
     // Add original URL and additional metadata

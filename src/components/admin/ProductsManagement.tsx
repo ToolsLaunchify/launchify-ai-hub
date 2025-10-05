@@ -1459,18 +1459,18 @@ const ProductsManagement: React.FC = () => {
       <Tabs 
         value={showTrash ? "trash" : "active"} 
         onValueChange={(v) => setShowTrash(v === "trash")}
-        className="w-full"
+        className="w-full mb-6"
       >
-        <TabsList className="grid w-full max-w-md grid-cols-2 border-2 border-border bg-muted/30 p-1.5">
+        <TabsList className="inline-flex h-auto border-2 border-border bg-muted/30 p-1.5 rounded-lg">
           <TabsTrigger 
             value="active"
-            className="data-[state=active]:border-2 data-[state=active]:border-blue-500 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-950/50 dark:data-[state=active]:text-blue-300 data-[state=active]:shadow-lg transition-all font-semibold"
+            className="border border-border bg-muted/50 hover:bg-muted/80 data-[state=active]:border-2 data-[state=active]:border-blue-500 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-950/50 dark:data-[state=active]:text-blue-300 data-[state=active]:shadow-lg transition-all font-semibold px-6 py-2"
           >
             Active Products
           </TabsTrigger>
           <TabsTrigger 
             value="trash"
-            className="data-[state=active]:border-2 data-[state=active]:border-red-500 data-[state=active]:bg-red-50 data-[state=active]:text-red-700 dark:data-[state=active]:bg-red-950/50 dark:data-[state=active]:text-red-300 data-[state=active]:shadow-lg transition-all font-semibold"
+            className="border border-border bg-muted/50 hover:bg-muted/80 data-[state=active]:border-2 data-[state=active]:border-red-500 data-[state=active]:bg-red-50 data-[state=active]:text-red-700 dark:data-[state=active]:bg-red-950/50 dark:data-[state=active]:text-red-300 data-[state=active]:shadow-lg transition-all font-semibold px-6 py-2"
           >
             <Trash2 className="h-4 w-4 mr-2" />
             Trash

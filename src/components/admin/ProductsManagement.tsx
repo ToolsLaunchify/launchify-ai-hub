@@ -544,8 +544,8 @@ const ProductsManagement: React.FC = () => {
     
     // Helper to sanitize UUID fields - convert empty strings to null
     const sanitizeUUID = (value: any): string | null => {
-      // Handle null, undefined, empty string, or whitespace
-      if (value === null || value === undefined || value === '' || 
+      // Handle null, undefined, empty string, whitespace, or string "undefined"
+      if (value === null || value === undefined || value === '' || value === 'undefined' ||
           (typeof value === 'string' && value.trim() === '')) {
         return null;
       }

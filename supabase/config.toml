@@ -2,3 +2,6 @@ project_id = "gazyicdietwqakxnbwmp"
 
 [functions.auto-delete-trash]
 verify_jwt = false
+
+[functions.extract-product-info]
+verify_jwt = false

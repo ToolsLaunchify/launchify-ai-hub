@@ -17,6 +17,7 @@ import { ProductAnalyticsWidget } from '@/components/admin/ProductAnalyticsWidge
 import { BulkActionsToolbar } from '@/components/admin/BulkActionsToolbar';
 import { ProductStatusIndicator } from '@/components/admin/ProductStatusIndicator';
 import { useRevenueAnalytics } from '@/hooks/useRevenueAnalytics';
+import { SmartProductImport } from '@/components/admin/SmartProductImport';
 import {
   Tooltip,
   TooltipContent,
@@ -148,6 +149,7 @@ const ProductsManagement: React.FC = () => {
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
   const [permanentDeletingProductId, setPermanentDeletingProductId] = useState<string | null>(null);
   const [showTrash, setShowTrash] = useState(false);
+  const [extractedData, setExtractedData] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -813,6 +815,65 @@ const ProductsManagement: React.FC = () => {
     setIsDialogOpen(true);
   };
 
+  const handleExtractedData = (data: any) => {
+    console.log('Received extracted data:', data);
+    setExtractedData(data);
+    
+    // Auto-fill the form with extracted data
+    setEditingProduct(prev => ({
+      ...(prev || {}),
+      id: prev?.id || '',
+      name: data.name || prev?.name || '',
+      slug: data.slug || prev?.slug || '',
+      description: data.description || prev?.description || '',
+      rich_description: data.rich_description || prev?.rich_description || '',
+      image_url: data.image_url || prev?.image_url || '',
+      category_id: prev?.category_id || '',
+      product_type: data.product_type || prev?.product_type || 'software',
+      original_price: data.original_price || prev?.original_price || 0,
+      discounted_price: data.discounted_price || prev?.discounted_price || 0,
+      currency: data.currency || prev?.currency || 'USD',
+      is_featured: prev?.is_featured || false,
+      is_free: data.original_price === null || data.original_price === 0,
+      is_newly_launched: prev?.is_newly_launched || false,
+      is_popular: prev?.is_popular || false,
+      is_trending: prev?.is_trending || false,
+      is_editors_choice: prev?.is_editors_choice || false,
+      affiliate_link: data.affiliate_link || prev?.affiliate_link || '',
+      payment_link: prev?.payment_link || '',
+      cta_button_text: data.cta_button_text || prev?.cta_button_text || 'Learn More',
+      views_count: prev?.views_count || 0,
+      saves_count: prev?.saves_count || 0,
+      created_at: prev?.created_at || new Date().toISOString(),
+      custom_permalink: prev?.custom_permalink || '',
+      deleted_at: null,
+      file_attachments: prev?.file_attachments || [],
+      video_courses: prev?.video_courses || [],
+      custom_code: prev?.custom_code || '',
+      revenue_type: prev?.revenue_type || 'free',
+      collect_email: prev?.collect_email || false,
+      meta_title: data.meta_title || prev?.meta_title || '',
+      meta_description: data.meta_description || prev?.meta_description || '',
+      keywords: data.keywords || prev?.keywords || [],
+      canonical_url: prev?.canonical_url || '',
+      og_image_url: data.image_url || prev?.og_image_url || '',
+      alt_text: prev?.alt_text || '',
+      schema_markup: prev?.schema_markup || {},
+      focus_keyword: data.focus_keyword || prev?.focus_keyword || '',
+      related_keywords: prev?.related_keywords || [],
+      content_score: prev?.content_score || 0,
+      seo_title: data.meta_title || prev?.seo_title || '',
+      social_title: data.meta_title || prev?.social_title || '',
+      social_description: data.meta_description || prev?.social_description || '',
+      twitter_image_url: data.image_url || prev?.twitter_image_url || '',
+      structured_data_type: prev?.structured_data_type || 'Product',
+      faq_data: data.faq_data || prev?.faq_data || [],
+      howto_data: data.howto_data || prev?.howto_data || [],
+    } as Product));
+
+    setRichDescription(data.rich_description || '');
+  };
+
   // Sort products with analytics integration
   const sortedProducts = React.useMemo(() => {
     return [...products].sort((a, b) => {
@@ -879,6 +940,11 @@ const ProductsManagement: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Smart Product Import Section */}
+              {!editingProduct?.id && (
+                <SmartProductImport onDataExtracted={handleExtractedData} />
+              )}
+              
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Product Name *</Label>

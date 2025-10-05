@@ -531,13 +531,20 @@ const ProductsManagement: React.FC = () => {
     const customPermalink = formData.get('custom_permalink') as string;
     const slug = customPermalink || (formData.get('name') as string).toLowerCase().replace(/\s+/g, '-');
     
+    // Helper to sanitize UUID fields - convert empty strings to null
+    const sanitizeUUID = (value: string | null): string | null => {
+      if (!value || value === '' || value.trim() === '') return null;
+      return value;
+    };
+
     const productData = {
       name: formData.get('name') as string,
       slug: slug,
       description: formData.get('description') as string,
       rich_description: richDescription,
       image_url: imageUrl,
-      category_id: formData.get('category_id') as string || null,
+      category_id: sanitizeUUID(formData.get('category_id') as string),
+      sub_category_id: sanitizeUUID(formData.get('sub_category_id') as string),
       product_type: formData.get('product_type') as string || 'software',
       revenue_type: formData.get('revenue_type') as 'affiliate' | 'payment' | 'free' | 'mixed' || 'free',
       collect_email: formData.get('collect_email') === 'true',

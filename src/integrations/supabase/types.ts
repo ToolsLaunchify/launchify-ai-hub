@@ -560,6 +560,8 @@ export type Database = {
           currency: string | null
           custom_code: string | null
           custom_permalink: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           discounted_price: number | null
           faq_data: Json | null
@@ -568,6 +570,7 @@ export type Database = {
           howto_data: Json | null
           id: string
           image_url: string | null
+          is_deleted: boolean | null
           is_editors_choice: boolean | null
           is_embedded_tool: boolean | null
           is_featured: boolean | null
@@ -618,6 +621,8 @@ export type Database = {
           currency?: string | null
           custom_code?: string | null
           custom_permalink?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           discounted_price?: number | null
           faq_data?: Json | null
@@ -626,6 +631,7 @@ export type Database = {
           howto_data?: Json | null
           id?: string
           image_url?: string | null
+          is_deleted?: boolean | null
           is_editors_choice?: boolean | null
           is_embedded_tool?: boolean | null
           is_featured?: boolean | null
@@ -676,6 +682,8 @@ export type Database = {
           currency?: string | null
           custom_code?: string | null
           custom_permalink?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           discounted_price?: number | null
           faq_data?: Json | null
@@ -684,6 +692,7 @@ export type Database = {
           howto_data?: Json | null
           id?: string
           image_url?: string | null
+          is_deleted?: boolean | null
           is_editors_choice?: boolean | null
           is_embedded_tool?: boolean | null
           is_featured?: boolean | null

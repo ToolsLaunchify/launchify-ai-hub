@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { uploadFileToStorage, generateYouTubeThumbnail, validateFileType, validateFileSize } from '@/lib/fileStorage';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -68,7 +69,8 @@ import {
   X,
   Bookmark,
   Copy,
-  BarChart3
+  BarChart3,
+  Undo2
 } from 'lucide-react';
 
 interface Product {
@@ -143,6 +145,8 @@ const ProductsManagement: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
+  const [permanentDeletingProductId, setPermanentDeletingProductId] = useState<string | null>(null);
+  const [showTrash, setShowTrash] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -151,11 +155,12 @@ const ProductsManagement: React.FC = () => {
 
   // Fetch products
   const { data: products = [], isLoading: productsLoading } = useQuery({
-    queryKey: ['admin-products', searchQuery, filterCategory, filterProductType],
+    queryKey: ['admin-products', searchQuery, filterCategory, filterProductType, showTrash],
     queryFn: async () => {
       let query = supabase
         .from('products')
         .select('*')
+        .eq('is_deleted', showTrash)
         .order('created_at', { ascending: false });
 
       if (searchQuery) {
@@ -253,28 +258,94 @@ const ProductsManagement: React.FC = () => {
     }
   });
 
-  // Delete product mutation
-  const deleteProductMutation = useMutation({
+  // Soft delete (move to trash) mutation
+  const softDeleteMutation = useMutation({
     mutationFn: async (id: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('products')
-        .delete()
+        .update({ 
+          is_deleted: true,
+          deleted_at: new Date().toISOString(),
+          deleted_by: user?.id
+        })
         .eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
       setDeletingProductId(null);
+      setSelectedProducts([]);
       toast({
-        title: "Product deleted",
-        description: "The product has been successfully deleted.",
+        title: "Moved to Trash",
+        description: "Product moved to trash successfully. You can restore it anytime.",
       });
     },
     onError: (error: any) => {
       setDeletingProductId(null);
       toast({
         title: "Error",
-        description: error.message || "Failed to delete product.",
+        description: error.message || "Failed to move product to trash.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Restore mutation
+  const restoreMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('products')
+        .update({ 
+          is_deleted: false,
+          deleted_at: null,
+          deleted_by: null
+        })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      setSelectedProducts([]);
+      toast({
+        title: "Product Restored",
+        description: "Product restored successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to restore product.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Permanent delete mutation
+  const permanentDeleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id)
+        .eq('is_deleted', true);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      setPermanentDeletingProductId(null);
+      setSelectedProducts([]);
+      toast({
+        title: "Permanently Deleted",
+        description: "Product permanently deleted from database.",
+        variant: "destructive",
+      });
+    },
+    onError: (error: any) => {
+      setPermanentDeletingProductId(null);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to permanently delete product.",
         variant: "destructive",
       });
     }
@@ -286,7 +357,17 @@ const ProductsManagement: React.FC = () => {
 
   const handleConfirmDelete = () => {
     if (deletingProductId) {
-      deleteProductMutation.mutate(deletingProductId);
+      softDeleteMutation.mutate(deletingProductId);
+    }
+  };
+
+  const handlePermanentDeleteClick = (productId: string) => {
+    setPermanentDeletingProductId(productId);
+  };
+
+  const handleConfirmPermanentDelete = () => {
+    if (permanentDeletingProductId) {
+      permanentDeleteMutation.mutate(permanentDeletingProductId);
     }
   };
 
@@ -662,19 +743,37 @@ const ProductsManagement: React.FC = () => {
 
   const handleBulkDelete = async () => {
     try {
-      for (const productId of selectedProducts) {
-        await supabase.from('products').delete().eq('id', productId);
+      if (showTrash) {
+        // Permanent delete from trash
+        for (const productId of selectedProducts) {
+          await permanentDeleteMutation.mutateAsync(productId);
+        }
+      } else {
+        // Soft delete (move to trash)
+        for (const productId of selectedProducts) {
+          await softDeleteMutation.mutateAsync(productId);
+        }
       }
-      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
       setSelectedProducts([]);
-      toast({
-        title: "Products deleted",
-        description: `${selectedProducts.length} products have been deleted.`,
-      });
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to delete products.",
+        description: error.message || "Failed to process bulk action.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBulkRestore = async () => {
+    try {
+      for (const productId of selectedProducts) {
+        await restoreMutation.mutateAsync(productId);
+      }
+      setSelectedProducts([]);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to restore products.",
         variant: "destructive",
       });
     }
@@ -768,7 +867,7 @@ const ProductsManagement: React.FC = () => {
           </Button>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openAddDialog}>
+            <Button onClick={openAddDialog} disabled={showTrash}>
               <Plus className="mr-2 h-4 w-4" />
               Add Product
             </Button>
@@ -1537,65 +1636,101 @@ const ProductsManagement: React.FC = () => {
                     <TableCell>
                       <TooltipProvider>
                         <div className="flex items-center space-x-1">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => window.open(`/${product.slug || product.id}`, '_blank')}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Preview Product Page</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDuplicate(product)}
-                              >
-                                <Copy className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Duplicate Product</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => openEditDialog(product)}
-                              >
-                                <PenSquare className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit Product Details</p>
-                            </TooltipContent>
-                          </Tooltip>
-                          
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleDeleteClick(product.id)}
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Delete Product (Requires Confirmation)</p>
-                            </TooltipContent>
-                          </Tooltip>
+                          {showTrash ? (
+                            <>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => restoreMutation.mutate(product.id)}
+                                  >
+                                    <Undo2 className="h-4 w-4 text-green-600" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Restore Product</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handlePermanentDeleteClick(product.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Delete Permanently</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </>
+                          ) : (
+                            <>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => window.open(`/${product.slug || product.id}`, '_blank')}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Preview Product Page</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleDuplicate(product)}
+                                  >
+                                    <Copy className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Duplicate Product</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => openEditDialog(product)}
+                                  >
+                                    <PenSquare className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Edit Product Details</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleDeleteClick(product.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Move to Trash</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </>
+                          )}
                           
                           {(product.affiliate_link || product.payment_link) && (
                             <Tooltip>
@@ -1631,25 +1766,46 @@ const ProductsManagement: React.FC = () => {
         onBulkEdit={handleBulkEdit}
         onClearSelection={() => setSelectedProducts([])}
         categories={categories}
+        isTrashView={showTrash}
+        onBulkRestore={showTrash ? handleBulkRestore : undefined}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {/* Move to Trash Dialog */}
       <AlertDialog open={!!deletingProductId} onOpenChange={() => setDeletingProductId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Product?</AlertDialogTitle>
+            <AlertDialogTitle>Move to Trash?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "<span className="font-semibold">{products.find(p => p.id === deletingProductId)?.name}</span>"? 
-              This action cannot be undone and will permanently remove all product data.
+              Move "<span className="font-semibold">{products.find(p => p.id === deletingProductId)?.name}</span>" to trash? 
+              You can restore it later from the Trash section.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmDelete}
+            <AlertDialogAction onClick={handleConfirmDelete}>
+              Move to Trash
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Permanent Delete Dialog */}
+      <AlertDialog open={!!permanentDeletingProductId} onOpenChange={() => setPermanentDeletingProductId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>⚠️ Permanently Delete Product?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p className="font-semibold text-destructive">WARNING: This action CANNOT be undone!</p>
+              <p>Permanently delete "<span className="font-semibold">{products.find(p => p.id === permanentDeletingProductId)?.name}</span>"?</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmPermanentDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Permanently
+              Delete Forever
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

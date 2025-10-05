@@ -26,7 +26,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Trash2, Edit, X } from 'lucide-react';
+import { Trash2, Edit, X, Undo2 } from 'lucide-react';
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
@@ -34,6 +34,8 @@ interface BulkActionsToolbarProps {
   onBulkEdit: (field: string, value: any) => void;
   onClearSelection: () => void;
   categories: Array<{ id: string; name: string }>;
+  isTrashView?: boolean;
+  onBulkRestore?: () => void;
 }
 
 export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
@@ -42,6 +44,8 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
   onBulkEdit,
   onClearSelection,
   categories,
+  isTrashView = false,
+  onBulkRestore,
 }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -83,41 +87,64 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
           <div className="h-6 w-px bg-border" />
 
           <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleBulkEdit('category')}
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              Change Category
-            </Button>
+            {isTrashView ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={onBulkRestore}
+                >
+                  <Undo2 className="mr-2 h-4 w-4" />
+                  Restore Selected
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Forever
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleBulkEdit('category')}
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Change Category
+                </Button>
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleBulkEdit('product_type')}
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              Change Type
-            </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleBulkEdit('product_type')}
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Change Type
+                </Button>
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleBulkEdit('revenue_type')}
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              Change Revenue
-            </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleBulkEdit('revenue_type')}
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Change Revenue
+                </Button>
 
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={() => setShowDeleteDialog(true)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Selected
-            </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Move to Trash
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -126,9 +153,13 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {selectedCount} products?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {isTrashView ? `Permanently delete ${selectedCount} products?` : `Move ${selectedCount} products to trash?`}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the selected products from the database.
+              {isTrashView 
+                ? "⚠️ WARNING: This action CANNOT be undone! This will permanently delete the selected products from the database."
+                : "You can restore these products later from the Trash section."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -138,9 +169,9 @@ export const BulkActionsToolbar: React.FC<BulkActionsToolbarProps> = ({
                 onBulkDelete();
                 setShowDeleteDialog(false);
               }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className={isTrashView ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : ""}
             >
-              Delete All
+              {isTrashView ? 'Delete Forever' : 'Move to Trash'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -631,6 +631,18 @@ const ProductsManagement: React.FC = () => {
     return category ? category.name : 'No Category';
   };
 
+  const getAffiliateClickCount = (productId: string): number => {
+    if (!revenueAnalytics?.clicksByProduct) return 0;
+    const productClicks = revenueAnalytics.clicksByProduct.find(p => p.product_id === productId);
+    return productClicks?.affiliate_clicks || 0;
+  };
+
+  const getPaymentClickCount = (productId: string): number => {
+    if (!revenueAnalytics?.clicksByProduct) return 0;
+    const productClicks = revenueAnalytics.clicksByProduct.find(p => p.product_id === productId);
+    return productClicks?.payment_clicks || 0;
+  };
+
   // Bulk actions handlers
   const handleSelectAll = () => {
     if (selectedProducts.length === products.length) {
@@ -1516,49 +1528,93 @@ const ProductsManagement: React.FC = () => {
                         <span>{product.saves_count || 0}</span>
                       </div>
                     </TableCell>
+                    <TableCell className="text-center">
+                      <span className="font-medium">{getAffiliateClickCount(product.id)}</span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className="font-medium">{getPaymentClickCount(product.id)}</span>
+                    </TableCell>
                     <TableCell>
-                      <div className="flex items-center space-x-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => window.open(`/${product.slug || product.id}`, '_blank')}
-                          title="Preview"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDuplicate(product)}
-                          title="Duplicate"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditDialog(product)}
-                          title="Edit"
-                        >
-                          <PenSquare className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteProductMutation.mutate(product.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                        {(product.affiliate_link || product.payment_link) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => window.open(product.affiliate_link || product.payment_link, '_blank')}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
+                      <TooltipProvider>
+                        <div className="flex items-center space-x-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => window.open(`/${product.slug || product.id}`, '_blank')}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Preview Product Page</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDuplicate(product)}
+                              >
+                                <Copy className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Duplicate Product</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => openEditDialog(product)}
+                              >
+                                <PenSquare className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit Product Details</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteClick(product.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete Product (Requires Confirmation)</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          
+                          {(product.affiliate_link || product.payment_link) && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => window.open(product.affiliate_link || product.payment_link, '_blank')}
+                                >
+                                  <ExternalLink className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Open {product.affiliate_link ? 'Affiliate' : 'Payment'} Link</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                      </TooltipProvider>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -1576,6 +1632,28 @@ const ProductsManagement: React.FC = () => {
         onClearSelection={() => setSelectedProducts([])}
         categories={categories}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingProductId} onOpenChange={() => setDeletingProductId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Product?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "<span className="font-semibold">{products.find(p => p.id === deletingProductId)?.name}</span>"? 
+              This action cannot be undone and will permanently remove all product data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

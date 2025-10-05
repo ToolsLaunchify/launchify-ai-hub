@@ -150,6 +150,7 @@ const ProductsManagement: React.FC = () => {
   const [permanentDeletingProductId, setPermanentDeletingProductId] = useState<string | null>(null);
   const [showTrash, setShowTrash] = useState(false);
   const [extractedData, setExtractedData] = useState<any>(null);
+  const [formKey, setFormKey] = useState<string>(Date.now().toString());
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -879,6 +880,9 @@ const ProductsManagement: React.FC = () => {
     } as Product));
 
     setRichDescription(data.rich_description || '');
+    
+    // Force form re-render with new data
+    setFormKey(Date.now().toString());
   };
 
   // Sort products with analytics integration
@@ -946,7 +950,7 @@ const ProductsManagement: React.FC = () => {
                 {editingProduct ? 'Update the product information below.' : 'Create a new product listing for your platform.'}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form key={formKey} onSubmit={handleSubmit} className="space-y-6">
               {/* Smart Product Import Section */}
               {!editingProduct?.id && (
                 <SmartProductImport onDataExtracted={handleExtractedData} />

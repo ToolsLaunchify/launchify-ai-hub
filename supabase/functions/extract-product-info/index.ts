@@ -361,21 +361,56 @@ CRITICAL REQUIREMENTS:
     // Parse AI response using tool calling (structured output)
     let extractedData;
     try {
-      // Extract from tool call response
+      // Try tool calling first (recommended approach)
       const toolCalls = aiData.choices[0].message.tool_calls;
       
-      if (!toolCalls || toolCalls.length === 0) {
-        console.error('No tool calls in response. AI response:', JSON.stringify(aiData).substring(0, 500));
-        throw new Error('AI did not use the extraction tool');
+      if (toolCalls && toolCalls.length > 0) {
+        const toolCall = toolCalls[0];
+        console.log('Using tool call response:', toolCall.function.name);
+        
+        // Parse the structured arguments (already properly escaped by AI)
+        extractedData = JSON.parse(toolCall.function.arguments);
+        console.log('Successfully parsed structured data from tool call');
+      } else {
+        // Fallback to manual parsing with sanitization
+        console.log('No tool calls found, using fallback sanitization method');
+        const aiContent = aiData.choices[0].message.content;
+        
+        if (!aiContent) {
+          throw new Error('No content or tool calls in AI response');
+        }
+        
+        console.log('Response preview (first 500 chars):', aiContent.substring(0, 500));
+        
+        // Strip markdown code blocks if present (```json ... ```)
+        let cleanedContent = aiContent.trim();
+        if (cleanedContent.startsWith('```')) {
+          console.log('Removing markdown code blocks from response');
+          cleanedContent = cleanedContent.replace(/^```(?:json)?\s*/i, '');
+          cleanedContent = cleanedContent.replace(/\s*```\s*$/i, '');
+        }
+        
+        // Sanitize control characters and problematic characters
+        console.log('Sanitizing control characters...');
+        cleanedContent = cleanedContent
+          .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, '') // Remove control chars except \n and \t
+          .replace(/\\/g, '\\\\') // Escape backslashes first
+          .replace(/\r\n/g, '\\n') // Escape Windows line breaks
+          .replace(/\n/g, '\\n') // Escape line breaks
+          .replace(/\t/g, '\\t') // Escape tabs
+          .replace(/\f/g, '\\f') // Escape form feeds
+          .replace(/"/g, '\\"'); // Escape quotes
+        
+        // Try to find JSON in the cleaned response
+        const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          extractedData = JSON.parse(jsonMatch[0]);
+        } else {
+          extractedData = JSON.parse(cleanedContent);
+        }
+        
+        console.log('Successfully parsed sanitized JSON');
       }
-      
-      const toolCall = toolCalls[0];
-      console.log('Tool call received:', toolCall.function.name);
-      
-      // Parse the structured arguments (already properly escaped by AI)
-      extractedData = JSON.parse(toolCall.function.arguments);
-      
-      console.log('Successfully parsed structured data');
       
       // Validate essential fields
       if (!extractedData.name || !extractedData.description) {
@@ -391,9 +426,9 @@ CRITICAL REQUIREMENTS:
       }
       
     } catch (parseError) {
-      console.error('Structured data parse error:', parseError);
+      console.error('Data extraction error:', parseError);
       console.error('AI response structure:', JSON.stringify(aiData).substring(0, 1000));
-      throw new Error(`Failed to parse structured AI response: ${parseError.message}`);
+      throw new Error(`Failed to extract product data: ${parseError.message}`);
     }
 
     // Add original URL and additional metadata

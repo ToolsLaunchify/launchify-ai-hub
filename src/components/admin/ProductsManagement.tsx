@@ -173,12 +173,8 @@ const ProductsManagement: React.FC = () => {
       }
 
       if (filterProductType !== 'all') {
-        if (filterProductType === 'free_tools') {
-          // For free tools, show products marked as free regardless of product_type
-          query = query.eq('is_free', true);
-        } else {
-          query = query.eq('product_type', filterProductType);
-        }
+      // Filter by product_type for all cases, including free_tools
+      query = query.eq('product_type', filterProductType);
       }
 
       const { data, error } = await query;

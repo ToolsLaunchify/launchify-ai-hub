@@ -222,13 +222,117 @@ CRITICAL REQUIREMENTS:
         messages: [
           {
             role: 'system',
-            content: 'You are an expert product reviewer and content strategist. Your task is to create comprehensive, detailed product review articles that inform and engage readers. Extract all available data from webpages and generate professional content. Always return valid JSON only.'
+            content: 'You are an expert product reviewer and content strategist. Your task is to create comprehensive, detailed product review articles that inform and engage readers. Extract all available data from webpages and generate professional content.'
           },
           {
             role: 'user',
             content: aiPrompt
           }
         ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "extract_product_info",
+              description: "Extract comprehensive product information from webpage content",
+              parameters: {
+                type: "object",
+                properties: {
+                  name: { type: "string", description: "Exact product name" },
+                  slug: { type: "string", description: "URL-friendly slug" },
+                  description: { type: "string", description: "2-3 sentence elevator pitch" },
+                  rich_description: { type: "string", description: "Complete HTML article (1200+ words minimum)" },
+                  image_url: { type: "string", description: "Primary product image URL" },
+                  original_price: { type: ["number", "null"], description: "Original price if available" },
+                  discounted_price: { type: ["number", "null"], description: "Discounted price if available" },
+                  currency: { type: "string", description: "Currency code (USD/EUR/etc)" },
+                  affiliate_link: { type: "string", description: "Main product/demo/signup URL" },
+                  payment_link: { type: "string", description: "Purchase or pricing page URL" },
+                  cta_button_text: { type: "string", description: "Primary CTA text" },
+                  product_type: { type: "string", description: "Product category type" },
+                  product_tags: { type: "array", items: { type: "string" }, description: "10-15 relevant tags" },
+                  meta_title: { type: "string", description: "SEO meta title (55-60 chars)" },
+                  meta_description: { type: "string", description: "SEO meta description (150-160 chars)" },
+                  keywords: { type: "array", items: { type: "string" }, description: "Primary keywords" },
+                  related_keywords: { type: "array", items: { type: "string" }, description: "Related keywords" },
+                  focus_keyword: { type: "string", description: "Primary SEO keyword" },
+                  seo_title: { type: "string", description: "H1 title" },
+                  social_title: { type: "string", description: "Social media title" },
+                  social_description: { type: "string", description: "Social media description" },
+                  faq_data: { 
+                    type: "array", 
+                    items: { 
+                      type: "object",
+                      properties: {
+                        question: { type: "string" },
+                        answer: { type: "string" }
+                      }
+                    }
+                  },
+                  howto_data: { 
+                    type: "array", 
+                    items: { 
+                      type: "object",
+                      properties: {
+                        step: { type: "number" },
+                        title: { type: "string" },
+                        description: { type: "string" }
+                      }
+                    }
+                  },
+                  features: { type: "array", items: { type: "string" }, description: "8-15 features" },
+                  benefits: { type: "array", items: { type: "string" }, description: "6-10 benefits" },
+                  pros: { type: "array", items: { type: "string" }, description: "6-8 pros" },
+                  cons: { type: "array", items: { type: "string" }, description: "3-5 cons" },
+                  use_cases: { type: "array", items: { type: "string" }, description: "5-7 use cases" },
+                  target_audience: { type: "string", description: "Description of ideal users" },
+                  pricing_tiers: { 
+                    type: "array", 
+                    items: { 
+                      type: "object",
+                      properties: {
+                        name: { type: "string" },
+                        price: { type: ["number", "string"] },
+                        currency: { type: "string" },
+                        features: { type: "array", items: { type: "string" } }
+                      }
+                    }
+                  },
+                  suggested_category: { type: "string", description: "Best matching category slug" },
+                  is_free: { type: "boolean", description: "Whether product is free" },
+                  tool_url: { type: "string", description: "Direct product URL" },
+                  demo_url: { type: "string", description: "Demo or trial URL" },
+                  video_urls: { type: "array", items: { type: "string" }, description: "Video URLs" },
+                  screenshots: { type: "array", items: { type: "string" }, description: "Screenshot URLs" },
+                  testimonials: { 
+                    type: "array", 
+                    items: { 
+                      type: "object",
+                      properties: {
+                        quote: { type: "string" },
+                        author: { type: "string" },
+                        role: { type: "string" }
+                      }
+                    }
+                  },
+                  confidence_scores: { 
+                    type: "object",
+                    properties: {
+                      name: { type: "number" },
+                      description: { type: "number" },
+                      rich_description: { type: "number" },
+                      pricing: { type: "number" },
+                      overall: { type: "number" }
+                    }
+                  }
+                },
+                required: ["name", "description", "rich_description"],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: "function", function: { name: "extract_product_info" } }
       }),
     });
 
@@ -251,31 +355,27 @@ CRITICAL REQUIREMENTS:
     }
 
     const aiData = await aiResponse.json();
-    const aiContent = aiData.choices[0].message.content;
     
-    console.log('AI response received, parsing JSON...');
-    console.log('Response preview (first 500 chars):', aiContent.substring(0, 500));
+    console.log('AI response received, extracting structured data...');
 
-    // Parse AI response and extract JSON
+    // Parse AI response using tool calling (structured output)
     let extractedData;
     try {
-      // Strip markdown code blocks if present (```json ... ```)
-      let cleanedContent = aiContent.trim();
-      if (cleanedContent.startsWith('```')) {
-        console.log('Removing markdown code blocks from response');
-        // Remove opening ```json or ```
-        cleanedContent = cleanedContent.replace(/^```(?:json)?\s*/i, '');
-        // Remove closing ```
-        cleanedContent = cleanedContent.replace(/\s*```\s*$/i, '');
+      // Extract from tool call response
+      const toolCalls = aiData.choices[0].message.tool_calls;
+      
+      if (!toolCalls || toolCalls.length === 0) {
+        console.error('No tool calls in response. AI response:', JSON.stringify(aiData).substring(0, 500));
+        throw new Error('AI did not use the extraction tool');
       }
       
-      // Try to find JSON in the cleaned response
-      const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        extractedData = JSON.parse(jsonMatch[0]);
-      } else {
-        extractedData = JSON.parse(cleanedContent);
-      }
+      const toolCall = toolCalls[0];
+      console.log('Tool call received:', toolCall.function.name);
+      
+      // Parse the structured arguments (already properly escaped by AI)
+      extractedData = JSON.parse(toolCall.function.arguments);
+      
+      console.log('Successfully parsed structured data');
       
       // Validate essential fields
       if (!extractedData.name || !extractedData.description) {
@@ -291,9 +391,9 @@ CRITICAL REQUIREMENTS:
       }
       
     } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.error('Failed content (first 1000 chars):', aiContent.substring(0, 1000));
-      throw new Error(`Failed to parse AI response: ${parseError.message}`);
+      console.error('Structured data parse error:', parseError);
+      console.error('AI response structure:', JSON.stringify(aiData).substring(0, 1000));
+      throw new Error(`Failed to parse structured AI response: ${parseError.message}`);
     }
 
     // Add original URL and additional metadata

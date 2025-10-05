@@ -412,7 +412,10 @@ const ProductsManagement: React.FC = () => {
     }
 
     // Validate that either image URL or uploaded file exists
-    if (!imageUrl && !imageFile) {
+    const hasImageUrl = imageUrl && imageUrl.trim() !== '';
+    const hasImageFile = imageFile !== null;
+    
+    if (!hasImageUrl && !hasImageFile) {
       toast({
         title: "Image required",
         description: "Please provide either an image URL or upload an image file.",

@@ -103,91 +103,91 @@ const AdminDashboard: React.FC = () => {
           <TabsList className="w-full flex flex-wrap gap-1 mb-8 bg-muted/30 border-2 border-border p-2 rounded-lg h-auto justify-start">
             <TabsTrigger 
               value="overview" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <BarChart3 className="h-4 w-4" />
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="products" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <Package className="h-4 w-4" />
               Products
             </TabsTrigger>
             <TabsTrigger 
               value="categories" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <Settings className="h-4 w-4" />
               Categories
             </TabsTrigger>
             <TabsTrigger 
               value="pages" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <PenSquare className="h-4 w-4" />
               Pages
             </TabsTrigger>
             <TabsTrigger 
               value="blog" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <BookOpen className="h-4 w-4" />
               Blog
             </TabsTrigger>
             <TabsTrigger 
               value="footer" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <Settings2 className="h-4 w-4" />
               Footer
             </TabsTrigger>
             <TabsTrigger 
               value="users" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <Users className="h-4 w-4" />
               Users
             </TabsTrigger>
             <TabsTrigger 
               value="leads" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <Mail className="h-4 w-4" />
               Leads
             </TabsTrigger>
             <TabsTrigger 
               value="newsletter" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <Mail className="h-4 w-4" />
               Newsletter
             </TabsTrigger>
             <TabsTrigger 
               value="analytics" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <BarChart3 className="h-4 w-4" />
               Analytics
             </TabsTrigger>
             <TabsTrigger 
               value="orders" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <ShoppingCart className="h-4 w-4" />
               Orders
             </TabsTrigger>
             <TabsTrigger 
               value="tool-intelligence" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <Brain className="h-4 w-4" />
               Tool Intelligence
             </TabsTrigger>
             <TabsTrigger 
               value="payment-management" 
-              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-primary data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
+              className="flex items-center gap-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow data-[state=active]:scale-105 rounded-md transition-all px-3 py-2 text-sm whitespace-nowrap font-medium"
             >
               <CreditCard className="h-4 w-4" />
               Payment Management

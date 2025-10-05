@@ -1460,13 +1460,13 @@ const ProductsManagement: React.FC = () => {
         <TabsList className="inline-flex h-auto border-2 border-border bg-muted/30 p-1.5 rounded-lg">
           <TabsTrigger 
             value="active"
-            className="border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-blue-500 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-950/50 dark:data-[state=active]:text-blue-300 data-[state=active]:shadow-lg transition-all font-semibold px-6 py-2"
+            className="border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow transition-all font-semibold px-6 py-2"
           >
             Active Products
           </TabsTrigger>
           <TabsTrigger 
             value="trash"
-            className="border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:border-2 data-[state=active]:border-red-500 data-[state=active]:bg-red-50 data-[state=active]:text-red-700 dark:data-[state=active]:bg-red-950/50 dark:data-[state=active]:text-red-300 data-[state=active]:shadow-lg transition-all font-semibold px-6 py-2"
+            className="border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-400 dark:hover:bg-gray-700 data-[state=active]:bg-destructive data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-lg transition-all font-semibold px-6 py-2"
           >
             <Trash2 className="h-4 w-4 mr-2" />
             Trash

@@ -246,9 +246,9 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
       {/* Detailed Analytics Tabs */}
       <Tabs defaultValue="sources" className="space-y-4">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="sources" className="bg-primary/10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Traffic Sources</TabsTrigger>
-          <TabsTrigger value="products" className="bg-primary/10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Product Performance</TabsTrigger>
-          <TabsTrigger value="activity" className="bg-primary/10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Recent Activity</TabsTrigger>
+          <TabsTrigger value="sources" className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow">Traffic Sources</TabsTrigger>
+          <TabsTrigger value="products" className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow">Product Performance</TabsTrigger>
+          <TabsTrigger value="activity" className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 data-[state=active]:bg-gradient-primary data-[state=active]:text-white data-[state=active]:border-0 data-[state=active]:shadow-glow">Recent Activity</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sources" className="space-y-4">

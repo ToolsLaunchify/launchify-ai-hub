@@ -288,16 +288,10 @@ CRITICAL REQUIREMENTS:
           cleanedContent = cleanedContent.replace(/\s*```\s*$/i, '');
         }
         
-        // Sanitize control characters and problematic characters
+        // Sanitize ONLY truly problematic control characters (not newlines, tabs, backslashes)
         console.log('Sanitizing control characters...');
         cleanedContent = cleanedContent
-          .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, '') // Remove control chars except \n and \t
-          .replace(/\\/g, '\\\\') // Escape backslashes first
-          .replace(/\r\n/g, '\\n') // Escape Windows line breaks
-          .replace(/\n/g, '\\n') // Escape line breaks
-          .replace(/\t/g, '\\t') // Escape tabs
-          .replace(/\f/g, '\\f') // Escape form feeds
-          .replace(/"/g, '\\"'); // Escape quotes
+          .replace(/[\u0000-\u0008\u000B-\u000C\u000E-\u001F\u007F-\u009F]/g, ''); // Remove control chars except \n and \t
         
         // Try to find JSON in the cleaned response
         const jsonMatch = cleanedContent.match(/\{[\s\S]*\}/);
